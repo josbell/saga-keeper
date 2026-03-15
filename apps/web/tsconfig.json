@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "jsx": "react-jsx",
+    "outDir": "dist",
+    "rootDir": "src",
+    "noEmit": true
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../../packages/domain" },
+    { "path": "../../packages/services" },
+    { "path": "../../packages/ai-gateway" },
+    { "path": "../../packages/storage" },
+    { "path": "../../packages/ui" },
+    { "path": "../../packages/rulesets/ironsworn" }
+  ]
+}

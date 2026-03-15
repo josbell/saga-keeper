@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.base.json",
+  "files": [],
+  "references": [
+    { "path": "./packages/domain" },
+    { "path": "./packages/services" },
+    { "path": "./packages/ai-gateway" },
+    { "path": "./packages/storage" },
+    { "path": "./packages/ui" },
+    { "path": "./packages/rulesets/ironsworn" },
+    { "path": "./apps/web" }
+  ]
+}
