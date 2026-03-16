@@ -6,6 +6,7 @@ node_modules/
 dist/
 build/
 .turbo/
+*.tsbuildinfo
 
 # Environment
 .env
@@ -14,6 +15,9 @@ build/
 
 # Coverage
 coverage/
+
+# Claude Code
+claude/
 
 # Editor
 .vscode/
