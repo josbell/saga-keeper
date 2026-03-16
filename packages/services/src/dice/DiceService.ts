@@ -5,7 +5,8 @@ const SIDES: Record<DieType, number> = {
 }
 
 // ── LCG for seeded replay ──────────────────────────────────────────────────
-// Parameters from Numerical Recipes. Gives deterministic replay from seed.
+// Parameters from Numerical Recipes (a=1664525, c=1013904223, m=2^32).
+// Deterministic: same seed always produces the same roll sequence.
 const LCG_A = 1664525
 const LCG_C = 1013904223
 const LCG_M = 2 ** 32
@@ -14,9 +15,19 @@ function lcgNext(state: number): number {
   return (LCG_A * state + LCG_C) % LCG_M
 }
 
-function rollWithLcg(sides: number, state: [number]): number {
-  state[0] = lcgNext(state[0])
-  return (state[0] % sides) + 1
+/** Returns a stateful roller for a given seed.
+ *  - Runs 3 warm-up iterations to avoid low-entropy clustering on small seeds.
+ *  - Uses rejection sampling to eliminate modulo bias. */
+function makeRoller(seed: string): (sides: number) => number {
+  let state = seedToInt(seed)
+  // Warm up: first few LCG outputs from low seeds cluster — discard them
+  state = lcgNext(lcgNext(lcgNext(state)))
+  return (sides: number) => {
+    // Rejection sampling: values ≥ limit would over-represent low faces
+    const limit = LCG_M - (LCG_M % sides)
+    do { state = lcgNext(state) } while (state >= limit)
+    return (state % sides) + 1
+  }
 }
 
 function generateSeed(): string {
@@ -26,30 +37,51 @@ function generateSeed(): string {
 }
 
 function seedToInt(seed: string): number {
+  if (!/^[0-9a-f]{8}$/i.test(seed)) throw new Error(`Invalid seed "${seed}": expected 8 hex chars`)
   return parseInt(seed, 16) >>> 0
 }
 
-function rollFromSeed(seed: string, request: DiceRollRequest): DiceRoll {
-  const state: [number] = [seedToInt(seed)]
-  const actionDie = rollWithLcg(SIDES[request.action], state)
-  const c1 = rollWithLcg(SIDES[request.challenge[0]], state)
-  const c2 = rollWithLcg(SIDES[request.challenge[1]], state)
+function rollFromSeed(seed: string, request: DiceRollRequest, rolledAt?: string): DiceRoll {
+  const roll = makeRoller(seed)
+  const [c0, c1] = request.challenge
+  const actionDie = roll(SIDES[request.action])
+  const challengeDie0 = roll(SIDES[c0])
+  const challengeDie1 = roll(SIDES[c1])
   return {
-    request,
+    request: { ...request, seed },
     actionDie,
-    challengeDice: [c1, c2],
+    challengeDice: [challengeDie0, challengeDie1],
     modifier: request.modifier,
     total: actionDie + request.modifier,
     seed,
-    rolledAt: new Date().toISOString(),
+    rolledAt: rolledAt ?? new Date().toISOString(),
   }
+}
+
+// ── Outcome resolution ─────────────────────────────────────────────────────
+
+export type HitResult = 'strong-hit' | 'weak-hit' | 'miss'
+
+/** Pure function: derives Ironsworn hit result from a completed roll.
+ *  Strong hit: total beats both challenge dice.
+ *  Weak hit:   total beats exactly one.
+ *  Miss:       total beats neither.
+ *  Match:      both challenge dice show the same face (applies at any result). */
+export function resolveOutcome(roll: DiceRoll): { result: HitResult; match: boolean } {
+  const { total, challengeDice: [c0, c1] } = roll
+  const match = c0 === c1
+  if (total > c0 && total > c1) return { result: 'strong-hit', match }
+  if (total > c0 || total > c1) return { result: 'weak-hit', match }
+  return { result: 'miss', match }
 }
 
 // ── Public API ─────────────────────────────────────────────────────────────
 
 export interface IDiceService {
   roll(request: DiceRollRequest): DiceRoll
-  replay(seed: string, request: DiceRollRequest): DiceRoll
+  /** Reproduce a prior roll exactly. Pass the original `rolledAt` timestamp
+   *  from the stored DiceRoll for true session replay fidelity. */
+  replay(seed: string, request: DiceRollRequest, rolledAt?: string): DiceRoll
 }
 
 export const DiceService: IDiceService = {
@@ -57,7 +89,7 @@ export const DiceService: IDiceService = {
     const seed = request.seed ?? generateSeed()
     return rollFromSeed(seed, request)
   },
-  replay(seed, request) {
-    return rollFromSeed(seed, { ...request, seed })
+  replay(seed, request, rolledAt) {
+    return rollFromSeed(seed, request, rolledAt)
   },
 }
