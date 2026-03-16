@@ -1,4 +1,4 @@
-// Ironsworn move catalogue — all 33 core moves from the Ironsworn SRD
+// Ironsworn move catalogue — all 32 core moves from the Ironsworn SRD
 // Ironsworn is licensed under Creative Commons Attribution 4.0 International
 import type { Move } from '@saga-keeper/domain'
 
@@ -31,7 +31,7 @@ export const IRONSWORN_MOVES: Move[] = [
     id: 'gather-information',
     name: 'Gather Information',
     category: 'adventure',
-    stats: ['edge', 'heart', 'iron', 'shadow', 'wits'],
+    stats: ['wits'],
     description:
       'When you search an area, ask questions, conduct research, or follow a track, roll +wits. ' +
       'If you are in the company of another who has relevant knowledge, add +1.',
@@ -41,7 +41,7 @@ export const IRONSWORN_MOVES: Move[] = [
     id: 'heal',
     name: 'Heal',
     category: 'adventure',
-    stats: ['wits', 'heart'],
+    stats: ['wits', 'iron'],
     description:
       'When you treat injuries or ailments, roll +wits. ' +
       'If you are mending your own wounds, roll +wits or +iron, whichever is lower.',
@@ -51,7 +51,7 @@ export const IRONSWORN_MOVES: Move[] = [
     id: 'resupply',
     name: 'Resupply',
     category: 'adventure',
-    stats: ['wits', 'iron'],
+    stats: ['wits'],
     description: 'When you hunt, forage, or scavenge, roll +wits.',
     trigger: 'Hunt, forage, or scavenge',
   },
@@ -227,7 +227,7 @@ export const IRONSWORN_MOVES: Move[] = [
     id: 'draw-the-circle',
     name: 'Draw the Circle',
     category: 'relationship',
-    stats: ['heart', 'shadow'],
+    stats: ['heart', 'iron'],
     description:
       'When you challenge someone to a formal duel or accept one, roll +heart. ' +
       'If you are the challenger, add +1. ' +

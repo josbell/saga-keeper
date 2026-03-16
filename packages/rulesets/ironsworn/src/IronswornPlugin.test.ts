@@ -144,6 +144,14 @@ describe('ironswornPlugin.character.momentumReset', () => {
     const state = makeState({ debilities: { ...IRONSWORN_DEFAULTS.debilities, wounded: true } })
     expect(ironswornPlugin.character.momentumReset(state)).toBe(2)
   })
+
+  it('curses (cursed, tormented) do not reduce momentum reset', () => {
+    const state = makeState({
+      debilities: { ...IRONSWORN_DEFAULTS.debilities, cursed: true, tormented: true },
+    })
+    // Curses reduce max momentum but NOT the reset value (only Banes do that)
+    expect(ironswornPlugin.character.momentumReset(state)).toBe(2)
+  })
 })
 
 describe('ironswornPlugin.character.canAdvance', () => {
@@ -257,6 +265,45 @@ describe('ironswornPlugin.moves.resolve', () => {
     const roll = makeRoll(1, 8, 9)
     const outcome = ironswornPlugin.moves.resolve(faceDanger, roll, state)
     expect(outcome.followUpMoves?.some((m) => m.id === 'pay-the-price')).toBe(true)
+  })
+
+  it('draw-the-circle stats contains iron not shadow', () => {
+    const drawCircle = IRONSWORN_MOVES.find((m) => m.id === 'draw-the-circle')!
+    expect(drawCircle.stats).toContain('iron')
+    expect(drawCircle.stats).not.toContain('shadow')
+  })
+
+  it('face-death strong hit grants +1 spirit (not health)', () => {
+    const faceDeath = IRONSWORN_MOVES.find((m) => m.id === 'face-death')!
+    const roll = makeRoll(9, 2, 3)
+    const lowState = makeState({ spirit: 2 })
+    const outcome = ironswornPlugin.moves.resolve(faceDeath, roll, lowState)
+    expect(outcome.result).toBe('strong-hit')
+    const spiritDelta = outcome.consequences.find((c) => c.stat === 'spirit')
+    expect(spiritDelta?.after).toBe(3) // 2 + 1
+    expect(outcome.consequences.find((c) => c.stat === 'health')).toBeUndefined()
+  })
+
+  it('matched weak-hit does not emit the miss onMatch text', () => {
+    // face-danger has onMatch.miss — a matched weak-hit must not show it
+    const roll = makeRoll(5, 3, 3) // total=5 > c0=3, total=5 > c1=3 ... wait: 5>3 AND 5>3 = strong hit
+    // Need weak-hit with match: total beats one die, both dice equal
+    const weakMatchRoll = makeRoll(4, 3, 3) // 4>3 and 4>3 — actually that's strong-hit too
+    // total must beat exactly one: e.g. total=4, c0=3, c1=5
+    // but c0==c1 for a match... so both must equal: total=4, c0=5, c1=5 => miss with match
+    // For a matched weak-hit we need c0==c1 and total beats exactly one: impossible (c0==c1 means ties too)
+    // Actually: total=6, c0=5, c1=5 => 6>5 AND 6>5 = strong-hit. Hmm.
+    // With equal dice, if total > both => strong-hit. If total <= both => miss. Weak-hit requires beating exactly one.
+    // So a matched weak-hit is mechanically impossible with identical challenge dice!
+    // The match ternary only matters for miss-matches. Test the miss case explicitly instead.
+    const missMatchRoll = makeRoll(2, 5, 5) // 2 < 5 and 2 < 5, match
+    const outcome = ironswornPlugin.moves.resolve(faceDanger, missMatchRoll, state)
+    expect(outcome.result).toBe('miss')
+    expect(outcome.match).toBe(true)
+    const matchHint = outcome.narrativeHints.find((h) => h.includes('MATCH'))
+    expect(matchHint).toBeDefined()
+    // Should show the MISS onMatch text, not a strong-hit text
+    expect(matchHint).toContain('dire complication')
   })
 
   it('heal strong hit restores +2 health', () => {

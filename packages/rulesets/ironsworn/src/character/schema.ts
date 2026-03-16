@@ -1,6 +1,10 @@
+import type { CharacterState } from '@saga-keeper/domain'
+
 export interface IronswornDebilities {
   wounded: boolean; shaken: boolean; unprepared: boolean; encumbered: boolean
-  maimed: boolean; corrupted: boolean; cursed: boolean; tormented: boolean; weak: boolean
+  maimed: boolean; corrupted: boolean; cursed: boolean; tormented: boolean
+  /** weak: custom condition (non-SRD) — reserved for asset/expansion use */
+  weak: boolean
 }
 
 export interface IronswornVow {
@@ -32,4 +36,16 @@ export const IRONSWORN_DEFAULTS: IronswornCharacterData = {
   },
   vows: [], bonds: [], assetIds: [],
   experience: { earned: 0, spent: 0 },
+}
+
+/** Valid [min, max] ranges for each Ironsworn stat and meter */
+export const IRONSWORN_STAT_RANGE: Record<string, [number, number]> = {
+  edge: [1, 4], heart: [1, 4], iron: [1, 4], shadow: [1, 4], wits: [1, 4],
+  health: [0, 5], spirit: [0, 5], supply: [0, 5], momentum: [-6, 10],
+}
+
+/** Type-safe cast from CharacterState.data (Record<string, unknown>) to the
+ *  concrete Ironsworn data shape. Only use inside the ironsworn package. */
+export function toIronswornData(state: CharacterState): IronswornCharacterData {
+  return state.data as unknown as IronswornCharacterData
 }

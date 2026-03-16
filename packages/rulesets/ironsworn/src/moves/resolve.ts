@@ -1,6 +1,7 @@
 // Ironsworn move resolution — derives MoveOutcome from a completed DiceRoll
 import type { CharacterState, DiceRoll, MoveOutcome, Move, StatDelta } from '@saga-keeper/domain'
-import type { IronswornCharacterData } from '../character/schema'
+import { IRONSWORN_STAT_RANGE, toIronswornData } from '../character/schema'
+import { IRONSWORN_MOVES } from './catalogue'
 
 type HitResult = 'strong-hit' | 'weak-hit' | 'miss'
 
@@ -21,19 +22,14 @@ function hitResult(roll: DiceRoll): { result: HitResult; match: boolean } {
 
 // ── Stat clamping ─────────────────────────────────────────────────────────────
 
-const STAT_RANGE: Record<string, [number, number]> = {
-  edge: [1, 4], heart: [1, 4], iron: [1, 4], shadow: [1, 4], wits: [1, 4],
-  health: [0, 5], spirit: [0, 5], supply: [0, 5], momentum: [-6, 10],
-}
-
 function clamp(stat: string, val: number): number {
-  const range = STAT_RANGE[stat]
+  const range = IRONSWORN_STAT_RANGE[stat]
   if (!range) return val
   return Math.max(range[0], Math.min(range[1], val))
 }
 
 function delta(state: CharacterState, stat: string, d: number): StatDelta {
-  const data = state.data as unknown as Record<string, number>
+  const data = toIronswornData(state) as unknown as Record<string, number>
   const before = data[stat] ?? 0
   const after = clamp(stat, before + d)
   return { stat, before, after }
@@ -56,7 +52,7 @@ interface MoveSpec {
   'strong-hit': OutcomeSpec
   'weak-hit': OutcomeSpec
   miss: OutcomeSpec
-  onMatch?: { strongHit?: string; miss?: string }
+  onMatch?: { strongHit?: string; weakHit?: string; miss?: string }
 }
 
 const MOVE_OUTCOMES: Record<string, MoveSpec> = {
@@ -139,8 +135,7 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
       hints: ['The camp restores body and spirit. +1 health, +1 spirit, +1 supply, +1 momentum.'],
     },
     'weak-hit': {
-      deltas: [['health', 1], ['momentum', 1]],
-      hints: ['You rest enough to continue. +1 health, +1 momentum.'],
+      hints: ['You rest enough to continue. Choose one: +2 health, +2 spirit, +2 supply, or +2 momentum.'],
     },
     miss: {
       deltas: [['supply', -1]],
@@ -194,7 +189,6 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
       hints: ['You seize the initiative. +2 momentum. You have initiative.'],
     },
     'weak-hit': {
-      deltas: [['momentum', 2]],
       hints: ['Combat is joined. Choose: take +2 momentum or take initiative. The fight is even.'],
     },
     miss: {
@@ -268,8 +262,7 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
       hints: ['You achieve your objective. +2 momentum.'],
     },
     'weak-hit': {
-      deltas: [['health', -1], ['spirit', -1]],
-      hints: ['You succeed at great cost. -1 health, -1 spirit.'],
+      hints: ['You succeed at great cost. Suffer -2 of one resource: health, spirit, or supply (your choice).'],
     },
     miss: {
       deltas: [['health', -2], ['spirit', -1]],
@@ -279,12 +272,11 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
 
   'face-death': {
     'strong-hit': {
-      deltas: [['health', 1], ['momentum', 1]],
-      hints: ['You cheat death. Return with hard-won clarity. +1 health, +1 momentum.'],
+      deltas: [['spirit', 1], ['momentum', 1]],
+      hints: ['You return from the brink. Hard-won clarity fills you. +1 spirit, +1 momentum.'],
     },
     'weak-hit': {
-      deltas: [['health', 1]],
-      hints: ['You survive, barely. You are alive, but deeply marked by the experience. +1 health.'],
+      hints: ['You survive, barely. You are deeply marked by the experience. No recovery — press on.'],
     },
     miss: {
       hints: ['You are dead, or face a fate worse than death. The world beyond claims you.'],
@@ -343,11 +335,9 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
 
   sojourn: {
     'strong-hit': {
-      deltas: [['health', 2], ['spirit', 2]],
       hints: ['The community welcomes you. Choose two: +2 health, +2 spirit, +2 supply, or +2 momentum.'],
     },
     'weak-hit': {
-      deltas: [['health', 2]],
       hints: ['The community offers modest aid. Choose one: +2 health, +2 spirit, +2 supply, or +2 momentum.'],
     },
     miss: {
@@ -372,7 +362,7 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
 
   'forge-a-bond': {
     'strong-hit': {
-      hints: ['Mark progress on your bonds track. +1 experience.'],
+      hints: ['Mark progress on your bonds track.'],
     },
     'weak-hit': {
       hints: ['Mark progress on your bonds track. There is a complication — a test or unresolved conflict ahead.'],
@@ -528,7 +518,11 @@ export function resolveMove(
 
   if (match && spec.onMatch) {
     const matchHint =
-      result === 'strong-hit' ? spec.onMatch.strongHit : spec.onMatch.miss
+      result === 'strong-hit'
+        ? spec.onMatch.strongHit
+        : result === 'weak-hit'
+          ? spec.onMatch.weakHit
+          : spec.onMatch.miss
     if (matchHint) narrativeHints.push(`MATCH — ${matchHint}`)
   }
 
@@ -544,15 +538,14 @@ export function resolveMove(
 
 // ── Follow-up move suggestions ────────────────────────────────────────────────
 
-import { IRONSWORN_MOVES } from './catalogue'
-
-function byId(id: string): Move {
-  return IRONSWORN_MOVES.find((m) => m.id === id)!
+function byId(id: string): Move | undefined {
+  return IRONSWORN_MOVES.find((m) => m.id === id)
 }
 
 function suggestFollowUps(moveId: string, result: HitResult): Move[] | undefined {
   if (result === 'miss') {
-    return [byId('pay-the-price')]
+    const payThePrice = byId('pay-the-price')
+    return payThePrice ? [payThePrice] : undefined
   }
   const followUps: Record<string, string[]> = {
     'swear-iron-vow': ['undertake-journey', 'ask-the-oracle'],
@@ -563,5 +556,5 @@ function suggestFollowUps(moveId: string, result: HitResult): Move[] | undefined
     sojourn: ['forge-a-bond'],
   }
   const ids = followUps[moveId]
-  return ids?.map(byId).filter(Boolean) ?? undefined
+  return ids?.map(byId).filter((m): m is Move => m !== undefined) ?? undefined
 }

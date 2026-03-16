@@ -12,6 +12,7 @@ import {
   IronswornCharacterData,
   IronswornDebilities,
   IRONSWORN_DEFAULTS,
+  toIronswornData,
 } from './character/schema'
 import { IRONSWORN_MOVES } from './moves/catalogue'
 import { resolveMove } from './moves/resolve'
@@ -71,9 +72,10 @@ const IRONSWORN_SCHEMA: Record<string, unknown> = {
   },
 }
 
-/** Debilities that permanently reduce momentum reset (banes + burdens) */
+/** Debilities that reduce momentum reset — Banes only (Maimed, Corrupted).
+ *  Curses (Cursed, Tormented) reduce max momentum but NOT the reset value. */
 const PERMANENT_DEBILITIES: ReadonlyArray<keyof IronswornDebilities> = [
-  'maimed', 'corrupted', 'cursed', 'tormented',
+  'maimed', 'corrupted',
 ]
 
 function countDebilities(debilities: IronswornDebilities): number {
@@ -89,7 +91,7 @@ function applyConditionMutation(
   condition: string,
   active: boolean,
 ): CharacterMutation {
-  const data = state.data as unknown as IronswornCharacterData
+  const data = toIronswornData(state)
   const debilities = { ...data.debilities, [condition]: active }
   const newMax = maxMomentum(debilities)
   // Clamp momentum to the new cap
@@ -123,7 +125,7 @@ export const ironswornPlugin: RulesetPlugin = {
     },
 
     momentumReset(state): number {
-      const data = state.data as unknown as IronswornCharacterData
+      const data = toIronswornData(state)
       const permanentCount = PERMANENT_DEBILITIES.filter(
         (k) => data.debilities[k],
       ).length
@@ -131,7 +133,7 @@ export const ironswornPlugin: RulesetPlugin = {
     },
 
     canAdvance(state, cost): boolean {
-      const data = state.data as unknown as IronswornCharacterData
+      const data = toIronswornData(state)
       return data.experience.earned - data.experience.spent >= cost
     },
   },
@@ -244,7 +246,7 @@ export const ironswornPlugin: RulesetPlugin = {
 
     validate(partial) {
       const errors: string[] = []
-      const data = partial as unknown as Partial<IronswornCharacterData>
+      const data = partial as unknown as Partial<IronswornCharacterData> // partial — no helper, not a CharacterState
 
       // Stats must use [3, 2, 2, 1, 1] budget exactly
       const statKeys = ['edge', 'heart', 'iron', 'shadow', 'wits'] as const

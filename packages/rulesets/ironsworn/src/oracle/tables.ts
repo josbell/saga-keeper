@@ -99,7 +99,7 @@ const NPC_ROLE_TABLE = ranged('npc-role', 'NPC Role', 'npc', [
   [48, 49, 'Spy'], [50, 52, 'Vagabond'], [53, 55, 'Forager'],
   [56, 58, 'Heretic'], [59, 61, 'Shaman'], [62, 64, 'Elder'],
   [65, 68, 'Wanderer'], [69, 72, 'Fisher'], [73, 75, 'Miner'],
-  [76, 78, 'Blacksmith'], [79, 81, 'Sailor'], [82, 84, 'Herbalist'],
+  [76, 78, 'Blacksmith'], [79, 81, 'Steward'], [82, 84, 'Herbalist'],
   [85, 87, 'Exile'], [88, 90, 'Ferryman'], [91, 93, 'Keeper'],
   [94, 96, 'Warden'], [97, 98, 'Seer'], [99, 100, 'Warlord'],
 ])
