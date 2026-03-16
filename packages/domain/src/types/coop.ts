@@ -2,7 +2,7 @@
 
 import type { SessionEvent } from './session'
 import type { CharacterState } from './character'
-import type { WorldEntity } from './world'
+import type { WorldEntity, WorldPatch } from './world'
 
 export type CoopMode = 'same-pc' | 'remote'
 
@@ -23,12 +23,6 @@ export interface CharacterPatch {
   characterId: string
   patch: Partial<CharacterState>
   timestamp: string
-}
-
-export interface WorldPatch {
-  entity: WorldEntity
-  /** Vector clock for CRDT merge */
-  vector: Record<string, number>
 }
 
 export type RealtimeEvent =
