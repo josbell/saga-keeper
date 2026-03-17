@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm --filter @saga-keeper/web build)",
+      "Bash(gh issue:*)",
+      "Bash(pnpm --filter @saga-keeper/services test)",
+      "Bash(gh pr:*)",
+      "Bash(node --input-type=module:*)",
+      "Bash(gh api:*)",
+      "Bash(python3 -c \"import sys,json; p=json.load\\(sys.stdin\\); print\\(''''force_push blocked:'''', not p[''''allow_force_pushes''''][''''enabled'''']\\); print\\(''''deletion blocked:'''', not p[''''allow_deletions''''][''''enabled'''']\\); print\\(''''required checks:'''', [c[''''context''''] for c in p[''''required_status_checks''''][''''contexts'''']]\\)\")"
+    ]
+  }
+}
