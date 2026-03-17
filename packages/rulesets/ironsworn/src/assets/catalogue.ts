@@ -21,7 +21,7 @@ export const IRONSWORN_ASSETS: Asset[] = [
     type: 'companion',
     description: 'A large spider that weaves webs and strikes from the shadows.',
     abilities: [
-      'When you create a trap using your spider\'s web, add +2 on your next Face Danger to avoid a foe.',
+      "When you create a trap using your spider's web, add +2 on your next Face Danger to avoid a foe.",
       'When you Strike or Clash, your spider assists: add +1.',
       'When you Gather Information in a dungeon or ruin, add +1.',
     ],
@@ -33,7 +33,7 @@ export const IRONSWORN_ASSETS: Asset[] = [
     description: 'A keen-eyed raptor that scouts ahead and assists in combat.',
     abilities: [
       'When you Gather Information by sending your hawk to scout, add +2.',
-      'When you Secure an Advantage using your hawk\'s vantage, add +1.',
+      "When you Secure an Advantage using your hawk's vantage, add +1.",
       'When you Strike at range, your hawk stoops: add +1.',
     ],
   },
@@ -65,7 +65,7 @@ export const IRONSWORN_ASSETS: Asset[] = [
     type: 'companion',
     description: 'A trusted companion — a fellow warrior or ally who fights at your side.',
     abilities: [
-      'When you Aid Your Ally using Kindred\'s expertise, add +2 instead of rolling.',
+      "When you Aid Your Ally using Kindred's expertise, add +2 instead of rolling.",
       'When your Kindred Endures Harm, you may suffer -1 momentum to aid them: they take +1 health.',
       'When you Forge a Bond with someone, if your Kindred vouches for you, take the strong-hit benefit.',
     ],
@@ -88,7 +88,7 @@ export const IRONSWORN_ASSETS: Asset[] = [
     description: 'A fae spirit bound to you — mischievous, powerful, and unpredictable.',
     abilities: [
       'When you Face Danger involving the mystical or magical, your sprite aids you: add +2.',
-      'When you Secure an Advantage using your sprite\'s illusions or tricks, add +2.',
+      "When you Secure an Advantage using your sprite's illusions or tricks, add +2.",
       'When your sprite acts against your wishes, you suffer -1 momentum but may use Ask the Oracle to discover why.',
     ],
   },
@@ -131,7 +131,7 @@ export const IRONSWORN_ASSETS: Asset[] = [
     id: 'path-duelist',
     name: 'Duelist',
     type: 'path',
-    description: 'You fight with precision and read your opponent\'s every move.',
+    description: "You fight with precision and read your opponent's every move.",
     abilities: [
       'When you Draw the Circle, add +2.',
       'When you Strike after studying your foe, you may add +wits.',
@@ -153,7 +153,7 @@ export const IRONSWORN_ASSETS: Asset[] = [
     id: 'path-herbalist',
     name: 'Herbalist',
     type: 'path',
-    description: 'You know the healing properties of the land\'s plants and herbs.',
+    description: "You know the healing properties of the land's plants and herbs.",
     abilities: [
       'When you Heal, add +2.',
       'When you Resupply in a forest or meadow, you may search for herbs: add +2.',
@@ -175,7 +175,7 @@ export const IRONSWORN_ASSETS: Asset[] = [
     id: 'path-ironclad',
     name: 'Ironclad',
     type: 'path',
-    description: 'Your armor is your shield against the world\'s brutality.',
+    description: "Your armor is your shield against the world's brutality.",
     abilities: [
       'When you Clash and score a weak hit, reduce the health cost by 1 (minimum 0).',
       'When you Endure Harm, add +1 due to your armor.',
@@ -222,7 +222,7 @@ export const IRONSWORN_ASSETS: Asset[] = [
     description: 'You hunt the beasts and horrors that prey on the innocent.',
     abilities: [
       'When you Enter the Fray against a monster or beast, add +2.',
-      'When you Gather Information to research a foe\'s weaknesses, add +2.',
+      "When you Gather Information to research a foe's weaknesses, add +2.",
       'When you Strike against a monster, reroll one challenge die.',
     ],
   },

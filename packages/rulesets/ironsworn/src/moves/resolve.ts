@@ -36,9 +36,7 @@ function delta(state: CharacterState, stat: string, d: number): StatDelta {
 }
 
 function deltas(state: CharacterState, specs: Array<[string, number]>): StatDelta[] {
-  return specs
-    .map(([stat, d]) => delta(state, stat, d))
-    .filter((sd) => sd.before !== sd.after) // only include actual changes
+  return specs.map(([stat, d]) => delta(state, stat, d)).filter((sd) => sd.before !== sd.after) // only include actual changes
 }
 
 // ── Per-move outcome tables ───────────────────────────────────────────────────
@@ -94,7 +92,9 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
     },
     'weak-hit': {
       deltas: [['momentum', 1]],
-      hints: ['You find something useful, but your investigation reveals new complications. +1 momentum.'],
+      hints: [
+        'You find something useful, but your investigation reveals new complications. +1 momentum.',
+      ],
     },
     miss: {
       hints: ['Your investigation leads you into danger or deeper confusion. Pay the Price.'],
@@ -107,7 +107,10 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
       hints: ['Wounds are mended. +2 health.'],
     },
     'weak-hit': {
-      deltas: [['health', 2], ['supply', -1]],
+      deltas: [
+        ['health', 2],
+        ['supply', -1],
+      ],
       hints: ['You recover, but treatment costs supplies. +2 health, -1 supply.'],
     },
     miss: {
@@ -131,11 +134,12 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
 
   'make-camp': {
     'strong-hit': {
-      deltas: [['health', 1], ['spirit', 1], ['supply', 1], ['momentum', 1]],
-      hints: ['The camp restores body and spirit. +1 health, +1 spirit, +1 supply, +1 momentum.'],
+      hints: ['You rest well. Choose two: +1 health, +1 spirit, +1 supply, or +1 momentum.'],
     },
     'weak-hit': {
-      hints: ['You rest enough to continue. Choose one: +2 health, +2 spirit, +2 supply, or +2 momentum.'],
+      hints: [
+        'You rest enough to continue. Choose one: +1 health, +1 spirit, +1 supply, or +1 momentum.',
+      ],
     },
     miss: {
       deltas: [['supply', -1]],
@@ -189,7 +193,7 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
       hints: ['You seize the initiative. +2 momentum. You have initiative.'],
     },
     'weak-hit': {
-      hints: ['Combat is joined. Choose: take +2 momentum or take initiative. The fight is even.'],
+      hints: ['Combat is joined. Choose one: take +2 momentum, or take initiative.'],
     },
     miss: {
       deltas: [['momentum', -1]],
@@ -206,7 +210,9 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
       hints: ['Strike true. Mark progress on your combat track twice. +1 momentum.'],
     },
     'weak-hit': {
-      hints: ['You land a blow. Mark progress on your combat track. Your foe retaliates — they have initiative.'],
+      hints: [
+        'You land a blow. Mark progress on your combat track. Your foe retaliates — they have initiative.',
+      ],
     },
     miss: {
       hints: ['Your attack fails. Your foe has initiative. Pay the Price.'],
@@ -220,7 +226,9 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
     },
     'weak-hit': {
       deltas: [['health', -1]],
-      hints: ['You exchange blows. Mark progress on your combat track. -1 health. Your foe retains initiative.'],
+      hints: [
+        'You exchange blows. Mark progress on your combat track. -1 health. Your foe retains initiative.',
+      ],
     },
     miss: {
       deltas: [['health', -2]],
@@ -248,10 +256,15 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
       hints: ['Victory is yours. The fight is over. +2 momentum.'],
     },
     'weak-hit': {
-      hints: ['The fight ends, but at great cost. Choose: a complication, harm, or a desperate concession.'],
+      hints: [
+        'The fight ends, but at great cost. Choose: a complication, harm, or a desperate concession.',
+      ],
     },
     miss: {
-      deltas: [['health', -2], ['momentum', -1]],
+      deltas: [
+        ['health', -2],
+        ['momentum', -1],
+      ],
       hints: ['Defeat. You are overwhelmed. -2 health, -1 momentum. Pay the Price.'],
     },
   },
@@ -262,21 +275,28 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
       hints: ['You achieve your objective. +2 momentum.'],
     },
     'weak-hit': {
-      hints: ['You succeed at great cost. Suffer -2 of one resource: health, spirit, or supply (your choice).'],
+      hints: [
+        'You succeed at great cost. Suffer -2 of one resource: health, spirit, or supply (your choice).',
+      ],
     },
     miss: {
-      deltas: [['health', -2], ['spirit', -1]],
+      deltas: [
+        ['health', -2],
+        ['spirit', -1],
+      ],
       hints: ['The battle turns against you. -2 health, -1 spirit. Pay the Price.'],
     },
   },
 
   'face-death': {
     'strong-hit': {
-      deltas: [['spirit', 1], ['momentum', 1]],
-      hints: ['You return from the brink. Hard-won clarity fills you. +1 spirit, +1 momentum.'],
+      deltas: [['momentum', 1]],
+      hints: ['Death rejects you. You are cast back into the mortal world. +1 momentum.'],
     },
     'weak-hit': {
-      hints: ['You survive, barely. You are deeply marked by the experience. No recovery — press on.'],
+      hints: [
+        'You survive, barely. You are deeply marked by the experience. No recovery — press on.',
+      ],
     },
     miss: {
       hints: ['You are dead, or face a fate worse than death. The world beyond claims you.'],
@@ -285,38 +305,78 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
 
   'face-desolation': {
     'strong-hit': {
-      deltas: [['spirit', 1], ['momentum', 1]],
-      hints: ['You find your footing. +1 spirit, +1 momentum.'],
+      deltas: [['momentum', 1]],
+      hints: ['You resist the darkness. +1 momentum.'],
     },
     'weak-hit': {
-      hints: ['You hold on, but choose: +1 spirit and one Vow falters, or press on with spirit unchanged but at great cost.'],
+      hints: [
+        'You hold on. Choose: press on with no gain, or envision how this changes you and gain +1 spirit (but one Vow falters).',
+      ],
     },
     miss: {
-      hints: ['You give in to desolation. You are lost. Your Ironsworn story ends — or you become a foe.'],
+      hints: [
+        'You give in to desolation. You are lost. Your Ironsworn story ends — or you become a foe.',
+      ],
     },
   },
 
+  // Not a roll — triggered when supply reaches 0. All outcomes apply the same consequence.
   'out-of-supply': {
     'strong-hit': {
-      hints: ['Mark unprepared. You manage despite the shortage.'],
+      hints: [
+        'Mark unprepared. While unprepared, further -supply instead triggers Endure Harm or Endure Stress.',
+      ],
     },
     'weak-hit': {
-      hints: ['Mark unprepared. Each step forward costs something precious.'],
+      hints: [
+        'Mark unprepared. While unprepared, further -supply instead triggers Endure Harm or Endure Stress.',
+      ],
     },
     miss: {
-      hints: ['Mark unprepared. The shortage strikes at a critical moment. Pay the Price.'],
+      hints: [
+        'Mark unprepared. While unprepared, further -supply instead triggers Endure Harm or Endure Stress.',
+      ],
     },
   },
 
+  // Not a roll — triggered when momentum is at minimum. All outcomes identical.
   'face-a-setback': {
     'strong-hit': {
-      hints: ['Choose to Endure Harm, Endure Stress, or Companion Endures Harm.'],
+      hints: ['Choose: Endure Harm, Endure Stress, or Companion Endures Harm.'],
     },
     'weak-hit': {
-      hints: ['Choose to Endure Harm, Endure Stress, or Companion Endures Harm.'],
+      hints: ['Choose: Endure Harm, Endure Stress, or Companion Endures Harm.'],
     },
     miss: {
-      hints: ['Choose to Endure Harm, Endure Stress, or Companion Endures Harm.'],
+      hints: ['Choose: Endure Harm, Endure Stress, or Companion Endures Harm.'],
+    },
+  },
+
+  'endure-harm': {
+    'strong-hit': {
+      deltas: [['momentum', 1]],
+      hints: ['You pull through. Take control. +1 momentum.'],
+    },
+    'weak-hit': {
+      hints: ['You focus past the pain. Choose: spend 1 momentum, or mark wounded.'],
+    },
+    miss: {
+      deltas: [['health', -1]],
+      hints: ['You are overcome by harm. -1 health. If your health is now 0, roll on Face Death.'],
+    },
+  },
+
+  'endure-stress': {
+    'strong-hit': {
+      deltas: [['momentum', 1]],
+      hints: ['You resist the darkness. +1 momentum.'],
+    },
+    'weak-hit': {
+      hints: ['You hold yourself together. Choose: spend 1 momentum, or mark shaken.'],
+    },
+    miss: {
+      deltas: [['spirit', -1]],
+      hints: ['Despair takes hold. -1 spirit. If your spirit is now 0, roll on Face Desolation.'],
     },
   },
 
@@ -335,10 +395,14 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
 
   sojourn: {
     'strong-hit': {
-      hints: ['The community welcomes you. Choose two: +2 health, +2 spirit, +2 supply, or +2 momentum.'],
+      hints: [
+        'The community welcomes you. Choose two: +2 health, +2 spirit, +2 supply, or +2 momentum.',
+      ],
     },
     'weak-hit': {
-      hints: ['The community offers modest aid. Choose one: +2 health, +2 spirit, +2 supply, or +2 momentum.'],
+      hints: [
+        'The community offers modest aid. Choose one: +2 health, +2 spirit, +2 supply, or +2 momentum.',
+      ],
     },
     miss: {
       hints: ['The community is unable or unwilling to help. Pay the Price.'],
@@ -365,7 +429,9 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
       hints: ['Mark progress on your bonds track.'],
     },
     'weak-hit': {
-      hints: ['Mark progress on your bonds track. There is a complication — a test or unresolved conflict ahead.'],
+      hints: [
+        'Mark progress on your bonds track. There is a complication — a test or unresolved conflict ahead.',
+      ],
     },
     miss: {
       hints: ['The bond is refused or sundered. Pay the Price.'],
@@ -382,7 +448,9 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
     },
     miss: {
       deltas: [['spirit', -1]],
-      hints: ['The bond is broken. Endure Stress. -1 spirit. You must Forsake Your Vow if the bond was the focus of one.'],
+      hints: [
+        'The bond is broken. Endure Stress. -1 spirit. You must Forsake Your Vow if the bond was the focus of one.',
+      ],
     },
   },
 
@@ -409,7 +477,9 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
     },
     miss: {
       deltas: [['momentum', -1]],
-      hints: ['You falter at the weight of this promise. -1 momentum. Your vow is marked, but begins under shadow.'],
+      hints: [
+        'You falter at the weight of this promise. -1 momentum. Your vow is marked, but begins under shadow.',
+      ],
     },
     onMatch: {
       strongHit: 'Iron sings. This vow will shake the Ironlands. +1 additional momentum.',
@@ -439,21 +509,29 @@ const MOVE_OUTCOMES: Record<string, MoveSpec> = {
       hints: ['Your vow is fulfilled, but at a cost. Gain 1 experience. +1 momentum.'],
     },
     miss: {
-      deltas: [['momentum', -1], ['spirit', -1]],
-      hints: ['Your vow is undone. The goal is lost or corrupted. -1 momentum, -1 spirit. Forsake Your Vow.'],
+      deltas: [
+        ['momentum', -1],
+        ['spirit', -1],
+      ],
+      hints: [
+        'Your vow is undone. The goal is lost or corrupted. -1 momentum, -1 spirit. Forsake Your Vow.',
+      ],
     },
   },
 
+  // Not a roll — triggered when a vow is abandoned. Always clears the vow and Endure Stress (-1 spirit).
   'forsake-your-vow': {
     'strong-hit': {
-      hints: ['Clear the vow. Endure Stress.'],
+      deltas: [['spirit', -1]],
+      hints: ['Clear the vow and Endure Stress. -1 spirit. If the vow was bonded, Test Your Bond.'],
     },
     'weak-hit': {
-      hints: ['Clear the vow. Endure Stress.'],
+      deltas: [['spirit', -1]],
+      hints: ['Clear the vow and Endure Stress. -1 spirit. If the vow was bonded, Test Your Bond.'],
     },
     miss: {
-      deltas: [['spirit', -2]],
-      hints: ['You forsake your vow. -2 spirit. The cost of broken iron is heavy.'],
+      deltas: [['spirit', -1]],
+      hints: ['Clear the vow and Endure Stress. -1 spirit. If the vow was bonded, Test Your Bond.'],
     },
   },
 
@@ -504,11 +582,7 @@ const GENERIC_SPEC: MoveSpec = {
 
 // ── Public resolver ───────────────────────────────────────────────────────────
 
-export function resolveMove(
-  move: Move,
-  roll: DiceRoll,
-  state: CharacterState,
-): MoveOutcome {
+export function resolveMove(move: Move, roll: DiceRoll, state: CharacterState): MoveOutcome {
   const { result, match } = hitResult(roll)
   const spec = MOVE_OUTCOMES[move.id] ?? GENERIC_SPEC
   const outcomeSpec = spec[result]
@@ -554,6 +628,9 @@ function suggestFollowUps(moveId: string, result: HitResult): Move[] | undefined
     strike: ['end-the-fight'],
     'face-danger': ['secure-advantage', 'gather-information'],
     sojourn: ['forge-a-bond'],
+    'forsake-your-vow': ['endure-stress', 'test-your-bond'],
+    'face-a-setback': ['endure-harm', 'endure-stress'],
+    'out-of-supply': ['endure-harm', 'endure-stress'],
   }
   const ids = followUps[moveId]
   return ids?.map(byId).filter((m): m is Move => m !== undefined) ?? undefined

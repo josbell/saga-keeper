@@ -175,14 +175,13 @@ export const IRONSWORN_MOVES: Move[] = [
     name: 'Face Desolation',
     category: 'combat',
     stats: ['heart'],
-    description:
-      'When you are brought to the brink of desolation, roll +heart.',
+    description: 'When you are brought to the brink of desolation, roll +heart.',
     trigger: 'Brought to the brink of desolation',
   },
   {
     id: 'out-of-supply',
     name: 'Out of Supply',
-    category: 'combat',
+    category: 'adventure',
     stats: [],
     description:
       'When your supply is exhausted (reduced to 0), mark unprepared. ' +
@@ -192,12 +191,36 @@ export const IRONSWORN_MOVES: Move[] = [
   {
     id: 'face-a-setback',
     name: 'Face a Setback',
-    category: 'combat',
+    category: 'adventure',
     stats: [],
     description:
       'When your momentum is at its minimum (-6) and you suffer additional -momentum, ' +
       'choose one: Endure Harm, Endure Stress, or Companion Endures Harm.',
     trigger: 'Momentum at minimum (-6)',
+  },
+
+  // ── Suffer (Adventure) ────────────────────────────────────────────────────
+  {
+    id: 'endure-harm',
+    name: 'Endure Harm',
+    category: 'adventure',
+    stats: ['health', 'iron'],
+    description:
+      'When you face physical damage, and your health is reduced to 0, or you suffer harm in a way that threatens your life, ' +
+      'roll +health or +iron, whichever is lower. ' +
+      'On a hit, you pull through. On a miss, also suffer -1 health, or roll on Face Death.',
+    trigger: 'Suffer harm that threatens your life',
+  },
+  {
+    id: 'endure-stress',
+    name: 'Endure Stress',
+    category: 'adventure',
+    stats: ['spirit'],
+    description:
+      'When you face mental shock or despair, and your spirit is reduced to 0, or you suffer stress in a way that threatens your sanity, ' +
+      'roll +spirit. ' +
+      'On a hit, you resist. On a miss, also suffer -1 spirit, or roll on Face Desolation.',
+    trigger: 'Suffer stress that threatens your sanity',
   },
 
   // ── Relationship ──────────────────────────────────────────────────────────

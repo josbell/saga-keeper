@@ -5,6 +5,6 @@ export const ironswornManifest: RulesetManifest = {
   displayName: 'Ironsworn',
   version: '1.0.0',
   author: 'Shawn Tomkin',
-  playerCount: { min: 1, max: 2 },
+  playerCount: { min: 1, max: 4 },
   features: ['vows', 'assets', 'oracle-tables', 'world-truths'],
 }

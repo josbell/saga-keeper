@@ -12,6 +12,7 @@ import {
   IronswornCharacterData,
   IronswornDebilities,
   IRONSWORN_DEFAULTS,
+  IRONSWORN_STAT_BUDGET,
   toIronswornData,
 } from './character/schema'
 import { IRONSWORN_MOVES } from './moves/catalogue'
@@ -24,13 +25,29 @@ import { IRONSWORN_ASSETS } from './assets/catalogue'
 
 const IRONSWORN_SCHEMA: Record<string, unknown> = {
   type: 'object',
-  required: ['edge', 'heart', 'iron', 'shadow', 'wits', 'health', 'spirit', 'supply', 'momentum', 'debilities', 'vows', 'bonds', 'assetIds', 'experience'],
+  required: [
+    'edge',
+    'heart',
+    'iron',
+    'shadow',
+    'wits',
+    'health',
+    'spirit',
+    'supply',
+    'momentum',
+    'debilities',
+    'vows',
+    'bonds',
+    'assetIds',
+    'experience',
+    'tracks',
+  ],
   properties: {
-    edge: { type: 'integer', minimum: 1, maximum: 4 },
-    heart: { type: 'integer', minimum: 1, maximum: 4 },
-    iron: { type: 'integer', minimum: 1, maximum: 4 },
-    shadow: { type: 'integer', minimum: 1, maximum: 4 },
-    wits: { type: 'integer', minimum: 1, maximum: 4 },
+    edge: { type: 'integer', minimum: 1, maximum: 3 },
+    heart: { type: 'integer', minimum: 1, maximum: 3 },
+    iron: { type: 'integer', minimum: 1, maximum: 3 },
+    shadow: { type: 'integer', minimum: 1, maximum: 3 },
+    wits: { type: 'integer', minimum: 1, maximum: 3 },
     health: { type: 'integer', minimum: 0, maximum: 5 },
     spirit: { type: 'integer', minimum: 0, maximum: 5 },
     supply: { type: 'integer', minimum: 0, maximum: 5 },
@@ -38,10 +55,14 @@ const IRONSWORN_SCHEMA: Record<string, unknown> = {
     debilities: {
       type: 'object',
       properties: {
-        wounded: { type: 'boolean' }, shaken: { type: 'boolean' },
-        unprepared: { type: 'boolean' }, encumbered: { type: 'boolean' },
-        maimed: { type: 'boolean' }, corrupted: { type: 'boolean' },
-        cursed: { type: 'boolean' }, tormented: { type: 'boolean' },
+        wounded: { type: 'boolean' },
+        shaken: { type: 'boolean' },
+        unprepared: { type: 'boolean' },
+        encumbered: { type: 'boolean' },
+        maimed: { type: 'boolean' },
+        corrupted: { type: 'boolean' },
+        cursed: { type: 'boolean' },
+        tormented: { type: 'boolean' },
         weak: { type: 'boolean' },
       },
     },
@@ -53,7 +74,10 @@ const IRONSWORN_SCHEMA: Record<string, unknown> = {
         properties: {
           id: { type: 'string' },
           title: { type: 'string' },
-          rank: { type: 'string', enum: ['troublesome', 'dangerous', 'formidable', 'extreme', 'epic'] },
+          rank: {
+            type: 'string',
+            enum: ['troublesome', 'dangerous', 'formidable', 'extreme', 'epic'],
+          },
           progress: { type: 'number', minimum: 0, maximum: 10 },
           fulfilled: { type: 'boolean' },
         },
@@ -69,27 +93,38 @@ const IRONSWORN_SCHEMA: Record<string, unknown> = {
         spent: { type: 'integer', minimum: 0 },
       },
     },
+    tracks: {
+      type: 'object',
+      required: ['combat', 'journey', 'bonds'],
+      properties: {
+        combat: { type: 'number', minimum: 0, maximum: 10 },
+        journey: { type: 'number', minimum: 0, maximum: 10 },
+        bonds: { type: 'number', minimum: 0, maximum: 10 },
+      },
+    },
   },
 }
 
-/** Debilities that reduce momentum reset — Banes only (Maimed, Corrupted).
- *  Curses (Cursed, Tormented) reduce max momentum but NOT the reset value. */
-const PERMANENT_DEBILITIES: ReadonlyArray<keyof IronswornDebilities> = [
-  'maimed', 'corrupted',
+/** Banes reduce momentum reset value (Maimed, Corrupted). */
+const PERMANENT_DEBILITIES: ReadonlyArray<keyof IronswornDebilities> = ['maimed', 'corrupted']
+
+/** Banes + Curses each reduce max momentum by 1. Conditions do not. */
+const MOMENTUM_REDUCING_DEBILITIES: ReadonlyArray<keyof IronswornDebilities> = [
+  'maimed',
+  'corrupted',
+  'cursed',
+  'tormented',
 ]
 
-function countDebilities(debilities: IronswornDebilities): number {
-  return (Object.values(debilities) as boolean[]).filter(Boolean).length
-}
-
 function maxMomentum(debilities: IronswornDebilities): number {
-  return 10 - countDebilities(debilities)
+  const count = MOMENTUM_REDUCING_DEBILITIES.filter((k) => debilities[k]).length
+  return 10 - count
 }
 
 function applyConditionMutation(
   state: CharacterState,
   condition: string,
-  active: boolean,
+  active: boolean
 ): CharacterMutation {
   const data = toIronswornData(state)
   const debilities = { ...data.debilities, [condition]: active }
@@ -126,9 +161,7 @@ export const ironswornPlugin: RulesetPlugin = {
 
     momentumReset(state): number {
       const data = toIronswornData(state)
-      const permanentCount = PERMANENT_DEBILITIES.filter(
-        (k) => data.debilities[k],
-      ).length
+      const permanentCount = PERMANENT_DEBILITIES.filter((k) => data.debilities[k]).length
       return Math.max(0, 2 - permanentCount)
     },
 
@@ -154,16 +187,37 @@ export const ironswornPlugin: RulesetPlugin = {
     suggest(context: SceneContext) {
       if (context.inCombat) {
         return IRONSWORN_MOVES.filter((m) =>
-          ['strike', 'clash', 'end-the-fight', 'turn-the-tide', 'battle', 'face-death', 'face-desolation'].includes(m.id),
+          [
+            'strike',
+            'clash',
+            'end-the-fight',
+            'turn-the-tide',
+            'battle',
+            'face-death',
+            'face-desolation',
+          ].includes(m.id)
         )
       }
       if (context.onJourney) {
         return IRONSWORN_MOVES.filter((m) =>
-          ['undertake-journey', 'face-danger', 'make-camp', 'reach-destination', 'resupply'].includes(m.id),
+          [
+            'undertake-journey',
+            'face-danger',
+            'make-camp',
+            'reach-destination',
+            'resupply',
+          ].includes(m.id)
         )
       }
       return IRONSWORN_MOVES.filter((m) =>
-        ['face-danger', 'secure-advantage', 'gather-information', 'compel', 'swear-iron-vow', 'ask-the-oracle'].includes(m.id),
+        [
+          'face-danger',
+          'secure-advantage',
+          'gather-information',
+          'compel',
+          'swear-iron-vow',
+          'ask-the-oracle',
+        ].includes(m.id)
       )
     },
   },
@@ -242,23 +296,21 @@ export const ironswornPlugin: RulesetPlugin = {
       },
     ],
 
-    statBudget: [3, 2, 2, 1, 1],
+    statBudget: [...IRONSWORN_STAT_BUDGET],
 
     validate(partial) {
       const errors: string[] = []
       const data = partial as unknown as Partial<IronswornCharacterData> // partial — no helper, not a CharacterState
 
-      // Stats must use [3, 2, 2, 1, 1] budget exactly
+      // Stats must use IRONSWORN_STAT_BUDGET distribution exactly (total 9, max 3, min 1)
       const statKeys = ['edge', 'heart', 'iron', 'shadow', 'wits'] as const
       if (statKeys.every((k) => data[k] !== undefined)) {
-        const total = statKeys.reduce((sum, k) => sum + (data[k] ?? 0), 0)
-        if (total !== 9) {
-          errors.push(`Stat total must be 9 (got ${total}). Distribute [3, 2, 2, 1, 1] across your five stats.`)
-        }
         const vals = statKeys.map((k) => data[k] ?? 0).sort((a, b) => b - a)
-        const budget = [3, 2, 2, 1, 1]
+        const budget = [...IRONSWORN_STAT_BUDGET].sort((a, b) => b - a)
         if (!vals.every((v, i) => v === budget[i])) {
-          errors.push('Stats must use the distribution [3, 2, 2, 1, 1] — no stat may exceed 3 or be below 1.')
+          errors.push(
+            'Stats must use the distribution [3, 2, 2, 1, 1] (total: 9) — no stat may exceed 3 or be below 1.'
+          )
         }
       }
 

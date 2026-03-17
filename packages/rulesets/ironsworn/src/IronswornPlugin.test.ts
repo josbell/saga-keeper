@@ -41,8 +41,8 @@ describe('ironswornPlugin.manifest', () => {
     expect(ironswornPlugin.manifest.id).toBe('ironsworn-v1')
   })
 
-  it('supports 1-2 players', () => {
-    expect(ironswornPlugin.manifest.playerCount).toEqual({ min: 1, max: 2 })
+  it('supports 1-4 players (solo, co-op, guided)', () => {
+    expect(ironswornPlugin.manifest.playerCount).toEqual({ min: 1, max: 4 })
   })
 
   it('declares vows and assets features', () => {
@@ -68,6 +68,12 @@ describe('ironswornPlugin.character.defaults', () => {
     const d = defaults as unknown as IronswornCharacterData
     expect(Object.values(d.debilities).every((v) => v === false)).toBe(true)
   })
+
+  it('tracks default to 0', () => {
+    const defaults = ironswornPlugin.character.defaults()
+    const d = defaults as unknown as IronswornCharacterData
+    expect(d.tracks).toEqual({ combat: 0, journey: 0, bonds: 0 })
+  })
 })
 
 describe('ironswornPlugin.character.applyCondition', () => {
@@ -85,26 +91,28 @@ describe('ironswornPlugin.character.applyCondition', () => {
     expect(data.debilities.wounded).toBe(false)
   })
 
-  it('reduces max momentum by 1 per debility', () => {
+  it('conditions (wounded) do not reduce max momentum', () => {
     const state = makeState()
-    // Fresh state has momentum 2, marking wounded should not lower it (2 < 10-1=9)
+    // Wounded is a Condition — it must NOT lower max momentum (only Banes+Curses do)
     const { next } = ironswornPlugin.character.applyCondition(state, 'wounded', true)
     const data = next.data as unknown as IronswornCharacterData
-    // Momentum should be unchanged (2 ≤ 9)
+    // Momentum unchanged; max is still 10
     expect(data.momentum).toBe(2)
   })
 
-  it('clamps momentum to new max when many debilities are marked', () => {
+  it('clamps momentum to new max when Banes and Curses are marked', () => {
     const state = makeState({ momentum: 10 })
-    // Mark 6 debilities to bring max down to 4 (10-6=4)
+    // All 4 momentum-reducing debilities: 2 Banes (maimed, corrupted) + 2 Curses (cursed, tormented)
+    // max = 10 - 4 = 6; conditions (wounded etc.) must NOT count
     let current = state
-    const conditions = ['wounded', 'shaken', 'unprepared', 'encumbered', 'maimed', 'corrupted']
-    for (const c of conditions) {
+    const debilities = ['wounded', 'maimed', 'corrupted', 'cursed', 'tormented']
+    for (const c of debilities) {
       const { next } = ironswornPlugin.character.applyCondition(current, c, true)
       current = next
     }
     const data = current.data as unknown as IronswornCharacterData
-    expect(data.momentum).toBeLessThanOrEqual(4)
+    // 4 momentum-reducing debilities: max = 10 - 4 = 6
+    expect(data.momentum).toBeLessThanOrEqual(6)
   })
 
   it('maimed reduces max health to 3', () => {
@@ -174,16 +182,18 @@ describe('ironswornPlugin.character.canAdvance', () => {
 // ── Moves ─────────────────────────────────────────────────────────────────────
 
 describe('ironswornPlugin.moves.getAll', () => {
-  it('returns 32 moves', () => {
-    expect(ironswornPlugin.moves.getAll()).toHaveLength(32)
+  it('returns 34 moves (including endure-harm and endure-stress)', () => {
+    expect(ironswornPlugin.moves.getAll()).toHaveLength(34)
   })
 
-  it('includes face-danger and swear-iron-vow', () => {
+  it('includes face-danger, swear-iron-vow, endure-harm, and endure-stress', () => {
     const ids = ironswornPlugin.moves.getAll().map((m) => m.id)
     expect(ids).toContain('face-danger')
     expect(ids).toContain('swear-iron-vow')
     expect(ids).toContain('pay-the-price')
     expect(ids).toContain('ask-the-oracle')
+    expect(ids).toContain('endure-harm')
+    expect(ids).toContain('endure-stress')
   })
 })
 
@@ -206,6 +216,21 @@ describe('ironswornPlugin.moves.getByCategory', () => {
     for (const cat of categories) {
       expect(ironswornPlugin.moves.getByCategory(cat).length).toBeGreaterThan(0)
     }
+  })
+
+  it('out-of-supply and face-a-setback are in adventure, not combat', () => {
+    const adventureMoveIds = ironswornPlugin.moves.getByCategory('adventure').map((m) => m.id)
+    const combatMoveIds = ironswornPlugin.moves.getByCategory('combat').map((m) => m.id)
+    expect(adventureMoveIds).toContain('out-of-supply')
+    expect(adventureMoveIds).toContain('face-a-setback')
+    expect(combatMoveIds).not.toContain('out-of-supply')
+    expect(combatMoveIds).not.toContain('face-a-setback')
+  })
+
+  it('endure-harm and endure-stress are in adventure', () => {
+    const adventureMoveIds = ironswornPlugin.moves.getByCategory('adventure').map((m) => m.id)
+    expect(adventureMoveIds).toContain('endure-harm')
+    expect(adventureMoveIds).toContain('endure-stress')
   })
 })
 
@@ -273,14 +298,15 @@ describe('ironswornPlugin.moves.resolve', () => {
     expect(drawCircle.stats).not.toContain('shadow')
   })
 
-  it('face-death strong hit grants +1 spirit (not health)', () => {
+  it('face-death strong hit grants +1 momentum only (no spirit per SRD)', () => {
     const faceDeath = IRONSWORN_MOVES.find((m) => m.id === 'face-death')!
     const roll = makeRoll(9, 2, 3)
-    const lowState = makeState({ spirit: 2 })
+    const lowState = makeState({ spirit: 2, momentum: 2 })
     const outcome = ironswornPlugin.moves.resolve(faceDeath, roll, lowState)
     expect(outcome.result).toBe('strong-hit')
-    const spiritDelta = outcome.consequences.find((c) => c.stat === 'spirit')
-    expect(spiritDelta?.after).toBe(3) // 2 + 1
+    const momentumDelta = outcome.consequences.find((c) => c.stat === 'momentum')
+    expect(momentumDelta?.after).toBe(3) // 2 + 1
+    expect(outcome.consequences.find((c) => c.stat === 'spirit')).toBeUndefined()
     expect(outcome.consequences.find((c) => c.stat === 'health')).toBeUndefined()
   })
 
@@ -326,7 +352,14 @@ describe('ironswornPlugin.moves.resolve', () => {
   })
 
   it('generic fallback handles an unknown move id gracefully', () => {
-    const unknownMove = { id: 'unknown-custom-move', name: 'Custom', category: 'adventure' as const, stats: [], description: '', trigger: '' }
+    const unknownMove = {
+      id: 'unknown-custom-move',
+      name: 'Custom',
+      category: 'adventure' as const,
+      stats: [],
+      description: '',
+      trigger: '',
+    }
     const roll = makeRoll(9, 2, 3)
     const outcome = ironswornPlugin.moves.resolve(unknownMove, roll, state)
     expect(outcome.result).toBe('strong-hit')
@@ -338,19 +371,34 @@ describe('ironswornPlugin.moves.suggest', () => {
   const base = makeState()
 
   it('suggests combat moves when inCombat', () => {
-    const suggestions = ironswornPlugin.moves.suggest({ characterState: base, recentMoves: [], inCombat: true, onJourney: false })
+    const suggestions = ironswornPlugin.moves.suggest({
+      characterState: base,
+      recentMoves: [],
+      inCombat: true,
+      onJourney: false,
+    })
     expect(suggestions.some((m) => m.id === 'strike')).toBe(true)
     expect(suggestions.some((m) => m.id === 'clash')).toBe(true)
   })
 
   it('suggests journey moves when onJourney', () => {
-    const suggestions = ironswornPlugin.moves.suggest({ characterState: base, recentMoves: [], inCombat: false, onJourney: true })
+    const suggestions = ironswornPlugin.moves.suggest({
+      characterState: base,
+      recentMoves: [],
+      inCombat: false,
+      onJourney: true,
+    })
     expect(suggestions.some((m) => m.id === 'undertake-journey')).toBe(true)
     expect(suggestions.some((m) => m.id === 'make-camp')).toBe(true)
   })
 
   it('suggests general moves in default scene', () => {
-    const suggestions = ironswornPlugin.moves.suggest({ characterState: base, recentMoves: [], inCombat: false, onJourney: false })
+    const suggestions = ironswornPlugin.moves.suggest({
+      characterState: base,
+      recentMoves: [],
+      inCombat: false,
+      onJourney: false,
+    })
     expect(suggestions.some((m) => m.id === 'face-danger')).toBe(true)
     expect(suggestions.some((m) => m.id === 'ask-the-oracle')).toBe(true)
   })
@@ -500,7 +548,11 @@ describe('ironswornPlugin.creation.steps', () => {
 describe('ironswornPlugin.creation.validate', () => {
   it('valid character passes', () => {
     const data: Partial<IronswornCharacterData> = {
-      edge: 2, heart: 3, iron: 1, shadow: 2, wits: 1,
+      edge: 2,
+      heart: 3,
+      iron: 1,
+      shadow: 2,
+      wits: 1,
       assetIds: ['a', 'b', 'c'],
       vows: [{ id: 'v1', title: 'Test Vow', rank: 'dangerous', progress: 0, fulfilled: false }],
     }
@@ -509,20 +561,28 @@ describe('ironswornPlugin.creation.validate', () => {
     expect(result.errors).toHaveLength(0)
   })
 
-  it('rejects stat total != 9', () => {
+  it('rejects wrong stat distribution (total != 9)', () => {
     const data: Partial<IronswornCharacterData> = {
-      edge: 3, heart: 3, iron: 2, shadow: 2, wits: 2, // total = 12
+      edge: 3,
+      heart: 3,
+      iron: 2,
+      shadow: 2,
+      wits: 2, // total = 12, wrong distribution
       assetIds: ['a', 'b', 'c'],
       vows: [{ id: 'v1', title: 'Test Vow', rank: 'dangerous', progress: 0, fulfilled: false }],
     }
     const result = ironswornPlugin.creation.validate(data)
     expect(result.valid).toBe(false)
-    expect(result.errors.some((e) => e.includes('9'))).toBe(true)
+    expect(result.errors.some((e) => e.includes('3, 2, 2, 1, 1'))).toBe(true)
   })
 
   it('rejects wrong stat distribution (all equal)', () => {
     const data: Partial<IronswornCharacterData> = {
-      edge: 2, heart: 2, iron: 2, shadow: 2, wits: 1, // total = 9 but wrong dist
+      edge: 2,
+      heart: 2,
+      iron: 2,
+      shadow: 2,
+      wits: 1, // total = 9 but wrong dist
       assetIds: ['a', 'b', 'c'],
       vows: [{ id: 'v1', title: 'Test Vow', rank: 'dangerous', progress: 0, fulfilled: false }],
     }
@@ -532,7 +592,11 @@ describe('ironswornPlugin.creation.validate', () => {
 
   it('rejects fewer than 3 assets', () => {
     const data: Partial<IronswornCharacterData> = {
-      edge: 2, heart: 3, iron: 1, shadow: 2, wits: 1,
+      edge: 2,
+      heart: 3,
+      iron: 1,
+      shadow: 2,
+      wits: 1,
       assetIds: ['a', 'b'], // only 2
       vows: [{ id: 'v1', title: 'Test Vow', rank: 'dangerous', progress: 0, fulfilled: false }],
     }
@@ -543,7 +607,11 @@ describe('ironswornPlugin.creation.validate', () => {
 
   it('rejects missing vow', () => {
     const data: Partial<IronswornCharacterData> = {
-      edge: 2, heart: 3, iron: 1, shadow: 2, wits: 1,
+      edge: 2,
+      heart: 3,
+      iron: 1,
+      shadow: 2,
+      wits: 1,
       assetIds: ['a', 'b', 'c'],
       vows: [],
     }
