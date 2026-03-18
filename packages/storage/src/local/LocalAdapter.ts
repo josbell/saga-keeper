@@ -85,7 +85,8 @@ export class LocalAdapter implements StorageAdapter {
 
     update: async (id: string, patch: Partial<Campaign>): Promise<Campaign> => {
       const updatedAt = new Date().toISOString()
-      await this.db.campaigns.update(id, { ...patch, updatedAt })
+      const count = await this.db.campaigns.update(id, { ...patch, updatedAt })
+      if (count === 0) throw new Error(`Campaign not found: ${id}`)
       return this.campaigns.get(id)
     },
 
@@ -165,10 +166,16 @@ export class LocalAdapter implements StorageAdapter {
   }
 
   async import(archive: CampaignArchive): Promise<Campaign> {
-    await this.db.campaigns.put(archive.campaign)
-    await this.db.characters.bulkPut(archive.characters)
-    await this.db.worldEntities.bulkPut(archive.world)
-    await this.db.sessionEvents.bulkAdd(archive.sessionLog)
+    await this.db.transaction(
+      'rw',
+      [this.db.campaigns, this.db.characters, this.db.worldEntities, this.db.sessionEvents],
+      async () => {
+        await this.db.campaigns.put(archive.campaign)
+        await this.db.characters.bulkPut(archive.characters)
+        await this.db.worldEntities.bulkPut(archive.world)
+        await this.db.sessionEvents.bulkPut(archive.sessionLog)
+      },
+    )
     return archive.campaign
   }
 }

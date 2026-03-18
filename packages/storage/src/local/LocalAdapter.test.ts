@@ -97,6 +97,12 @@ describe('campaigns', () => {
     const list = await adapter.campaigns.list()
     expect(list).toHaveLength(0)
   })
+
+  it('update throws on non-existent id', async () => {
+    await expect(adapter.campaigns.update('ghost-id', { name: 'Renamed' })).rejects.toThrow(
+      'Campaign not found: ghost-id',
+    )
+  })
 })
 
 // ── characters ──────────────────────────────────────────────────────────────
@@ -327,6 +333,24 @@ describe('export and import', () => {
     expect(archive.version).toBe('1')
     expect(archive.rulesetId).toBe('ironsworn-v1')
     expect(typeof archive.exportedAt).toBe('string')
+  })
+
+  it('import is idempotent — re-importing the same archive does not duplicate records', async () => {
+    const campaignId = await seedCampaign()
+    const archive = await adapter.export(campaignId)
+
+    const freshAdapter = makeAdapter()
+    await freshAdapter.import(archive)
+    await freshAdapter.import(archive) // second import must not throw or duplicate
+
+    const campaigns = await freshAdapter.campaigns.list()
+    expect(campaigns).toHaveLength(1)
+
+    const events = await freshAdapter.session.getAll(campaignId)
+    expect(events).toHaveLength(1)
+
+    const entities = await freshAdapter.world.list(campaignId)
+    expect(entities).toHaveLength(1)
   })
 
   it('import round-trips an archive into a fresh db', async () => {
