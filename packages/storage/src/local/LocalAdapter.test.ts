@@ -418,4 +418,15 @@ describe('ArchiveSerializer', () => {
     const result = serializer.deserialize(json)
     expect(result).toEqual(archive)
   })
+
+  it('deserialize throws a descriptive error on invalid JSON', () => {
+    expect(() => serializer.deserialize('not-valid-json{')).toThrow(
+      'Invalid archive: could not parse JSON',
+    )
+  })
+
+  it('deserialize throws on unsupported archive version', () => {
+    const wrongVersion = serializer.serialize({ ...archive, version: '99' })
+    expect(() => serializer.deserialize(wrongVersion)).toThrow('Unsupported archive version')
+  })
 })

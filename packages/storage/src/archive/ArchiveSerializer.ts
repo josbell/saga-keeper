@@ -11,6 +11,16 @@ export class ArchiveSerializer implements IArchiveSerializer {
   }
 
   deserialize(json: string): CampaignArchive {
-    return JSON.parse(json) as CampaignArchive
+    let parsed: unknown
+    try {
+      parsed = JSON.parse(json)
+    } catch {
+      throw new Error('Invalid archive: could not parse JSON')
+    }
+    const archive = parsed as CampaignArchive
+    if (archive.version !== '1') {
+      throw new Error(`Unsupported archive version: "${archive.version}"`)
+    }
+    return archive
   }
 }
