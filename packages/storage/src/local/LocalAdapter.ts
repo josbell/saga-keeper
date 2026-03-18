@@ -91,6 +91,8 @@ export class LocalAdapter implements StorageAdapter {
     },
 
     delete: async (id: string): Promise<void> => {
+      // Deletes only the campaign record. Characters, session events, and world entities
+      // for this campaign are NOT cascaded — callers must clean those up if needed.
       await this.db.campaigns.delete(id)
     },
   }
