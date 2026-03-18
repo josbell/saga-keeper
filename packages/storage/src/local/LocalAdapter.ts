@@ -114,11 +114,12 @@ export class LocalAdapter implements StorageAdapter {
     },
 
     getRecent: async (campaignId: string, limit: number): Promise<SessionEvent[]> => {
-      const all = await this.db.sessionEvents
-        .where('campaignId')
-        .equals(campaignId)
-        .sortBy('timestamp')
-      return all.reverse().slice(0, limit)
+      return this.db.sessionEvents
+        .where('[campaignId+timestamp]')
+        .between([campaignId, Dexie.minKey], [campaignId, Dexie.maxKey])
+        .reverse()
+        .limit(limit)
+        .toArray()
     },
 
     getAll: async (campaignId: string): Promise<SessionEvent[]> => {
