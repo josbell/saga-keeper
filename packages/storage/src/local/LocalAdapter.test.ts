@@ -2,7 +2,14 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { indexedDB, IDBKeyRange } from 'fake-indexeddb'
 import Dexie from 'dexie'
 import { LocalAdapter } from './LocalAdapter'
-import type { NewCampaign, CharacterState, SessionEvent, WorldEntity } from '@saga-keeper/domain'
+import { ArchiveSerializer } from '../archive/ArchiveSerializer'
+import type {
+  NewCampaign,
+  CharacterState,
+  SessionEvent,
+  WorldEntity,
+  CampaignArchive,
+} from '@saga-keeper/domain'
 
 // Inject fake-indexeddb so tests don't require a real browser environment
 Dexie.dependencies.indexedDB = indexedDB
@@ -258,5 +265,133 @@ describe('world', () => {
     await adapter.world.delete('npc-001')
     const list = await adapter.world.list('camp-1')
     expect(list).toEqual([])
+  })
+})
+
+// ── export / import ──────────────────────────────────────────────────────────
+
+describe('export and import', () => {
+  let adapter: LocalAdapter
+
+  beforeEach(() => {
+    adapter = makeAdapter()
+  })
+
+  async function seedCampaign() {
+    const campaign = await adapter.campaigns.create({
+      name: 'Test Campaign',
+      rulesetId: 'ironsworn-v1',
+      mode: 'solo',
+    })
+    const character: CharacterState = {
+      id: 'char-export-1',
+      campaignId: campaign.id,
+      name: 'Saga Hero',
+      rulesetId: 'ironsworn-v1',
+      data: {},
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+    // Link character to campaign
+    await adapter.campaigns.update(campaign.id, { characterIds: [character.id] })
+    await adapter.characters.save(character)
+    await adapter.session.append(campaign.id, {
+      id: 'ev-export-1',
+      campaignId: campaign.id,
+      turnId: 'turn-1',
+      type: 'session.started',
+      playerId: 'player-1',
+      payload: {},
+      timestamp: new Date().toISOString(),
+    })
+    await adapter.world.save({
+      id: 'entity-export-1',
+      campaignId: campaign.id,
+      type: 'npc',
+      name: 'Witness',
+      attributes: {},
+      connections: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    })
+    return campaign.id
+  }
+
+  it('export returns a CampaignArchive with all four collections', async () => {
+    const campaignId = await seedCampaign()
+    const archive = await adapter.export(campaignId)
+    expect(archive.campaign.id).toBe(campaignId)
+    expect(archive.characters).toHaveLength(1)
+    expect(archive.sessionLog).toHaveLength(1)
+    expect(archive.world).toHaveLength(1)
+    expect(archive.version).toBe('1')
+    expect(archive.rulesetId).toBe('ironsworn-v1')
+    expect(typeof archive.exportedAt).toBe('string')
+  })
+
+  it('import round-trips an archive into a fresh db', async () => {
+    const campaignId = await seedCampaign()
+    const archive = await adapter.export(campaignId)
+
+    const freshAdapter = makeAdapter()
+    const imported = await freshAdapter.import(archive)
+    expect(imported.id).toBe(campaignId)
+
+    const campaigns = await freshAdapter.campaigns.list()
+    expect(campaigns).toHaveLength(1)
+
+    const chars = await freshAdapter.characters.get('char-export-1')
+    expect(chars.name).toBe('Saga Hero')
+
+    const events = await freshAdapter.session.getAll(campaignId)
+    expect(events).toHaveLength(1)
+
+    const entities = await freshAdapter.world.list(campaignId)
+    expect(entities).toHaveLength(1)
+  })
+})
+
+// ── ArchiveSerializer ────────────────────────────────────────────────────────
+
+describe('ArchiveSerializer', () => {
+  const serializer = new ArchiveSerializer()
+
+  const archive: CampaignArchive = {
+    version: '1',
+    exportedAt: '2024-01-01T00:00:00.000Z',
+    rulesetId: 'ironsworn-v1',
+    campaign: {
+      id: 'camp-serial-1',
+      name: 'Serialized Run',
+      rulesetId: 'ironsworn-v1',
+      mode: 'solo',
+      status: 'active',
+      characterIds: [],
+      createdAt: '2024-01-01T00:00:00.000Z',
+      updatedAt: '2024-01-01T00:00:00.000Z',
+    },
+    characters: [],
+    world: [],
+    sessionLog: [],
+  }
+
+  it('serialize produces a JSON string', () => {
+    const json = serializer.serialize(archive)
+    expect(typeof json).toBe('string')
+    expect(json).toContain('Serialized Run')
+  })
+
+  it('deserialize reconstructs the original archive', () => {
+    const json = serializer.serialize(archive)
+    const result = serializer.deserialize(json)
+    expect(result.campaign.id).toBe('camp-serial-1')
+    expect(result.version).toBe('1')
+    expect(result.rulesetId).toBe('ironsworn-v1')
+  })
+
+  it('serialize → deserialize round-trips without data loss', () => {
+    const json = serializer.serialize(archive)
+    const result = serializer.deserialize(json)
+    expect(result).toEqual(archive)
   })
 })
