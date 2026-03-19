@@ -98,6 +98,51 @@ describe('campaigns', () => {
     expect(list).toHaveLength(0)
   })
 
+  it('delete does NOT cascade — characters, events, and world entities persist', async () => {
+    const campaign = await adapter.campaigns.create(newCampaign)
+    const character: CharacterState = {
+      id: 'orphan-char-1',
+      campaignId: campaign.id,
+      name: 'Orphan',
+      rulesetId: 'ironsworn-v1',
+      data: {},
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+    await adapter.characters.save(character)
+    await adapter.session.append(campaign.id, {
+      id: 'orphan-ev-1',
+      campaignId: campaign.id,
+      turnId: 'turn-1',
+      type: 'session.started',
+      playerId: 'local',
+      payload: {},
+      timestamp: new Date().toISOString(),
+    })
+    const entity: WorldEntity = {
+      id: 'orphan-npc-1',
+      campaignId: campaign.id,
+      type: 'npc',
+      name: 'Ghost NPC',
+      attributes: {},
+      connections: [],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    }
+    await adapter.world.save(entity)
+
+    await adapter.campaigns.delete(campaign.id)
+
+    // Campaign row is gone
+    await expect(adapter.campaigns.get(campaign.id)).rejects.toThrow()
+    // Related data still exists (callers must clean up)
+    await expect(adapter.characters.get('orphan-char-1')).resolves.toBeDefined()
+    const events = await adapter.session.getAll(campaign.id)
+    expect(events).toHaveLength(1)
+    const entities = await adapter.world.list(campaign.id)
+    expect(entities).toHaveLength(1)
+  })
+
   it('update throws on non-existent id', async () => {
     await expect(adapter.campaigns.update('ghost-id', { name: 'Renamed' })).rejects.toThrow(
       'Campaign not found: ghost-id',
@@ -206,6 +251,13 @@ describe('session', () => {
     const all = await adapter.session.getAll('camp-1')
     expect(all).toHaveLength(1)
     expect(all[0]!.id).toBe('ev-a')
+  })
+
+  it('append throws when event.campaignId does not match the given campaignId', async () => {
+    const ev = makeEvent('ev-mismatch', 'camp-2', '2024-01-01T00:00:01.000Z')
+    await expect(adapter.session.append('camp-1', ev)).rejects.toThrow(
+      'Event campaignId "camp-2" does not match campaign "camp-1"',
+    )
   })
 })
 
@@ -428,5 +480,22 @@ describe('ArchiveSerializer', () => {
   it('deserialize throws on unsupported archive version', () => {
     const wrongVersion = serializer.serialize({ ...archive, version: '99' })
     expect(() => serializer.deserialize(wrongVersion)).toThrow('Unsupported archive version')
+  })
+
+  it('deserialize throws when required fields are missing', () => {
+    const missing = JSON.stringify({ version: '1', exportedAt: '2024-01-01T00:00:00.000Z' })
+    expect(() => serializer.deserialize(missing)).toThrow('Invalid archive: missing required fields')
+  })
+
+  it('deserialize throws a descriptive error when JSON is null', () => {
+    expect(() => serializer.deserialize('null')).toThrow('Invalid archive: missing required fields')
+  })
+
+  it('deserialize throws a descriptive error when JSON is a number', () => {
+    expect(() => serializer.deserialize('42')).toThrow('Invalid archive: missing required fields')
+  })
+
+  it('deserialize throws a descriptive error when JSON is an array', () => {
+    expect(() => serializer.deserialize('[]')).toThrow('Invalid archive: missing required fields')
   })
 })
