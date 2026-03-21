@@ -84,10 +84,14 @@ export class LocalAdapter implements StorageAdapter {
     },
 
     update: async (id: string, patch: Partial<Campaign>): Promise<Campaign> => {
-      const updatedAt = new Date().toISOString()
-      const count = await this.db.campaigns.update(id, { ...patch, updatedAt })
-      if (count === 0) throw new Error(`Campaign not found: ${id}`)
-      return this.campaigns.get(id)
+      return this.db.transaction('rw', this.db.campaigns, async () => {
+        const updatedAt = new Date().toISOString()
+        const count = await this.db.campaigns.update(id, { ...patch, updatedAt })
+        if (count === 0) throw new Error(`Campaign not found: ${id}`)
+        const updated = await this.db.campaigns.get(id)
+        if (!updated) throw new Error(`Campaign not found: ${id}`)
+        return updated
+      })
     },
 
     delete: async (id: string): Promise<void> => {
@@ -111,7 +115,12 @@ export class LocalAdapter implements StorageAdapter {
   }
 
   session = {
-    append: async (_campaignId: string, event: SessionEvent): Promise<void> => {
+    append: async (campaignId: string, event: SessionEvent): Promise<void> => {
+      if (event.campaignId !== campaignId) {
+        throw new Error(
+          `Event campaignId "${event.campaignId}" does not match campaign "${campaignId}"`,
+        )
+      }
       await this.db.sessionEvents.add(event)
     },
 
@@ -125,7 +134,12 @@ export class LocalAdapter implements StorageAdapter {
     },
 
     getAll: async (campaignId: string): Promise<SessionEvent[]> => {
-      return this.db.sessionEvents.where('campaignId').equals(campaignId).sortBy('timestamp')
+      const events = await this.db.sessionEvents
+        .where('[campaignId+timestamp]')
+        .between([campaignId, Dexie.minKey], [campaignId, Dexie.maxKey])
+        .toArray()
+      // Explicit sort — don't rely on implicit compound-index traversal order
+      return events.sort((a, b) => (a.timestamp < b.timestamp ? -1 : 1))
     },
   }
 
@@ -151,21 +165,29 @@ export class LocalAdapter implements StorageAdapter {
   }
 
   async export(campaignId: string): Promise<CampaignArchive> {
-    const [campaign, world, sessionLog] = await Promise.all([
-      this.campaigns.get(campaignId),
-      this.world.list(campaignId),
-      this.session.getAll(campaignId),
-    ])
-    const characters = await Promise.all(campaign.characterIds.map((id) => this.characters.get(id)))
-    return {
-      version: '1',
-      exportedAt: new Date().toISOString(),
-      rulesetId: campaign.rulesetId,
-      campaign,
-      characters,
-      world,
-      sessionLog,
-    }
+    return this.db.transaction(
+      'r',
+      [this.db.campaigns, this.db.characters, this.db.sessionEvents, this.db.worldEntities],
+      async () => {
+        const campaign = await this.campaigns.get(campaignId)
+        const [world, sessionLog] = await Promise.all([
+          this.world.list(campaignId),
+          this.session.getAll(campaignId),
+        ])
+        const characters = await Promise.all(
+          campaign.characterIds.map((id) => this.characters.get(id)),
+        )
+        return {
+          version: '1',
+          exportedAt: new Date().toISOString(),
+          rulesetId: campaign.rulesetId,
+          campaign,
+          characters,
+          world,
+          sessionLog,
+        }
+      },
+    )
   }
 
   async import(archive: CampaignArchive): Promise<Campaign> {
