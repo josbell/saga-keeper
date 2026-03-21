@@ -124,6 +124,18 @@ export class LocalAdapter implements StorageAdapter {
       await this.db.sessionEvents.add(event)
     },
 
+    appendBatch: async (campaignId: string, events: SessionEvent[]): Promise<void> => {
+      const bad = events.find((e) => e.campaignId !== campaignId)
+      if (bad) {
+        throw new Error(
+          `Event campaignId "${bad.campaignId}" does not match campaign "${campaignId}"`,
+        )
+      }
+      await this.db.transaction('rw', this.db.sessionEvents, async () => {
+        await this.db.sessionEvents.bulkAdd(events)
+      })
+    },
+
     getRecent: async (campaignId: string, limit: number): Promise<SessionEvent[]> => {
       return this.db.sessionEvents
         .where('[campaignId+timestamp]')

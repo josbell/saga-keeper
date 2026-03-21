@@ -118,21 +118,74 @@ describe('OracleService.rollAskFates', () => {
   })
 
   it('extreme flag is true when roll is doubles (roll=11)', () => {
-    // RANGE=100_000: Math.floor(0.0001 * 100_000) = 10, roll = (10 % 100) + 1 = 11
-    // isDoubles(11): floor(11/10)=1, 11%10=1 → 1===1 → true
-    vi.spyOn(Math, 'random').mockReturnValue(0.0001)
+    // Math.floor(0.10 * 100) + 1 = 11; isDoubles(11): floor(1)===1 → true
+    vi.spyOn(Math, 'random').mockReturnValue(0.10)
     const result = oracle.rollAskFates('fifty-fifty')
     expect(result.roll).toBe(11)
     expect(result.extreme).toBe(true)
   })
 
   it('extreme flag is false when roll is not doubles (roll=12)', () => {
-    // Math.floor(0.00011 * 100_000) = 11, roll = (11 % 100) + 1 = 12
-    // isDoubles(12): floor(12/10)=1, 12%10=2 → 1!==2 → false
-    vi.spyOn(Math, 'random').mockReturnValue(0.00011)
+    // Math.floor(0.11 * 100) + 1 = 12; isDoubles(12): floor(1)!==2 → false
+    vi.spyOn(Math, 'random').mockReturnValue(0.11)
     const result = oracle.rollAskFates('fifty-fifty')
     expect(result.roll).toBe(12)
     expect(result.extreme).toBe(false)
+  })
+})
+
+// ── OracleService — injectable PRNG + seed (#18) ─────────────────────────────
+
+describe('OracleService — injectable PRNG', () => {
+  it('roll() is deterministic with a fixed PRNG', () => {
+    // Math.floor(0.5 * 100) + 1 = 51
+    const oracle = new OracleService(() => 0.5)
+    const r1 = oracle.roll('simple-table', TABLES)
+    const r2 = oracle.roll('simple-table', TABLES)
+    expect(r1.roll).toBe(r2.roll)
+    expect(r1.raw).toBe(r2.raw)
+  })
+
+  it('rollAskFates() is deterministic with a fixed PRNG', () => {
+    const oracle = new OracleService(() => 0.5)
+    const r1 = oracle.rollAskFates('fifty-fifty')
+    const r2 = oracle.rollAskFates('fifty-fifty')
+    expect(r1.roll).toBe(r2.roll)
+    expect(r1.result).toBe(r2.result)
+  })
+
+  it('roll() returns a seed field', () => {
+    const oracle = new OracleService(() => 0.5)
+    const result = oracle.roll('simple-table', TABLES)
+    expect(result.seed).toBeDefined()
+    expect(typeof result.seed).toBe('string')
+  })
+
+  it('rollAskFates() returns a seed field', () => {
+    const oracle = new OracleService(() => 0.5)
+    const result = oracle.rollAskFates('fifty-fifty')
+    expect(result.seed).toBeDefined()
+    expect(typeof result.seed).toBe('string')
+  })
+
+  it('seed round-trips: replaying the seed via injected PRNG reproduces the same roll', () => {
+    const oracle = new OracleService(() => 0.5)
+    const r1 = oracle.roll('simple-table', TABLES)
+    // Reconstruct PRNG from seed: seed is the raw float passed to rand()
+    const seedFloat = parseFloat(r1.seed!)
+    const oracleReplay = new OracleService(() => seedFloat)
+    const r2 = oracleReplay.roll('simple-table', TABLES)
+    expect(r2.roll).toBe(r1.roll)
+    expect(r2.raw).toBe(r1.raw)
+  })
+
+  it('existing Math.random spy approach still works with default PRNG', () => {
+    // Math.floor(0.10 * 100) + 1 = 11
+    vi.spyOn(Math, 'random').mockReturnValue(0.10)
+    const oracle = new OracleService()
+    const result = oracle.rollAskFates('fifty-fifty')
+    expect(result.roll).toBe(11)
+    vi.restoreAllMocks()
   })
 })
 

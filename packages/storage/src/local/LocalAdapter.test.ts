@@ -259,6 +259,63 @@ describe('session', () => {
       'Event campaignId "camp-2" does not match campaign "camp-1"',
     )
   })
+
+  it('appendBatch writes all events and they are all readable via getAll', async () => {
+    const events = [
+      makeEvent('ev-b1', 'camp-1', '2024-01-01T00:00:01.000Z'),
+      makeEvent('ev-b2', 'camp-1', '2024-01-01T00:00:02.000Z'),
+      makeEvent('ev-b3', 'camp-1', '2024-01-01T00:00:03.000Z'),
+    ]
+    await adapter.session.appendBatch('camp-1', events)
+    const all = await adapter.session.getAll('camp-1')
+    expect(all).toHaveLength(3)
+    expect(all.map((e) => e.id)).toEqual(['ev-b1', 'ev-b2', 'ev-b3'])
+  })
+
+  it('appendBatch with an empty array succeeds and writes nothing', async () => {
+    await adapter.session.appendBatch('camp-1', [])
+    const all = await adapter.session.getAll('camp-1')
+    expect(all).toHaveLength(0)
+  })
+
+  it('appendBatch throws when any event.campaignId mismatches, and writes nothing', async () => {
+    const events = [
+      makeEvent('ev-ok', 'camp-1', '2024-01-01T00:00:01.000Z'),
+      makeEvent('ev-bad', 'camp-2', '2024-01-01T00:00:02.000Z'),
+    ]
+    await expect(adapter.session.appendBatch('camp-1', events)).rejects.toThrow(
+      'Event campaignId "camp-2" does not match campaign "camp-1"',
+    )
+    // Nothing should have been written
+    const all = await adapter.session.getAll('camp-1')
+    expect(all).toHaveLength(0)
+  })
+
+  it('appendBatch events are retrievable via getRecent', async () => {
+    const events = [
+      makeEvent('ev-r1', 'camp-1', '2024-01-01T00:00:01.000Z'),
+      makeEvent('ev-r2', 'camp-1', '2024-01-01T00:00:02.000Z'),
+    ]
+    await adapter.session.appendBatch('camp-1', events)
+    const recent = await adapter.session.getRecent('camp-1', 1)
+    expect(recent[0]!.id).toBe('ev-r2')
+  })
+
+  it('appendBatch rolls back ALL writes when a mid-batch ConstraintError occurs inside the transaction', async () => {
+    // Pre-seed an event with a known id so the second item in the batch collides
+    await adapter.session.append('camp-1', makeEvent('dup-id', 'camp-1', '2024-01-01T00:00:00.000Z'))
+
+    // Batch: first item is new (would succeed alone), second item duplicates 'dup-id'
+    const batch = [
+      makeEvent('new-before-dup', 'camp-1', '2024-01-01T00:00:01.000Z'),
+      makeEvent('dup-id',         'camp-1', '2024-01-01T00:00:02.000Z'),
+    ]
+    await expect(adapter.session.appendBatch('camp-1', batch)).rejects.toThrow()
+
+    // The Dexie 'rw' transaction must have aborted: 'new-before-dup' should NOT exist
+    const all = await adapter.session.getAll('camp-1')
+    expect(all.map((e) => e.id)).toEqual(['dup-id'])
+  })
 })
 
 // ── world ────────────────────────────────────────────────────────────────────

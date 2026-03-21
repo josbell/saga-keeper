@@ -9,20 +9,19 @@ export interface IOracleService {
 
 // ── Internal helpers ──────────────────────────────────────────────────────────
 
-// RANGE is evenly divisible by 100 → no modulo bias, rejection loop never fires
-const RANGE = 100_000
-const LIMIT = RANGE - (RANGE % 100)
-
-function rollD100(): number {
-  let n: number
-  do {
-    n = Math.floor(Math.random() * RANGE)
-  } while (n >= LIMIT)
-  return (n % 100) + 1
+// rand() ∈ [0, 1) → d100 in [1, 100].
+// Note: Math.random() has ~2^53 possible values; 2^53 % 100 ≠ 0, so there is a
+// negligible modulo bias (~1.1e-14). For a TTRPG game this is indistinguishable
+// from uniform. A crypto-quality approach would use rejection sampling over
+// Math.floor(rand() * 2^k) with k chosen so 2^k >> 100, but is not warranted here.
+function rollD100(rand: () => number): { roll: number; seed: string } {
+  const raw = rand()
+  return { roll: Math.floor(raw * 100) + 1, seed: String(raw) }
 }
 
 export const ODDS_THRESHOLD: Record<Odds, number> = {
-  certain: 100,
+  // Infinity ensures 'certain' always resolves true regardless of roll range changes.
+  certain: Infinity,
   'almost-certain': 90,
   likely: 75,
   'fifty-fifty': 50,
@@ -30,6 +29,8 @@ export const ODDS_THRESHOLD: Record<Odds, number> = {
   'small-chance': 10,
 }
 
+// Ironsworn "doubles": tens digit === units digit.
+// roll=100 is treated as two 0s (00 on a d10 pair) → remapped to 0 before digit check.
 function isDoubles(roll: number): boolean {
   const r = roll === 100 ? 0 : roll
   return Math.floor(r / 10) === r % 10
@@ -38,27 +39,32 @@ function isDoubles(roll: number): boolean {
 // ── OracleService ─────────────────────────────────────────────────────────────
 
 export class OracleService implements IOracleService {
+  // Default wraps Math.random via arrow function so vi.spyOn still intercepts it
+  constructor(private readonly rand: () => number = () => Math.random()) {}
+
   roll(tableId: string, tables: OracleTable[]): OracleRoll {
     const table = tables.find((t) => t.id === tableId)
     if (!table) throw new Error(`Unknown oracle table: "${tableId}"`)
-    const roll = rollD100()
+    const { roll, seed } = rollD100(this.rand)
     const entry = table.entries.find((e) => roll >= e.min && roll <= e.max)
     return {
       tableId,
       roll,
       raw: entry?.result ?? `(no entry for ${roll})`,
       timestamp: new Date().toISOString(),
+      seed,
     }
   }
 
   rollAskFates(odds: Odds): FatesResult {
-    const roll = rollD100()
+    const { roll, seed } = rollD100(this.rand)
     return {
       odds,
       roll,
       result: roll <= ODDS_THRESHOLD[odds],
       extreme: isDoubles(roll),
       timestamp: new Date().toISOString(),
+      seed,
     }
   }
 

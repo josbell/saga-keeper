@@ -34,6 +34,8 @@ export interface StorageAdapter {
   session: {
     /** Append-only — events are never edited */
     append(campaignId: string, event: SessionEvent): Promise<void>
+    /** Atomically append multiple events in a single transaction */
+    appendBatch(campaignId: string, events: SessionEvent[]): Promise<void>
     getRecent(campaignId: string, limit: number): Promise<SessionEvent[]>
     getAll(campaignId: string): Promise<SessionEvent[]>
   }

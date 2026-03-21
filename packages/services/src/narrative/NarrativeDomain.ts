@@ -2,6 +2,7 @@
 import type {
   PlayerAction,
   NarrativeTurn,
+  OracleResultRecord,
   StorageAdapter,
   RulesetPlugin,
   AIGateway,
@@ -14,7 +15,7 @@ import type {
   DiceRoll,
   Odds,
 } from '@saga-keeper/domain'
-import { ODDS_THRESHOLD, type IOracleService } from '../oracle/OracleService'
+import type { IOracleService } from '../oracle/OracleService'
 import type { IDiceService } from '../dice/DiceService'
 
 export interface INarrativeDomain {
@@ -46,14 +47,14 @@ function makeEvent(
     campaignId,
     turnId,
     type,
+    // TODO: 'local' assumes solo/single-device play. Co-op attribution requires
+    // processTurn() to accept a playerId parameter from the calling context.
     playerId: 'local',
     characterId,
     payload,
     timestamp: new Date().toISOString(),
   }
 }
-
-const VALID_ODDS = Object.keys(ODDS_THRESHOLD) as Odds[]
 
 // ── NarrativeDomain ───────────────────────────────────────────────────────────
 
@@ -71,10 +72,11 @@ export class NarrativeDomain implements INarrativeDomain {
 
     // ── Load campaign + character ──────────────────────────────────────────────
     const campaign = await this.storage.campaigns.get(campaignId)
-    if (campaign.characterIds.length === 0) throw new Error('Campaign has no characters')
-    // TODO: solo-only assumption — multi-character and co-op campaigns require PlayerAction
-    // to carry a characterId field so the correct character is selected.
-    const character = await this.storage.characters.get(campaign.characterIds[0]!)
+    const charId = action.characterId ?? campaign.characterIds[0]
+    if (!charId) throw new Error('Campaign has no characters')
+    if (!campaign.characterIds.includes(charId))
+      throw new Error(`Character "${charId}" does not belong to campaign "${campaignId}"`)
+    const character = await this.storage.characters.get(charId)
 
     // ── Phase 1: Classify intent ───────────────────────────────────────────────
     const intent: AIIntent =
@@ -114,7 +116,7 @@ export class NarrativeDomain implements INarrativeDomain {
     }
 
     // ── Phase 5: Oracle ────────────────────────────────────────────────────────
-    const oracleRolls: { tableId: string; roll: number; raw: string; timestamp: string }[] = []
+    const oracleRolls: OracleResultRecord[] = []
 
     if (action.type === 'move' && outcome) {
       // Auto-trigger oracle on miss — filter to tables the plugin actually has
@@ -124,16 +126,17 @@ export class NarrativeDomain implements INarrativeDomain {
         .filter((id) => allTables.some((t) => t.id === id))
       for (const id of triggerIds) {
         const r = this.oracle.roll(id, allTables)
-        oracleRolls.push({ tableId: r.tableId, roll: r.roll, raw: r.raw, timestamp: r.timestamp })
+        oracleRolls.push({ tableId: r.tableId, roll: r.roll, raw: r.raw, timestamp: r.timestamp, ...(r.seed !== undefined && { seed: r.seed }) })
       }
     } else if (action.type === 'oracle') {
-      const odds: Odds = VALID_ODDS.includes(action.odds as Odds) ? (action.odds as Odds) : 'fifty-fifty'
+      const odds: Odds = action.odds ?? 'fifty-fifty'
       const fates = this.oracle.rollAskFates(odds)
       oracleRolls.push({
         tableId: 'ask-the-fates',
         roll: fates.roll,
         raw: fates.result ? 'Yes' : 'No',
         timestamp: fates.timestamp,
+        ...(fates.seed !== undefined && { seed: fates.seed }),
       })
     }
 
@@ -166,35 +169,20 @@ export class NarrativeDomain implements INarrativeDomain {
       await this.storage.characters.save(updatedCharacter)
     }
 
-    // Append events in canonical order
+    // Collect events in canonical order, then commit atomically
     const make = (type: SessionEventType, payload: Record<string, unknown>) =>
       makeEvent(turnId, campaignId, type, character.id, payload)
 
-    // TODO: event appends are not transactional — a mid-turn storage failure produces a
-    // partial session log. Requires a batch-append API on StorageAdapter to fix properly.
-    await this.storage.session.append(campaignId, make('player.input', { action }))
+    const events: SessionEvent[] = []
+    events.push(make('player.input', { action }))
+    if (diceRoll) events.push(make('dice.rolled', { diceRoll }))
+    if (outcome) events.push(make('move.resolved', { moveId: action.moveId, outcome }))
+    if (oracleRolls.length > 0) events.push(make('oracle.consulted', { oracleRolls }))
+    events.push(make('skald.narrated', { text: response.text, tokensUsed: response.tokensUsed }))
+    if (extractedEntities.length > 0) events.push(make('entity.extracted', { entities: extractedEntities }))
+    if (deltas.length > 0) events.push(make('character.mutated', { deltas }))
 
-    if (diceRoll) {
-      await this.storage.session.append(campaignId, make('dice.rolled', { diceRoll }))
-    }
-
-    if (outcome) {
-      await this.storage.session.append(campaignId, make('move.resolved', { moveId: action.moveId, outcome }))
-    }
-
-    if (oracleRolls.length > 0) {
-      await this.storage.session.append(campaignId, make('oracle.consulted', { oracleRolls }))
-    }
-
-    await this.storage.session.append(campaignId, make('skald.narrated', { text: response.text, tokensUsed: response.tokensUsed }))
-
-    if (extractedEntities.length > 0) {
-      await this.storage.session.append(campaignId, make('entity.extracted', { entities: extractedEntities }))
-    }
-
-    if (deltas.length > 0) {
-      await this.storage.session.append(campaignId, make('character.mutated', { deltas }))
-    }
+    await this.storage.session.appendBatch(campaignId, events)
 
     // ── Build and return NarrativeTurn ─────────────────────────────────────────
     return {
