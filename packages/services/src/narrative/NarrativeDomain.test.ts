@@ -74,6 +74,11 @@ const AI_RESPONSE: CompletionResponse = { text: AI_NARRATION, intent: 'skald.mov
 function appendedTypes(mockStorage: { session: { appendBatch: ReturnType<typeof vi.fn> } }): string[] {
   const calls = mockStorage.session.appendBatch.mock.calls as unknown[][]
   if (calls.length === 0) return []
+  if (calls.length !== 1) {
+    throw new Error(
+      `Expected session.appendBatch to be called exactly once, but was called ${calls.length} times.`
+    )
+  }
   // appendBatch is called once with (campaignId, events[])
   return ((calls[0]![1] as SessionEvent[]) ?? []).map((e) => e.type)
 }

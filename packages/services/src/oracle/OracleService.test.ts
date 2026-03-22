@@ -187,6 +187,21 @@ describe('OracleService — injectable PRNG', () => {
     expect(result.roll).toBe(11)
     vi.restoreAllMocks()
   })
+
+  it('roll() throws when PRNG returns NaN', () => {
+    const oracle = new OracleService(() => NaN)
+    expect(() => oracle.roll('simple-table', TABLES)).toThrow(/must return a value in \[0, 1\)/)
+  })
+
+  it('roll() throws when PRNG returns 1 (upper boundary, would produce roll=101)', () => {
+    const oracle = new OracleService(() => 1)
+    expect(() => oracle.roll('simple-table', TABLES)).toThrow(/must return a value in \[0, 1\)/)
+  })
+
+  it('rollAskFates() throws when PRNG returns a negative value', () => {
+    const oracle = new OracleService(() => -0.1)
+    expect(() => oracle.rollAskFates('fifty-fifty')).toThrow(/must return a value in \[0, 1\)/)
+  })
 })
 
 // ── OracleService.detectTriggers ──────────────────────────────────────────────

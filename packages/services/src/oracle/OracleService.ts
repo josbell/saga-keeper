@@ -16,6 +16,9 @@ export interface IOracleService {
 // Math.floor(rand() * 2^k) with k chosen so 2^k >> 100, but is not warranted here.
 function rollD100(rand: () => number): { roll: number; seed: string } {
   const raw = rand()
+  if (!Number.isFinite(raw) || raw < 0 || raw >= 1) {
+    throw new Error(`OracleService rand() must return a value in [0, 1), got ${raw}`)
+  }
   return { roll: Math.floor(raw * 100) + 1, seed: String(raw) }
 }
 
