@@ -44,7 +44,9 @@ function makeHitOutcome(result: 'strong-hit' | 'weak-hit'): MoveOutcome {
 describe('OracleService.roll', () => {
   const oracle = new OracleService()
 
-  afterEach(() => { vi.restoreAllMocks() })
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
 
   it('returns a roll between 1 and 100', () => {
     const result = oracle.roll('simple-table', TABLES)
@@ -85,7 +87,9 @@ describe('OracleService.roll', () => {
 describe('OracleService.rollAskFates', () => {
   const oracle = new OracleService()
 
-  afterEach(() => { vi.restoreAllMocks() })
+  afterEach(() => {
+    vi.restoreAllMocks()
+  })
 
   it('returns the correct structure', () => {
     const result = oracle.rollAskFates('fifty-fifty')
@@ -119,7 +123,7 @@ describe('OracleService.rollAskFates', () => {
 
   it('extreme flag is true when roll is doubles (roll=11)', () => {
     // Math.floor(0.10 * 100) + 1 = 11; isDoubles(11): floor(1)===1 → true
-    vi.spyOn(Math, 'random').mockReturnValue(0.10)
+    vi.spyOn(Math, 'random').mockReturnValue(0.1)
     const result = oracle.rollAskFates('fifty-fifty')
     expect(result.roll).toBe(11)
     expect(result.extreme).toBe(true)
@@ -189,7 +193,7 @@ describe('OracleService — injectable PRNG', () => {
 
   it('existing Math.random spy approach still works with default PRNG', () => {
     // Math.floor(0.10 * 100) + 1 = 11
-    vi.spyOn(Math, 'random').mockReturnValue(0.10)
+    vi.spyOn(Math, 'random').mockReturnValue(0.1)
     const oracle = new OracleService()
     const result = oracle.rollAskFates('fifty-fifty')
     expect(result.roll).toBe(11)

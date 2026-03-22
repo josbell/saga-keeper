@@ -26,12 +26,12 @@ export interface CharacterPatch {
 }
 
 export type RealtimeEvent =
-  | { type: 'session.event';    payload: SessionEvent }
-  | { type: 'character.patch';  payload: CharacterPatch; owner: string }
-  | { type: 'world.patch';      payload: WorldPatch }
-  | { type: 'presence.update';  payload: PresenceState }
-  | { type: 'turn.lock';        payload: TurnLockState }
-  | { type: 'turn.unlock';      payload: { actingPlayer: string } }
+  | { type: 'session.event'; payload: SessionEvent }
+  | { type: 'character.patch'; payload: CharacterPatch; owner: string }
+  | { type: 'world.patch'; payload: WorldPatch }
+  | { type: 'presence.update'; payload: PresenceState }
+  | { type: 'turn.lock'; payload: TurnLockState }
+  | { type: 'turn.unlock'; payload: { actingPlayer: string } }
 
 export interface CoopSession {
   campaignId: string

@@ -24,12 +24,21 @@ export interface INarrativeDomain {
 
 // ── Internal helpers ──────────────────────────────────────────────────────────
 
-const STAT_KEYS = ['edge', 'heart', 'iron', 'shadow', 'wits', 'health', 'spirit', 'supply', 'momentum']
+const STAT_KEYS = [
+  'edge',
+  'heart',
+  'iron',
+  'shadow',
+  'wits',
+  'health',
+  'spirit',
+  'supply',
+  'momentum',
+]
 
 function buildSnapshot(state: CharacterState): CharacterSnapshot {
   const data = state.data as Record<string, unknown>
-  const summary = STAT_KEYS
-    .filter((k) => typeof data[k] === 'number')
+  const summary = STAT_KEYS.filter((k) => typeof data[k] === 'number')
     .map((k) => `${k[0]!.toUpperCase()}${k.slice(1)}:${data[k] as number}`)
     .join(' ')
   return { id: state.id, name: state.name, rulesetId: state.rulesetId, summary, data: state.data }
@@ -40,7 +49,7 @@ function makeEvent(
   campaignId: string,
   type: SessionEventType,
   characterId: string,
-  payload: Record<string, unknown>,
+  payload: Record<string, unknown>
 ): SessionEvent {
   return {
     id: crypto.randomUUID(),
@@ -64,7 +73,7 @@ export class NarrativeDomain implements INarrativeDomain {
     private readonly plugin: RulesetPlugin,
     private readonly ai: AIGateway,
     private readonly oracle: IOracleService,
-    private readonly dice: IDiceService,
+    private readonly dice: IDiceService
   ) {}
 
   async processTurn(campaignId: string, action: PlayerAction): Promise<NarrativeTurn> {
@@ -82,18 +91,19 @@ export class NarrativeDomain implements INarrativeDomain {
 
     // ── Phase 1: Classify intent ───────────────────────────────────────────────
     const intent: AIIntent =
-      action.type === 'move' ? 'skald.move' :
-      action.type === 'oracle' ? 'oracle.narrate' :
-      'skald.narrate'
+      action.type === 'move'
+        ? 'skald.move'
+        : action.type === 'oracle'
+          ? 'oracle.narrate'
+          : 'skald.narrate'
 
     // ── Phase 2: Roll dice (move only) ─────────────────────────────────────────
     let diceRoll: DiceRoll | undefined
     if (action.type === 'move') {
       if (!action.moveId) throw new Error('moveId is required for move actions')
-      const modifier =
-        action.statKey
-          ? ((character.data as Record<string, number>)[action.statKey] ?? 0)
-          : 0
+      const modifier = action.statKey
+        ? ((character.data as Record<string, number>)[action.statKey] ?? 0)
+        : 0
       diceRoll = this.dice.roll({ action: 'd6', challenge: ['d10', 'd10'], modifier })
     }
 
@@ -128,7 +138,13 @@ export class NarrativeDomain implements INarrativeDomain {
         .filter((id) => allTables.some((t) => t.id === id))
       for (const id of triggerIds) {
         const r = this.oracle.roll(id, allTables)
-        oracleRolls.push({ tableId: r.tableId, roll: r.roll, raw: r.raw, timestamp: r.timestamp, ...(r.seed !== undefined && { seed: r.seed }) })
+        oracleRolls.push({
+          tableId: r.tableId,
+          roll: r.roll,
+          raw: r.raw,
+          timestamp: r.timestamp,
+          ...(r.seed !== undefined && { seed: r.seed }),
+        })
       }
     } else if (action.type === 'oracle') {
       const odds: Odds = action.odds ?? 'fifty-fifty'
@@ -166,7 +182,11 @@ export class NarrativeDomain implements INarrativeDomain {
       for (const d of deltas) {
         ;(data as Record<string, number>)[d.stat] = d.after
       }
-      await this.storage.characters.save({ ...character, data, updatedAt: new Date().toISOString() })
+      await this.storage.characters.save({
+        ...character,
+        data,
+        updatedAt: new Date().toISOString(),
+      })
     }
 
     // Collect events in canonical order, then commit atomically
@@ -179,7 +199,8 @@ export class NarrativeDomain implements INarrativeDomain {
     if (outcome) events.push(make('move.resolved', { moveId: action.moveId, outcome }))
     if (oracleRolls.length > 0) events.push(make('oracle.consulted', { oracleRolls }))
     events.push(make('skald.narrated', { text: response.text, tokensUsed: response.tokensUsed }))
-    if (extractedEntities.length > 0) events.push(make('entity.extracted', { entities: extractedEntities }))
+    if (extractedEntities.length > 0)
+      events.push(make('entity.extracted', { entities: extractedEntities }))
     if (deltas.length > 0) events.push(make('character.mutated', { deltas }))
 
     await this.storage.session.appendBatch(campaignId, events)
@@ -189,17 +210,18 @@ export class NarrativeDomain implements INarrativeDomain {
       turnId,
       input: action,
       ...(action.moveId !== undefined && { move: action.moveId }),
-      ...(diceRoll && outcome && {
-        roll: {
-          actionDie: diceRoll.actionDie,
-          challengeDice: diceRoll.challengeDice,
-          modifier: diceRoll.modifier,
-          total: diceRoll.total,
-          result: outcome.result,
-          match: outcome.match,
-          ...(diceRoll.seed !== undefined && { seed: diceRoll.seed }),
-        },
-      }),
+      ...(diceRoll &&
+        outcome && {
+          roll: {
+            actionDie: diceRoll.actionDie,
+            challengeDice: diceRoll.challengeDice,
+            modifier: diceRoll.modifier,
+            total: diceRoll.total,
+            result: outcome.result,
+            match: outcome.match,
+            ...(diceRoll.seed !== undefined && { seed: diceRoll.seed }),
+          },
+        }),
       ...(oracleRolls.length > 0 && { oracleResults: oracleRolls }),
       narration: response.text,
       statDeltas: deltas,

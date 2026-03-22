@@ -34,11 +34,9 @@ describe('TemplateRegistry.register + resolve', () => {
 
   it('returns fallback (renders empty string) for unknown rulesetId', () => {
     const registry = new TemplateRegistry()
-    const result = registry.resolve('unknown-ruleset', 'skald.narrate').render(
-      'unknown-ruleset',
-      'skald.narrate',
-      MINIMAL_CONTEXT,
-    )
+    const result = registry
+      .resolve('unknown-ruleset', 'skald.narrate')
+      .render('unknown-ruleset', 'skald.narrate', MINIMAL_CONTEXT)
     expect(result).toBe('')
   })
 

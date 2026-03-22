@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest'
 import { IronswornPromptTemplate } from './IronswornPromptTemplate'
-import type { GameContext, CharacterSnapshot, WorldEntity, SessionEvent, OracleRoll } from '@saga-keeper/domain'
+import type {
+  GameContext,
+  CharacterSnapshot,
+  WorldEntity,
+  SessionEvent,
+  OracleRoll,
+} from '@saga-keeper/domain'
 
 const CHAR: CharacterSnapshot = {
   id: 'char-1',
@@ -151,7 +157,11 @@ describe('IronswornPromptTemplate.render — world block', () => {
   })
 
   it('contains location name', () => {
-    const entity = makeEntity({ type: 'location', name: 'The Iron Hold', description: 'A ruined fortress' })
+    const entity = makeEntity({
+      type: 'location',
+      name: 'The Iron Hold',
+      description: 'A ruined fortress',
+    })
     const ctx: GameContext = {
       ...MINIMAL_CONTEXT,
       world: { entities: [entity], totalEntityCount: 1 },

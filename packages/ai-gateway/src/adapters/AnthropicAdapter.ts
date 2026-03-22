@@ -1,7 +1,12 @@
 // AnthropicAdapter — MVP provider — proxied, never exposes key to client bundle
 
 import Anthropic from '@anthropic-ai/sdk'
-import type { ProviderAdapter, Message, CompletionOptions, ProviderCapabilities } from '@saga-keeper/domain'
+import type {
+  ProviderAdapter,
+  Message,
+  CompletionOptions,
+  ProviderCapabilities,
+} from '@saga-keeper/domain'
 
 const MODEL = 'claude-haiku-4-5-20251001'
 const DEFAULT_MAX_TOKENS = 1024
@@ -27,7 +32,7 @@ export class AnthropicAdapter implements ProviderAdapter {
   async complete(
     systemPrompt: string,
     messages: Message[],
-    options: CompletionOptions,
+    options: CompletionOptions
   ): Promise<string> {
     const filtered = toAnthropicMessages(messages)
     const response = await this.client.messages.create({
@@ -49,7 +54,7 @@ export class AnthropicAdapter implements ProviderAdapter {
   async *stream(
     systemPrompt: string,
     messages: Message[],
-    options: CompletionOptions,
+    options: CompletionOptions
   ): AsyncIterable<string> {
     const filtered = toAnthropicMessages(messages)
     const msgStream = this.client.messages.stream({
@@ -63,10 +68,7 @@ export class AnthropicAdapter implements ProviderAdapter {
     let streamDone = false
     try {
       for await (const event of msgStream) {
-        if (
-          event.type === 'content_block_delta' &&
-          event.delta.type === 'text_delta'
-        ) {
+        if (event.type === 'content_block_delta' && event.delta.type === 'text_delta') {
           yield event.delta.text
         }
       }
@@ -102,6 +104,6 @@ function logUsage(usage: Anthropic.Usage, log: (message: string) => void): void 
   const cacheRead = usage.cache_read_input_tokens ?? 0
   const cacheCreation = usage.cache_creation_input_tokens ?? 0
   log(
-    `[AnthropicAdapter] tokens — input: ${usage.input_tokens}, output: ${usage.output_tokens}, cache_read: ${cacheRead}, cache_creation: ${cacheCreation}`,
+    `[AnthropicAdapter] tokens — input: ${usage.input_tokens}, output: ${usage.output_tokens}, cache_read: ${cacheRead}, cache_creation: ${cacheCreation}`
   )
 }

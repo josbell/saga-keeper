@@ -1,7 +1,13 @@
 import type { DiceRoll, DiceRollRequest, DieType } from '@saga-keeper/domain'
 
 const SIDES: Record<DieType, number> = {
-  d4: 4, d6: 6, d8: 8, d10: 10, d12: 12, d20: 20, d100: 100,
+  d4: 4,
+  d6: 6,
+  d8: 8,
+  d10: 10,
+  d12: 12,
+  d20: 20,
+  d100: 100,
 }
 
 // ── LCG for seeded replay ──────────────────────────────────────────────────
@@ -25,7 +31,9 @@ function makeRoller(seed: string): (sides: number) => number {
   return (sides: number) => {
     // Rejection sampling: values ≥ limit would over-represent low faces
     const limit = LCG_M - (LCG_M % sides)
-    do { state = lcgNext(state) } while (state >= limit)
+    do {
+      state = lcgNext(state)
+    } while (state >= limit)
     return (state % sides) + 1
   }
 }
@@ -68,7 +76,10 @@ export type HitResult = 'strong-hit' | 'weak-hit' | 'miss'
  *  Miss:       total beats neither.
  *  Match:      both challenge dice show the same face (applies at any result). */
 export function resolveOutcome(roll: DiceRoll): { result: HitResult; match: boolean } {
-  const { total, challengeDice: [c0, c1] } = roll
+  const {
+    total,
+    challengeDice: [c0, c1],
+  } = roll
   const match = c0 === c1
   if (total > c0 && total > c1) return { result: 'strong-hit', match }
   if (total > c0 || total > c1) return { result: 'weak-hit', match }

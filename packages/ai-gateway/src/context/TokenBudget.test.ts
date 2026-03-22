@@ -7,11 +7,15 @@ describe('TokenBudget constructor — invalid options', () => {
   })
 
   it('throws for charsPerToken = 0', () => {
-    expect(() => new TokenBudget({ maxTokens: 100, charsPerToken: 0 })).toThrow('charsPerToken must be > 0')
+    expect(() => new TokenBudget({ maxTokens: 100, charsPerToken: 0 })).toThrow(
+      'charsPerToken must be > 0'
+    )
   })
 
   it('throws for negative charsPerToken', () => {
-    expect(() => new TokenBudget({ maxTokens: 100, charsPerToken: -2 })).toThrow('charsPerToken must be > 0')
+    expect(() => new TokenBudget({ maxTokens: 100, charsPerToken: -2 })).toThrow(
+      'charsPerToken must be > 0'
+    )
   })
 
   it('does NOT throw for maxTokens = 0 (valid: empty budget)', () => {

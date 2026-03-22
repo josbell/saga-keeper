@@ -25,13 +25,7 @@ export interface RulesetManifest {
 
 // ── Move types ────────────────────────────────────────────────────────────────
 
-export type MoveCategory =
-  | 'adventure'
-  | 'combat'
-  | 'relationship'
-  | 'quest'
-  | 'fate'
-  | 'legacy'
+export type MoveCategory = 'adventure' | 'combat' | 'relationship' | 'quest' | 'fate' | 'legacy'
 
 export interface Move {
   id: string
@@ -99,11 +93,7 @@ export interface RulesetPlugin {
     /** JSON Schema for character data — validated on load/save */
     schema: Record<string, unknown>
     defaults(): CharacterState['data']
-    applyCondition(
-      state: CharacterState,
-      condition: string,
-      active: boolean
-    ): CharacterMutation
+    applyCondition(state: CharacterState, condition: string, active: boolean): CharacterMutation
     momentumReset(state: CharacterState): number
     canAdvance(state: CharacterState, cost: number): boolean
   }

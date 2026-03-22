@@ -142,7 +142,11 @@ describe('AnthropicAdapter — constructor', () => {
 describe('AnthropicAdapter.complete() — happy path', () => {
   it('returns the text content from the response', async () => {
     mockCompletionResponse('The raven speaks.')
-    const result = await new AnthropicAdapter('k').complete('You are a skald.', makeMessages('user'), {})
+    const result = await new AnthropicAdapter('k').complete(
+      'You are a skald.',
+      makeMessages('user'),
+      {}
+    )
     expect(result).toBe('The raven speaks.')
   })
 
@@ -190,7 +194,11 @@ describe('AnthropicAdapter.complete() — happy path', () => {
 describe('AnthropicAdapter.complete() — message filtering', () => {
   it('filters out system-role messages from history', async () => {
     mockCompletionResponse('ok')
-    await new AnthropicAdapter('k').complete('sys', makeMessages('user', 'system', 'assistant', 'user'), {})
+    await new AnthropicAdapter('k').complete(
+      'sys',
+      makeMessages('user', 'system', 'assistant', 'user'),
+      {}
+    )
     const roles = (firstCallArg(getMockCreate()).messages as Message[]).map((m) => m.role)
     expect(roles).not.toContain('system')
   })
@@ -277,7 +285,12 @@ describe('AnthropicAdapter.complete() — edge cases', () => {
   it('returns empty string when response content array is empty', async () => {
     getMockCreate().mockResolvedValue({
       content: [],
-      usage: { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 },
+      usage: {
+        input_tokens: 0,
+        output_tokens: 0,
+        cache_read_input_tokens: 0,
+        cache_creation_input_tokens: 0,
+      },
     })
     const result = await new AnthropicAdapter('k').complete('sys', makeMessages('user'), {})
     expect(result).toBe('')
@@ -286,7 +299,12 @@ describe('AnthropicAdapter.complete() — edge cases', () => {
   it('skips non-text content blocks and returns empty string', async () => {
     getMockCreate().mockResolvedValue({
       content: [{ type: 'tool_use', id: 'tu_1', name: 'some_tool', input: {} }],
-      usage: { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 },
+      usage: {
+        input_tokens: 0,
+        output_tokens: 0,
+        cache_read_input_tokens: 0,
+        cache_creation_input_tokens: 0,
+      },
     })
     const result = await new AnthropicAdapter('k').complete('sys', makeMessages('user'), {})
     expect(result).toBe('')
@@ -298,7 +316,12 @@ describe('AnthropicAdapter.complete() — edge cases', () => {
         { type: 'text', text: 'Hello ' },
         { type: 'text', text: 'world' },
       ],
-      usage: { input_tokens: 0, output_tokens: 0, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 },
+      usage: {
+        input_tokens: 0,
+        output_tokens: 0,
+        cache_read_input_tokens: 0,
+        cache_creation_input_tokens: 0,
+      },
     })
     const result = await new AnthropicAdapter('k').complete('sys', makeMessages('user'), {})
     expect(result).toBe('Hello world')
@@ -306,7 +329,9 @@ describe('AnthropicAdapter.complete() — edge cases', () => {
 
   it('rejects when messages.create throws', async () => {
     getMockCreate().mockRejectedValue(new Error('Network error'))
-    await expect(new AnthropicAdapter('k').complete('sys', makeMessages('user'), {})).rejects.toThrow('Network error')
+    await expect(
+      new AnthropicAdapter('k').complete('sys', makeMessages('user'), {})
+    ).rejects.toThrow('Network error')
   })
 })
 
@@ -315,7 +340,9 @@ describe('AnthropicAdapter.complete() — edge cases', () => {
 describe('AnthropicAdapter.stream() — happy path', () => {
   it('yields each text delta chunk in order', async () => {
     getMockStream().mockReturnValue(makeStreamMock(['Once ', 'upon ', 'a time']))
-    const chunks = await collectStream(new AnthropicAdapter('k').stream('sys', makeMessages('user'), {}))
+    const chunks = await collectStream(
+      new AnthropicAdapter('k').stream('sys', makeMessages('user'), {})
+    )
     expect(chunks).toEqual(['Once ', 'upon ', 'a time'])
   })
 
@@ -341,7 +368,9 @@ describe('AnthropicAdapter.stream() — happy path', () => {
 
   it('yields nothing for a stream with no text_delta events', async () => {
     getMockStream().mockReturnValue(makeStreamMock([]))
-    const chunks = await collectStream(new AnthropicAdapter('k').stream('sys', makeMessages('user'), {}))
+    const chunks = await collectStream(
+      new AnthropicAdapter('k').stream('sys', makeMessages('user'), {})
+    )
     expect(chunks).toHaveLength(0)
   })
 
@@ -353,7 +382,9 @@ describe('AnthropicAdapter.stream() — happy path', () => {
 
   it('passes temperature to stream call when provided', async () => {
     getMockStream().mockReturnValue(makeStreamMock([]))
-    await collectStream(new AnthropicAdapter('k').stream('sys', makeMessages('user'), { temperature: 0.5 }))
+    await collectStream(
+      new AnthropicAdapter('k').stream('sys', makeMessages('user'), { temperature: 0.5 })
+    )
     expect(firstCallArg(getMockStream()).temperature).toBe(0.5)
   })
 })
@@ -363,7 +394,9 @@ describe('AnthropicAdapter.stream() — happy path', () => {
 describe('AnthropicAdapter.stream() — message filtering', () => {
   it('filters system-role messages from stream call', async () => {
     getMockStream().mockReturnValue(makeStreamMock([]))
-    await collectStream(new AnthropicAdapter('k').stream('sys', makeMessages('user', 'system', 'assistant'), {}))
+    await collectStream(
+      new AnthropicAdapter('k').stream('sys', makeMessages('user', 'system', 'assistant'), {})
+    )
     const roles = (firstCallArg(getMockStream()).messages as Message[]).map((m) => m.role)
     expect(roles).not.toContain('system')
   })
@@ -394,14 +427,19 @@ describe('AnthropicAdapter.stream() — error handling', () => {
     }
     getMockStream().mockReturnValue(failingStream)
     await expect(
-      collectStream(new AnthropicAdapter('k').stream('sys', makeMessages('user'), {})),
+      collectStream(new AnthropicAdapter('k').stream('sys', makeMessages('user'), {}))
     ).rejects.toThrow('Stream broken')
   })
 
   it('skips non-text_delta events without throwing', async () => {
     const mixedStream = {
       finalMessage: vi.fn().mockResolvedValue({
-        usage: { input_tokens: 5, output_tokens: 3, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 },
+        usage: {
+          input_tokens: 5,
+          output_tokens: 3,
+          cache_read_input_tokens: 0,
+          cache_creation_input_tokens: 0,
+        },
       }),
       async *[Symbol.asyncIterator]() {
         yield { type: 'message_start', message: {} }
@@ -410,7 +448,9 @@ describe('AnthropicAdapter.stream() — error handling', () => {
       },
     }
     getMockStream().mockReturnValue(mixedStream)
-    const result = await collectStream(new AnthropicAdapter('k').stream('sys', makeMessages('user'), {}))
+    const result = await collectStream(
+      new AnthropicAdapter('k').stream('sys', makeMessages('user'), {})
+    )
     expect(result).toEqual(['hi'])
   })
 

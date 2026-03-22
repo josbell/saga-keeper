@@ -1,6 +1,8 @@
 # Saga Keeper
+
 ### Ironsworn Companion App — UI Design Notes & Mockup Commentary
-*March 2026 · Version 1.0*
+
+_March 2026 · Version 1.0_
 
 ---
 
@@ -62,14 +64,14 @@ Great Hall  (home / campaign management)
 
 ### Step Structure
 
-| Step | Name | Description |
-|------|------|-------------|
-| 1 | Name Your World | Choose setting (The Ironlands, custom) |
-| 2 | Name & Background | Character name, background archetype (Warrior, Mystic, Ranger, etc.) |
-| 3 | Assign Stats | Distribute values 3/2/2/1/1 across Edge, Heart, Iron, Shadow, Wits |
-| 4 | Choose Assets | Pick 3 starting asset cards |
-| 5 | Swear Your Vow | Compose the first iron vow dramatically |
-| 6 | Enter the World | Confirmation and handoff to Iron Sheet |
+| Step | Name              | Description                                                          |
+| ---- | ----------------- | -------------------------------------------------------------------- |
+| 1    | Name Your World   | Choose setting (The Ironlands, custom)                               |
+| 2    | Name & Background | Character name, background archetype (Warrior, Mystic, Ranger, etc.) |
+| 3    | Assign Stats      | Distribute values 3/2/2/1/1 across Edge, Heart, Iron, Shadow, Wits   |
+| 4    | Choose Assets     | Pick 3 starting asset cards                                          |
+| 5    | Swear Your Vow    | Compose the first iron vow dramatically                              |
+| 6    | Enter the World   | Confirmation and handoff to Iron Sheet                               |
 
 ### Layout
 
@@ -122,12 +124,12 @@ Great Hall  (home / campaign management)
 
 Four rune-stamped tiles, each with a rune character and short label:
 
-| Rune | Type |
-|------|------|
-| ᚨ | Ask Oracle |
-| ᚲ | Generate Event |
-| ᚾ | Name & Place |
-| ᛞ | Twist Fate |
+| Rune | Type           |
+| ---- | -------------- |
+| ᚨ    | Ask Oracle     |
+| ᚲ    | Generate Event |
+| ᚾ    | Name & Place   |
+| ᛞ    | Twist Fate     |
 
 ### Quick Odds Pills
 
@@ -136,6 +138,7 @@ Six pills — Small Chance, Unlikely, 50/50, Likely, Almost Certain, Certain. On
 ### Scroll Result Card
 
 The most dramatic element: a dark card with the two-color top gradient, showing:
+
 - Oracle type + roll details in the header
 - A Cinzel Decorative title
 - AI-generated narrative body
@@ -163,16 +166,16 @@ Auto-extraction of named entities from the oracle narrative into colored chips i
 
 ### Chat Feed Message Types
 
-| Type | Description |
-|------|-------------|
-| Skald narration | Dark card with gold top-rule, italic prose, feather quill avatar |
-| Player action | Amber-tinted (Björn) or frost-tinted (Sigrid) bubble, right-aligned |
-| Move card | Inline strip: move name, stat, roll, die faces, hit outcome badge (Strong/Weak/Miss) |
-| Auto-oracle strip | Subtle amber bar showing what the Skald auto-consulted, odds, roll, outcome |
-| Inline oracle card | Frost-blue card with full AI narration, entity tags, Accept/Reroll/Discard actions |
-| Narrative suggestion | Blood-red left-bordered strip where the Skald recommends the player's next move |
-| Partner typing | Animated frost-blue dots when remote partner is composing |
-| Turn wait block | Pauses scene advancement until both co-op players confirm their action |
+| Type                 | Description                                                                          |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| Skald narration      | Dark card with gold top-rule, italic prose, feather quill avatar                     |
+| Player action        | Amber-tinted (Björn) or frost-tinted (Sigrid) bubble, right-aligned                  |
+| Move card            | Inline strip: move name, stat, roll, die faces, hit outcome badge (Strong/Weak/Miss) |
+| Auto-oracle strip    | Subtle amber bar showing what the Skald auto-consulted, odds, roll, outcome          |
+| Inline oracle card   | Frost-blue card with full AI narration, entity tags, Accept/Reroll/Discard actions   |
+| Narrative suggestion | Blood-red left-bordered strip where the Skald recommends the player's next move      |
+| Partner typing       | Animated frost-blue dots when remote partner is composing                            |
+| Turn wait block      | Pauses scene advancement until both co-op players confirm their action               |
 
 ### Oracle Integration (No Tab Switching Required)
 
@@ -196,6 +199,7 @@ Auto-extraction of named entities from the oracle narrative into colored chips i
 ### Mode Toggle
 
 A banner beneath the top navigation bar shows the current mode and a toggle to switch:
+
 - **Remote mode** shows the campaign share link and live presence indicators
 - **Same PC mode** shows the character switcher in the input bar and hides presence indicators
 
@@ -217,12 +221,12 @@ A banner beneath the top navigation bar shows the current mode and a toggle to s
 
 ### Shared vs. Private
 
-| Shared | Private |
-|--------|---------|
-| Skald chat feed | Each player's private notes |
-| World Forge | Character secrets / hidden motivations |
-| Oracle history | Information one character has that the other doesn't |
-| Vow progress | |
+| Shared          | Private                                              |
+| --------------- | ---------------------------------------------------- |
+| Skald chat feed | Each player's private notes                          |
+| World Forge     | Character secrets / hidden motivations               |
+| Oracle history  | Information one character has that the other doesn't |
+| Vow progress    |                                                      |
 
 The right panel in duo mode shows a side-by-side **Party Stats** table (both characters' Health, Spirit, Supply, Momentum, and key stats) plus the shared vow with individual contribution tracking.
 
@@ -273,41 +277,43 @@ The right panel in duo mode shows a side-by-side **Party Stats** table (both cha
 
 ## Design System
 
+> **Implementation home:** `packages/ui` — a pnpm workspace package consumed by all shells. Currently exports design tokens as TypeScript objects. Base components (`Button`, `Input`, `Textarea`, `Card`, `Badge`, `DiceRoller`, `StatTrack`) and CSS custom property exports are planned (tracked in issue #31). Components will be theme-agnostic — light/dark mode driven by CSS variable overrides at the shell level.
+
 ### Color Palette
 
-| Token | Hex | Usage |
-|-------|-----|-------|
-| Void black | `#0d0b08` | Primary background |
-| Ash | `#13100d` | Surface background (cards, header) |
-| Ember | `#1e1710` | Input fields, inset elements |
-| Iron | `#2a241c` | Borders |
-| Stone | `#3d3428` | Inactive borders, labels |
-| Bone | `#7a6a52` | Secondary text, inactive items |
-| Parchment | `#c4a96e` | Primary body text |
-| Gold | `#d4941a` / `#f0b429` | Active states, headings, highlights |
-| Blood | `#8b1a1a` / `#c0392b` | Vows, threats, debilities, miss outcomes |
-| Ice | `#7ab3cc` / `#a8d4e8` | Spirit meter, oracle, remote/co-op elements |
+| Token      | Hex                   | Usage                                       |
+| ---------- | --------------------- | ------------------------------------------- |
+| Void black | `#0d0b08`             | Primary background                          |
+| Ash        | `#13100d`             | Surface background (cards, header)          |
+| Ember      | `#1e1710`             | Input fields, inset elements                |
+| Iron       | `#2a241c`             | Borders                                     |
+| Stone      | `#3d3428`             | Inactive borders, labels                    |
+| Bone       | `#7a6a52`             | Secondary text, inactive items              |
+| Parchment  | `#c4a96e`             | Primary body text                           |
+| Gold       | `#d4941a` / `#f0b429` | Active states, headings, highlights         |
+| Blood      | `#8b1a1a` / `#c0392b` | Vows, threats, debilities, miss outcomes    |
+| Ice        | `#7ab3cc` / `#a8d4e8` | Spirit meter, oracle, remote/co-op elements |
 
 ### Typography
 
-| Font | Usage |
-|------|-------|
-| Cinzel Decorative | Character names, screen titles, die faces, logo — the most dramatic moments |
-| Cinzel | Navigation, labels, input text, body — readable at small sizes with runic character |
+| Font              | Usage                                                                               |
+| ----------------- | ----------------------------------------------------------------------------------- |
+| Cinzel Decorative | Character names, screen titles, die faces, logo — the most dramatic moments         |
+| Cinzel            | Navigation, labels, input text, body — readable at small sizes with runic character |
 
 All-caps + letter-spacing is used for labels (8–9px font, 2–5px letter-spacing) to evoke engraved stone.
 
 ### Rune Characters
 
-| Rune | Meaning | Usage |
-|------|---------|-------|
-| ᛖ | Edge | Speed & ranged stat |
-| ᚺ | Heart | Courage & bonds stat |
-| ᛁ | Iron | Strength & combat stat |
-| ᛊ | Shadow | Deception & stealth stat |
-| ᚹ | Wits | Cunning & survival stat |
-| ᛟ | Oracle type tile | Ask Oracle |
-| ᚦ | Section marker | The Iron Sheet title bar |
+| Rune | Meaning          | Usage                    |
+| ---- | ---------------- | ------------------------ |
+| ᛖ    | Edge             | Speed & ranged stat      |
+| ᚺ    | Heart            | Courage & bonds stat     |
+| ᛁ    | Iron             | Strength & combat stat   |
+| ᛊ    | Shadow           | Deception & stealth stat |
+| ᚹ    | Wits             | Cunning & survival stat  |
+| ᛟ    | Oracle type tile | Ask Oracle               |
+| ᚦ    | Section marker   | The Iron Sheet title bar |
 
 ### Signature Elements
 
@@ -327,4 +333,4 @@ All-caps + letter-spacing is used for labels (8–9px font, 2–5px letter-spaci
 
 ---
 
-*Saga Keeper design notes — generated from UI mockup session, March 2026*
+_Saga Keeper design notes — generated from UI mockup session, March 2026_

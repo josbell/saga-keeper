@@ -77,11 +77,7 @@ export interface AIGateway {
 export interface ProviderAdapter {
   id: string
   displayName: string
-  complete(
-    systemPrompt: string,
-    messages: Message[],
-    options: CompletionOptions
-  ): Promise<string>
+  complete(systemPrompt: string, messages: Message[], options: CompletionOptions): Promise<string>
   stream(
     systemPrompt: string,
     messages: Message[],
