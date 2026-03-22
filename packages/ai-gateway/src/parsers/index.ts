@@ -36,18 +36,25 @@ export type RandomEvent = z.infer<typeof RandomEventSchema>
  * Parse a raw AI response string as JSON, then validate against the
  * provided Zod schema. Throws a descriptive error on failure.
  */
+const RAW_PREVIEW_MAX = 500
+
+function truncateRaw(raw: string): string {
+  if (raw.length <= RAW_PREVIEW_MAX) return raw
+  return `${raw.slice(0, RAW_PREVIEW_MAX)}…[${raw.length - RAW_PREVIEW_MAX} chars omitted]`
+}
+
 export function parseStructuredOutput<T>(schema: z.ZodType<T>, raw: string): T {
   let parsed: unknown
   try {
     parsed = JSON.parse(raw)
   } catch {
-    throw new Error(`AI response was not valid JSON.\n\nRaw response:\n${raw}`)
+    throw new Error(`AI response was not valid JSON.\n\nRaw response:\n${truncateRaw(raw)}`)
   }
 
   const result = schema.safeParse(parsed)
   if (!result.success) {
     throw new Error(
-      `AI response did not match expected schema.\n\nErrors:\n${result.error.message}\n\nRaw response:\n${raw}`
+      `AI response did not match expected schema.\n\nErrors:\n${result.error.message}\n\nRaw response:\n${truncateRaw(raw)}`
     )
   }
 

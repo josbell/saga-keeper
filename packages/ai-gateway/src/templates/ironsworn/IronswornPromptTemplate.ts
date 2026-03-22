@@ -108,5 +108,9 @@ function toneDescription(tone: NonNullable<GameContext['narrativeTone']>): strin
     case 'grim': return 'The tone is grim and dark. Outcomes are harsh; hope is scarce.'
     case 'heroic': return 'The tone is heroic and epic. Deeds matter; glory is within reach.'
     case 'mythic': return 'The tone is mythic. The world is ancient, strange, and vast.'
+    default: {
+      const _exhaustiveCheck: never = tone
+      throw new Error(`IronswornPromptTemplate: unhandled narrative tone "${_exhaustiveCheck}"`)
+    }
   }
 }
