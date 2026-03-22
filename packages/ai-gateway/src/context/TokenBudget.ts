@@ -34,6 +34,12 @@ export class TokenBudget implements ITokenBudget {
   private readonly budgetChars: number
 
   constructor(opts: TokenBudgetOptions) {
+    if (opts.maxTokens < 0) {
+      throw new Error(`TokenBudget: maxTokens must be ≥ 0, received ${opts.maxTokens}`)
+    }
+    if (opts.charsPerToken !== undefined && opts.charsPerToken <= 0) {
+      throw new Error(`TokenBudget: charsPerToken must be > 0, received ${opts.charsPerToken}`)
+    }
     this.ratio = opts.charsPerToken ?? 4
     this.budgetChars = opts.maxTokens * this.ratio
   }

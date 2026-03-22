@@ -1,6 +1,24 @@
 import { describe, it, expect } from 'vitest'
 import { TokenBudget } from './TokenBudget'
 
+describe('TokenBudget constructor — invalid options', () => {
+  it('throws for negative maxTokens', () => {
+    expect(() => new TokenBudget({ maxTokens: -1 })).toThrow('maxTokens must be ≥ 0')
+  })
+
+  it('throws for charsPerToken = 0', () => {
+    expect(() => new TokenBudget({ maxTokens: 100, charsPerToken: 0 })).toThrow('charsPerToken must be > 0')
+  })
+
+  it('throws for negative charsPerToken', () => {
+    expect(() => new TokenBudget({ maxTokens: 100, charsPerToken: -2 })).toThrow('charsPerToken must be > 0')
+  })
+
+  it('does NOT throw for maxTokens = 0 (valid: empty budget)', () => {
+    expect(() => new TokenBudget({ maxTokens: 0 })).not.toThrow()
+  })
+})
+
 describe('TokenBudget.estimate', () => {
   const budget = new TokenBudget({ maxTokens: 1000 })
 

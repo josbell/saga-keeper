@@ -104,19 +104,23 @@ describe('ContextBuilder.build — passthrough when under budget', () => {
 })
 
 describe('ContextBuilder.build — recentEvents trimming', () => {
-  it('drops oldest events first when over budget', () => {
+  it('drops oldest events first — newest event survives when budget allows', () => {
     const t = makeTemplate()
-    // maxTokens: 1 → 4 chars; everything will be trimmed
-    const events = [makeEvent('oldest'), makeEvent('middle'), makeEvent('newest')]
+    // Use a large payload (~400 chars/event when serialised) so budget maths is predictable.
+    // maxTokens: 500 → 2000 chars; boilerplate reserve = 800; remaining = 1200;
+    // eventBudget = 720 chars — fits 1 event (~400 chars) but not 3 (~1200 chars).
+    const largePayload = { text: 'x'.repeat(200) }
+    const events = [
+      { ...makeEvent('oldest'), payload: largePayload },
+      { ...makeEvent('middle'), payload: largePayload },
+      { ...makeEvent('newest'), payload: largePayload },
+    ]
     const ctx: GameContext = { ...MINIMAL_CONTEXT, recentEvents: events }
-    new ContextBuilder(t, { maxTokens: 1 }).build('skald.narrate', ctx)
+    new ContextBuilder(t, { maxTokens: 500 }).build('skald.narrate', ctx)
     const passedCtx = capturedContext(t)
-    // newest items survive
-    if (passedCtx.recentEvents.length > 0) {
-      expect(passedCtx.recentEvents[passedCtx.recentEvents.length - 1]!.id).toBe('e-newest')
-    }
-    // total must not exceed original
-    expect(passedCtx.recentEvents.length).toBeLessThanOrEqual(events.length)
+    expect(passedCtx.recentEvents.length).toBeGreaterThan(0)
+    expect(passedCtx.recentEvents[passedCtx.recentEvents.length - 1]!.id).toBe('newest')
+    expect(passedCtx.recentEvents.length).toBeLessThan(events.length)
   })
 
   it('template.render is called exactly once after trimming', () => {
