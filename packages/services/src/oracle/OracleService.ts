@@ -22,7 +22,7 @@ function rollD100(rand: () => number): { roll: number; seed: string } {
   return { roll: Math.floor(raw * 100) + 1, seed: String(raw) }
 }
 
-export const ODDS_THRESHOLD: Record<Odds, number> = {
+const ODDS_THRESHOLD: Record<Odds, number> = {
   // Infinity ensures 'certain' always resolves true regardless of roll range changes.
   certain: Infinity,
   'almost-certain': 90,

@@ -301,6 +301,21 @@ describe('session', () => {
     expect(recent[0]!.id).toBe('ev-r2')
   })
 
+  it('getAll preserves insertion order for events that share the same timestamp', async () => {
+    // All events in a single appendBatch turn share the same ms timestamp.
+    // The sort comparator must return 0 for equal keys so V8's stable sort keeps
+    // their original array order rather than reversing them.
+    const ts = '2024-06-01T12:00:00.000Z'
+    const events = [
+      makeEvent('same-ts-1', 'camp-1', ts),
+      makeEvent('same-ts-2', 'camp-1', ts),
+      makeEvent('same-ts-3', 'camp-1', ts),
+    ]
+    await adapter.session.appendBatch('camp-1', events)
+    const all = await adapter.session.getAll('camp-1')
+    expect(all.map((e) => e.id)).toEqual(['same-ts-1', 'same-ts-2', 'same-ts-3'])
+  })
+
   it('appendBatch rolls back ALL writes when a mid-batch ConstraintError occurs inside the transaction', async () => {
     // Pre-seed an event with a known id so the second item in the batch collides
     await adapter.session.append('camp-1', makeEvent('dup-id', 'camp-1', '2024-01-01T00:00:00.000Z'))

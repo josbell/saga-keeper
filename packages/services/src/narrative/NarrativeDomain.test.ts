@@ -49,12 +49,12 @@ const CAMPAIGN: Campaign = {
 // DiceRoll stubs for controlled outcomes
 function makeRoll(total: number, c0: number, c1: number) {
   return {
-    request: { action: 'd6' as const, challenge: ['d10', 'd10'] as ['d10', 'd10'], modifier: 0, seed: 'test' },
+    request: { action: 'd6' as const, challenge: ['d10', 'd10'] as ['d10', 'd10'], modifier: 0, seed: 'deadbeef' },
     actionDie: total,
     challengeDice: [c0, c1] as [number, number],
     modifier: 0,
     total,
-    seed: 'test',
+    seed: 'deadbeef',
     rolledAt: '2026-01-01T00:00:00Z',
   }
 }

@@ -132,6 +132,14 @@ describe('OracleService.rollAskFates', () => {
     expect(result.roll).toBe(12)
     expect(result.extreme).toBe(false)
   })
+
+  it('extreme flag is true for roll=100 (isDoubles treats 100 as 00, the only special case)', () => {
+    // Math.floor(0.995 * 100) + 1 = 100; isDoubles(100) remaps to 0 → floor(0)===0 → true
+    vi.spyOn(Math, 'random').mockReturnValue(0.995)
+    const result = oracle.rollAskFates('fifty-fifty')
+    expect(result.roll).toBe(100)
+    expect(result.extreme).toBe(true)
+  })
 })
 
 // ── OracleService — injectable PRNG + seed (#18) ─────────────────────────────

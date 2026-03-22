@@ -125,6 +125,7 @@ export class LocalAdapter implements StorageAdapter {
     },
 
     appendBatch: async (campaignId: string, events: SessionEvent[]): Promise<void> => {
+      // Pre-flight check — runs before the transaction opens, so no writes occur on failure
       const bad = events.find((e) => e.campaignId !== campaignId)
       if (bad) {
         throw new Error(
@@ -150,8 +151,14 @@ export class LocalAdapter implements StorageAdapter {
         .where('[campaignId+timestamp]')
         .between([campaignId, Dexie.minKey], [campaignId, Dexie.maxKey])
         .toArray()
-      // Explicit sort — don't rely on implicit compound-index traversal order
-      return events.sort((a, b) => (a.timestamp < b.timestamp ? -1 : 1))
+      // Explicit sort — don't rely on implicit compound-index traversal order.
+      // Returning 0 for equal timestamps preserves V8's stable insertion order,
+      // which matches the appendBatch write order within a single turn.
+      return events.sort((a, b) => {
+        if (a.timestamp < b.timestamp) return -1
+        if (a.timestamp > b.timestamp) return 1
+        return 0
+      })
     },
   }
 

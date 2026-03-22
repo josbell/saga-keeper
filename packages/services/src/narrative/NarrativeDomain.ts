@@ -76,6 +76,8 @@ export class NarrativeDomain implements INarrativeDomain {
     if (!charId) throw new Error('Campaign has no characters')
     if (!campaign.characterIds.includes(charId))
       throw new Error(`Character "${charId}" does not belong to campaign "${campaignId}"`)
+    // Character is always loaded regardless of action type: all turn types (move, oracle,
+    // free) include a character snapshot in the GameContext sent to the AI gateway.
     const character = await this.storage.characters.get(charId)
 
     // ── Phase 1: Classify intent ───────────────────────────────────────────────
@@ -159,14 +161,12 @@ export class NarrativeDomain implements INarrativeDomain {
 
     // Apply stat deltas — use d.after (already clamped by move resolver)
     const deltas = outcome?.consequences ?? []
-    let updatedCharacter = character
     if (deltas.length > 0) {
       const data = { ...(character.data as Record<string, unknown>) }
       for (const d of deltas) {
         ;(data as Record<string, number>)[d.stat] = d.after
       }
-      updatedCharacter = { ...character, data, updatedAt: new Date().toISOString() }
-      await this.storage.characters.save(updatedCharacter)
+      await this.storage.characters.save({ ...character, data, updatedAt: new Date().toISOString() })
     }
 
     // Collect events in canonical order, then commit atomically
@@ -197,6 +197,7 @@ export class NarrativeDomain implements INarrativeDomain {
           total: diceRoll.total,
           result: outcome.result,
           match: outcome.match,
+          ...(diceRoll.seed !== undefined && { seed: diceRoll.seed }),
         },
       }),
       ...(oracleRolls.length > 0 && { oracleResults: oracleRolls }),

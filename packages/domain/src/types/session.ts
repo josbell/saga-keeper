@@ -54,6 +54,8 @@ export interface DiceRollRecord {
   total: number
   result: 'strong-hit' | 'weak-hit' | 'miss'
   match: boolean
+  /** Raw seed used to produce this roll — enables deterministic replay, symmetric with OracleResultRecord */
+  seed?: string
 }
 
 export interface OracleResultRecord {
