@@ -53,12 +53,12 @@ Each platform target is a thin shell. All business logic lives below this layer.
 - **Web Shell** — React + Vite. Responsive, CSS variables, dark mode. Priority target.
 - **Mobile Shell** — React Native (future). Touch gestures, native nav, offline-first.
 - **Desktop Shell** — Tauri/Electron (future). Native menus, local file system, offline.
-- **Design System** — `packages/ui`. Shared design tokens (CSS variables), base components (`Button`, `Input`, `Textarea`, `Card`, `Badge`, `DiceRoller`, `StatTrack`), and typography. One source across all shells.
+- **Design System** — `packages/ui`. Shared design tokens and typography. Base components (`Button`, `Input`, `Textarea`, `Card`, `Badge`, `DiceRoller`, `StatTrack`) are planned (tracked in issue #31). One source across all shells.
 
 **State management (web):**
 - All live game state lives in a Zustand store (`apps/web/src/store/`) with five slices: `characterSlice` (stats, conditions, vows, assets), `skaldFeedSlice` (messages, active turn phase), `oracleSlice` (history, last roll), `worldSlice` (entities, atlas), `sessionSlice` (active campaign, log reference).
 - All screens read from the store via the `useGameStore` hook. UI components make no direct calls into L4 or L5.
-- L3 services (`NarrativeDomain` and others) write directly to store slices via `useGameStore.getState().setX(...)` after each turn phase completes. There is no domain event bus between L3 and L1.
+- L3 services return state deltas to their caller. The L1 web shell (or turn orchestrator) commits those deltas to the relevant Zustand store slices. L3 has no dependency on `apps/web` or `useGameStore`.
 
 **Screen modules (Ironsworn default ruleset):**
 - Great Hall — Campaign home, multi-character overview
@@ -213,7 +213,7 @@ interface ProviderCapabilities {
 4. **Cost guard** — Checks session token spend against the configured budget. Warns at 80%, blocks at 100% and degrades tier.
 5. **Provider dispatch** — Calls the active `ProviderAdapter`.
 6. **Response parsing** — Extracts structured data where needed (entity tags, move outcomes). Raw narration passes through as-is.
-7. **Store commit** — `NarrativeDomain` writes results directly to the relevant Zustand store slices via `useGameStore.getState().setX(...)`. Skald feed, oracle history, character state, and World Forge entity suggestions all update reactively through the store. No domain events are emitted.
+7. **Return result** — Returns a structured `AIResponse` to the L1 caller. The caller is responsible for committing the parsed results to the relevant Zustand store slices.
 
 #### Planned Providers
 

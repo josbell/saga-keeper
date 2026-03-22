@@ -273,7 +273,7 @@ The right panel in duo mode shows a side-by-side **Party Stats** table (both cha
 
 ## Design System
 
-> **Implementation home:** `packages/ui` — a pnpm workspace package consumed by all shells. Exports base components (`Button`, `Input`, `Textarea`, `Card`, `Badge`, `DiceRoller`, `StatTrack`) and all design tokens as CSS custom properties. Components are theme-agnostic — light/dark mode is driven entirely by CSS variable overrides at the shell level.
+> **Implementation home:** `packages/ui` — a pnpm workspace package consumed by all shells. Currently exports design tokens as TypeScript objects. Base components (`Button`, `Input`, `Textarea`, `Card`, `Badge`, `DiceRoller`, `StatTrack`) and CSS custom property exports are planned (tracked in issue #31). Components will be theme-agnostic — light/dark mode driven by CSS variable overrides at the shell level.
 
 ### Color Palette
 
