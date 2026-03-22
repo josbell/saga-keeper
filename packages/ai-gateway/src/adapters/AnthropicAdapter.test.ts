@@ -53,8 +53,17 @@ function mockCompletionResponse(text: string, usageOverride?: object) {
   })
 }
 
-function makeStreamMock(chunks: string[]) {
+function makeStreamMock(chunks: string[], usageOverride?: object) {
   return {
+    finalMessage: vi.fn().mockResolvedValue({
+      usage: {
+        input_tokens: 80,
+        output_tokens: 20,
+        cache_read_input_tokens: 0,
+        cache_creation_input_tokens: 0,
+        ...usageOverride,
+      },
+    }),
     async *[Symbol.asyncIterator]() {
       for (const text of chunks) {
         yield { type: 'content_block_delta', delta: { type: 'text_delta', text } }
@@ -214,26 +223,50 @@ describe('AnthropicAdapter.complete() — message filtering', () => {
   })
 })
 
-// ── Chunk 5: complete() — token telemetry ────────────────────────────────────
+// ── Chunk 5: token telemetry ──────────────────────────────────────────────────
 
-describe('AnthropicAdapter.complete() — token telemetry', () => {
-  it('logs input_tokens and output_tokens', async () => {
-    const spy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+describe('AnthropicAdapter — token telemetry', () => {
+  it('complete() logs input_tokens and output_tokens via injected logger', async () => {
+    const log = vi.fn()
     mockCompletionResponse('ok', { input_tokens: 123, output_tokens: 45 })
-    await new AnthropicAdapter('k').complete('sys', makeMessages('user'), {})
-    const logOutput = spy.mock.calls.flat().join(' ')
-    expect(logOutput).toContain('123')
-    expect(logOutput).toContain('45')
-    spy.mockRestore()
+    await new AnthropicAdapter('k', log).complete('sys', makeMessages('user'), {})
+    const output = log.mock.calls.flat().join(' ')
+    expect(output).toContain('123')
+    expect(output).toContain('45')
   })
 
-  it('logs cache_read_input_tokens and cache_creation_input_tokens', async () => {
-    const spy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+  it('complete() logs cache_read and cache_creation tokens via injected logger', async () => {
+    const log = vi.fn()
     mockCompletionResponse('ok', { cache_read_input_tokens: 200, cache_creation_input_tokens: 50 })
+    await new AnthropicAdapter('k', log).complete('sys', makeMessages('user'), {})
+    const output = log.mock.calls.flat().join(' ')
+    expect(output).toContain('200')
+    expect(output).toContain('50')
+  })
+
+  it('stream() logs token usage after normal completion via injected logger', async () => {
+    const log = vi.fn()
+    getMockStream().mockReturnValue(makeStreamMock(['hi'], { input_tokens: 55, output_tokens: 10 }))
+    await collectStream(new AnthropicAdapter('k', log).stream('sys', makeMessages('user'), {}))
+    const output = log.mock.calls.flat().join(' ')
+    expect(output).toContain('55')
+    expect(output).toContain('10')
+  })
+
+  it('stream() does not log when consumer breaks early', async () => {
+    const log = vi.fn()
+    getMockStream().mockReturnValue(makeStreamMock(['a', 'b', 'c']))
+    for await (const _ of new AnthropicAdapter('k', log).stream('sys', makeMessages('user'), {})) {
+      break
+    }
+    expect(log).not.toHaveBeenCalled()
+  })
+
+  it('defaults to console.log when no logger is provided', async () => {
+    const spy = vi.spyOn(console, 'log').mockImplementation(() => undefined)
+    mockCompletionResponse('ok', { input_tokens: 1, output_tokens: 1 })
     await new AnthropicAdapter('k').complete('sys', makeMessages('user'), {})
-    const logOutput = spy.mock.calls.flat().join(' ')
-    expect(logOutput).toContain('200')
-    expect(logOutput).toContain('50')
+    expect(spy).toHaveBeenCalled()
     spy.mockRestore()
   })
 })
@@ -354,6 +387,7 @@ describe('AnthropicAdapter.stream() — message filtering', () => {
 describe('AnthropicAdapter.stream() — error handling', () => {
   it('propagates errors from the stream', async () => {
     const failingStream = {
+      finalMessage: vi.fn(),
       async *[Symbol.asyncIterator](): AsyncGenerator<never> {
         throw new Error('Stream broken')
       },
@@ -366,6 +400,9 @@ describe('AnthropicAdapter.stream() — error handling', () => {
 
   it('skips non-text_delta events without throwing', async () => {
     const mixedStream = {
+      finalMessage: vi.fn().mockResolvedValue({
+        usage: { input_tokens: 5, output_tokens: 3, cache_read_input_tokens: 0, cache_creation_input_tokens: 0 },
+      }),
       async *[Symbol.asyncIterator]() {
         yield { type: 'message_start', message: {} }
         yield { type: 'content_block_delta', delta: { type: 'text_delta', text: 'hi' } }

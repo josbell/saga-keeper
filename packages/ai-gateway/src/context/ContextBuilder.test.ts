@@ -106,9 +106,9 @@ describe('ContextBuilder.build — passthrough when under budget', () => {
 describe('ContextBuilder.build — recentEvents trimming', () => {
   it('drops oldest events first — newest event survives when budget allows', () => {
     const t = makeTemplate()
-    // Use a large payload (~400 chars/event when serialised) so budget maths is predictable.
-    // maxTokens: 500 → 2000 chars; boilerplate reserve = 800; remaining = 1200;
-    // eventBudget = 720 chars — fits 1 event (~400 chars) but not 3 (~1200 chars).
+    // Serialiser: `- ${e.type}: ${JSON.stringify(e.payload)}` ≈ 227 chars/event.
+    // maxTokens: 350 → 1400 chars; used = char summary (38) + boilerplate (800) = 838;
+    // remaining = 562; eventBudget = 337 chars — fits 1 event but not 2 (~454 chars).
     const largePayload = { text: 'x'.repeat(200) }
     const events = [
       { ...makeEvent('oldest'), payload: largePayload },
@@ -116,7 +116,7 @@ describe('ContextBuilder.build — recentEvents trimming', () => {
       { ...makeEvent('newest'), payload: largePayload },
     ]
     const ctx: GameContext = { ...MINIMAL_CONTEXT, recentEvents: events }
-    new ContextBuilder(t, { maxTokens: 500 }).build('skald.narrate', ctx)
+    new ContextBuilder(t, { maxTokens: 350 }).build('skald.narrate', ctx)
     const passedCtx = capturedContext(t)
     expect(passedCtx.recentEvents.length).toBeGreaterThan(0)
     expect(passedCtx.recentEvents[passedCtx.recentEvents.length - 1]!.id).toBe('newest')

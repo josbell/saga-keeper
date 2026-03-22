@@ -11,9 +11,17 @@ export class AnthropicAdapter implements ProviderAdapter {
   readonly displayName = 'Anthropic (Claude)'
 
   private readonly client: Anthropic
+  private readonly log: (message: string) => void
 
-  constructor(apiKey?: string) {
+  /**
+   * @param apiKey  Optional API key — falls back to `ANTHROPIC_API_KEY` env var.
+   *                Never passed to the client bundle; this adapter is server-side only.
+   * @param log     Optional logger. Defaults to `console.log`. Inject a no-op or
+   *                structured logger to control telemetry output in callers.
+   */
+  constructor(apiKey?: string, log?: (message: string) => void) {
     this.client = new Anthropic(apiKey !== undefined ? { apiKey } : {})
+    this.log = log ?? console.log
   }
 
   async complete(
@@ -30,7 +38,7 @@ export class AnthropicAdapter implements ProviderAdapter {
       messages: filtered,
     })
 
-    logUsage(response.usage)
+    logUsage(response.usage, this.log)
 
     return response.content
       .filter((block): block is Anthropic.TextBlock => block.type === 'text')
@@ -44,7 +52,7 @@ export class AnthropicAdapter implements ProviderAdapter {
     options: CompletionOptions,
   ): AsyncIterable<string> {
     const filtered = toAnthropicMessages(messages)
-    const stream = this.client.messages.stream({
+    const msgStream = this.client.messages.stream({
       model: MODEL,
       max_tokens: options.maxTokens ?? DEFAULT_MAX_TOKENS,
       ...(options.temperature !== undefined && { temperature: options.temperature }),
@@ -52,12 +60,22 @@ export class AnthropicAdapter implements ProviderAdapter {
       messages: filtered,
     })
 
-    for await (const event of stream) {
-      if (
-        event.type === 'content_block_delta' &&
-        event.delta.type === 'text_delta'
-      ) {
-        yield event.delta.text
+    let streamDone = false
+    try {
+      for await (const event of msgStream) {
+        if (
+          event.type === 'content_block_delta' &&
+          event.delta.type === 'text_delta'
+        ) {
+          yield event.delta.text
+        }
+      }
+      streamDone = true
+    } finally {
+      // Only log usage on normal completion — early break or error gives incomplete data.
+      if (streamDone) {
+        const finalMsg = await msgStream.finalMessage()
+        logUsage(finalMsg.usage, this.log)
       }
     }
   }
@@ -80,10 +98,10 @@ function toAnthropicMessages(messages: Message[]): Anthropic.MessageParam[] {
     .map((m) => ({ role: m.role, content: m.content }))
 }
 
-function logUsage(usage: Anthropic.Usage): void {
+function logUsage(usage: Anthropic.Usage, log: (message: string) => void): void {
   const cacheRead = usage.cache_read_input_tokens ?? 0
   const cacheCreation = usage.cache_creation_input_tokens ?? 0
-  console.log(
+  log(
     `[AnthropicAdapter] tokens — input: ${usage.input_tokens}, output: ${usage.output_tokens}, cache_read: ${cacheRead}, cache_creation: ${cacheCreation}`,
   )
 }

@@ -62,7 +62,7 @@ export class ContextBuilder implements IContextBuilder {
 
     const { items: trimmedEvents } = budget.trimToFit(
       context.recentEvents,
-      (e) => JSON.stringify(e),
+      (e) => `- ${e.type}: ${JSON.stringify(e.payload)}`,
       eventBudgetChars,
     )
 
