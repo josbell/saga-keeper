@@ -13,9 +13,11 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@saga-keeper/domain": "workspace:*"
+    "@saga-keeper/domain": "workspace:*",
+    "dexie": "^4"
   },
   "devDependencies": {
+    "fake-indexeddb": "^4",
     "typescript": "*",
     "vitest": "*"
   }

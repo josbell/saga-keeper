@@ -16,6 +16,7 @@
     "@saga-keeper/domain": "workspace:*"
   },
   "devDependencies": {
+    "@saga-keeper/ruleset-ironsworn": "workspace:*",
     "typescript": "*",
     "vitest": "*"
   }

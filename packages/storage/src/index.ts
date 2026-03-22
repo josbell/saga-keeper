@@ -3,5 +3,5 @@
 // Depends on: @saga-keeper/domain
 
 export * from './local/LocalAdapter'
-export * from './cloud/CloudAdapter'
 export * from './archive/ArchiveSerializer'
+// CloudAdapter is not yet implemented — re-export added when ready
