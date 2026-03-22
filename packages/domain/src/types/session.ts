@@ -42,7 +42,9 @@ export interface PlayerAction {
   moveId?: string
   statKey?: string
   userText?: string
-  odds?: string
+  odds?: import('./oracle').Odds
+  /** Which character is acting. Defaults to campaign.characterIds[0] for solo play. */
+  characterId?: string
 }
 
 export interface DiceRollRecord {
@@ -52,6 +54,8 @@ export interface DiceRollRecord {
   total: number
   result: 'strong-hit' | 'weak-hit' | 'miss'
   match: boolean
+  /** Raw seed used to produce this roll — enables deterministic replay, symmetric with OracleResultRecord */
+  seed?: string
 }
 
 export interface OracleResultRecord {
@@ -59,4 +63,6 @@ export interface OracleResultRecord {
   roll: number
   raw: string
   timestamp: string
+  /** Raw PRNG output that produced this roll — enables deterministic replay */
+  seed?: string
 }

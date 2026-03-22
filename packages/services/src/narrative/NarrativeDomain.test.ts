@@ -49,12 +49,12 @@ const CAMPAIGN: Campaign = {
 // DiceRoll stubs for controlled outcomes
 function makeRoll(total: number, c0: number, c1: number) {
   return {
-    request: { action: 'd6' as const, challenge: ['d10', 'd10'] as ['d10', 'd10'], modifier: 0, seed: 'test' },
+    request: { action: 'd6' as const, challenge: ['d10', 'd10'] as ['d10', 'd10'], modifier: 0, seed: 'deadbeef' },
     actionDie: total,
     challengeDice: [c0, c1] as [number, number],
     modifier: 0,
     total,
-    seed: 'test',
+    seed: 'deadbeef',
     rolledAt: '2026-01-01T00:00:00Z',
   }
 }
@@ -71,10 +71,16 @@ const AI_RESPONSE: CompletionResponse = { text: AI_NARRATION, intent: 'skald.mov
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function appendedTypes(mockStorage: { session: { append: ReturnType<typeof vi.fn> } }): string[] {
-  return (mockStorage.session.append.mock.calls as unknown[][]).map(
-    (call) => (call[1] as SessionEvent).type
-  )
+function appendedTypes(mockStorage: { session: { appendBatch: ReturnType<typeof vi.fn> } }): string[] {
+  const calls = mockStorage.session.appendBatch.mock.calls as unknown[][]
+  if (calls.length === 0) return []
+  if (calls.length !== 1) {
+    throw new Error(
+      `Expected session.appendBatch to be called exactly once, but was called ${calls.length} times.`
+    )
+  }
+  // appendBatch is called once with (campaignId, events[])
+  return ((calls[0]![1] as SessionEvent[]) ?? []).map((e) => e.type)
 }
 
 function makeStorage(overrides?: Partial<{
@@ -86,6 +92,7 @@ function makeStorage(overrides?: Partial<{
     characters: { get: vi.fn().mockResolvedValue(CHARACTER), save: vi.fn().mockImplementation(async (c: CharacterState) => c) },
     session: {
       append: vi.fn().mockResolvedValue(undefined),
+      appendBatch: vi.fn().mockResolvedValue(undefined),
       getRecent: vi.fn().mockResolvedValue(overrides?.recentEvents ?? []),
       getAll: vi.fn().mockResolvedValue([]),
     },
@@ -98,7 +105,7 @@ function makeStorage(overrides?: Partial<{
     type: 'local' as const,
     supportsRealtime: false,
     requiresAuth: false,
-  } as unknown as StorageAdapter & { session: { append: ReturnType<typeof vi.fn> }; characters: { save: ReturnType<typeof vi.fn> } }
+  } as unknown as StorageAdapter & { session: { append: ReturnType<typeof vi.fn>; appendBatch: ReturnType<typeof vi.fn> }; characters: { save: ReturnType<typeof vi.fn> } }
   return storage
 }
 
@@ -401,6 +408,71 @@ describe('NarrativeDomain.processTurn — free', () => {
   it('appends exactly 2 events: player.input and skald.narrated', async () => {
     await domain.processTurn('camp-1', { type: 'free', userText: 'I look around.' })
     expect(appendedTypes(storage)).toEqual(['player.input', 'skald.narrated'])
+  })
+})
+
+// ── Character selection (#19) ─────────────────────────────────────────────────
+
+const CHARACTER_2: CharacterState = {
+  id: 'char-2',
+  campaignId: 'camp-1',
+  name: 'Mira',
+  rulesetId: 'ironsworn-v1',
+  data: {
+    edge: 1, heart: 2, iron: 3, shadow: 1, wits: 2,
+    health: 5, spirit: 5, supply: 5, momentum: 2,
+    debilities: {
+      wounded: false, shaken: false, unprepared: false, encumbered: false,
+      maimed: false, corrupted: false, cursed: false, tormented: false, weak: false,
+    },
+    vows: [], bonds: [], assetIds: [],
+    experience: { earned: 0, spent: 0 },
+    tracks: { combat: 0, journey: 0, bonds: 0 },
+  },
+  createdAt: '2026-01-01T00:00:00Z',
+  updatedAt: '2026-01-01T00:00:00Z',
+}
+
+const MULTI_CHAR_CAMPAIGN: Campaign = {
+  ...CAMPAIGN,
+  characterIds: ['char-1', 'char-2'],
+}
+
+describe('NarrativeDomain.processTurn — character selection', () => {
+  it('uses action.characterId when provided', async () => {
+    const storage = makeStorage()
+    ;(storage.campaigns.get as ReturnType<typeof vi.fn>).mockResolvedValue(MULTI_CHAR_CAMPAIGN)
+    ;(storage.characters.get as ReturnType<typeof vi.fn>).mockImplementation(async (id: string) =>
+      id === 'char-2' ? CHARACTER_2 : CHARACTER,
+    )
+    const domain = new NarrativeDomain(storage, ironswornPlugin, makeAi(), new OracleService(), DiceService)
+    await domain.processTurn('camp-1', { type: 'free', userText: 'Hello.', characterId: 'char-2' })
+    expect(storage.characters.get).toHaveBeenCalledWith('char-2')
+  })
+
+  it('falls back to characterIds[0] when action.characterId is omitted', async () => {
+    const storage = makeStorage()
+    ;(storage.campaigns.get as ReturnType<typeof vi.fn>).mockResolvedValue(MULTI_CHAR_CAMPAIGN)
+    const domain = new NarrativeDomain(storage, ironswornPlugin, makeAi(), new OracleService(), DiceService)
+    await domain.processTurn('camp-1', { type: 'free', userText: 'Hello.' })
+    expect(storage.characters.get).toHaveBeenCalledWith('char-1')
+  })
+
+  it('throws when action.characterId is not in campaign.characterIds', async () => {
+    const storage = makeStorage()
+    const domain = new NarrativeDomain(storage, ironswornPlugin, makeAi(), new OracleService(), DiceService)
+    await expect(
+      domain.processTurn('camp-1', { type: 'free', userText: 'Hello.', characterId: 'unknown-char' }),
+    ).rejects.toThrow(/does not belong to campaign/)
+  })
+
+  it('throws "does not belong" (not "no characters") when characterId is explicit but campaign is empty', async () => {
+    const storage = makeStorage()
+    ;(storage.campaigns.get as ReturnType<typeof vi.fn>).mockResolvedValue({ ...CAMPAIGN, characterIds: [] })
+    const domain = new NarrativeDomain(storage, ironswornPlugin, makeAi(), new OracleService(), DiceService)
+    await expect(
+      domain.processTurn('camp-1', { type: 'free', userText: 'Hello.', characterId: 'explicit-char' }),
+    ).rejects.toThrow(/does not belong to campaign/)
   })
 })
 

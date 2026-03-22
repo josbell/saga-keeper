@@ -29,6 +29,8 @@ export interface OracleRoll {
   roll: number
   raw: string
   timestamp: string
+  /** Raw PRNG output used to produce this roll — enables deterministic replay */
+  seed?: string
 }
 
 export interface FatesResult {
@@ -39,4 +41,6 @@ export interface FatesResult {
   /** Extreme yes/no — match on doubles */
   extreme: boolean
   timestamp: string
+  /** Raw PRNG output used to produce this roll — enables deterministic replay */
+  seed?: string
 }
