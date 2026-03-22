@@ -19,7 +19,8 @@
     "@saga-keeper/storage": "workspace:*",
     "@saga-keeper/ui": "workspace:*",
     "react": "^18.3.0",
-    "react-dom": "^18.3.0"
+    "react-dom": "^18.3.0",
+    "zustand": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
