@@ -42,7 +42,7 @@ export class AnthropicAdapter implements ProviderAdapter {
     systemPrompt: string,
     messages: Message[],
     options: CompletionOptions,
-  ): AsyncGenerator<string> {
+  ): AsyncIterable<string> {
     const filtered = toAnthropicMessages(messages)
     const stream = this.client.messages.stream({
       model: MODEL,
@@ -76,18 +76,14 @@ export class AnthropicAdapter implements ProviderAdapter {
 
 function toAnthropicMessages(messages: Message[]): Anthropic.MessageParam[] {
   return messages
-    .filter((m) => m.role !== 'system')
-    .map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content }))
+    .filter((m): m is Message & { role: 'user' | 'assistant' } => m.role !== 'system')
+    .map((m) => ({ role: m.role, content: m.content }))
 }
 
 function logUsage(usage: Anthropic.Usage): void {
-  const u = usage as Anthropic.Usage & {
-    cache_read_input_tokens?: number
-    cache_creation_input_tokens?: number
-  }
-  const cacheRead = u.cache_read_input_tokens ?? 0
-  const cacheCreation = u.cache_creation_input_tokens ?? 0
+  const cacheRead = usage.cache_read_input_tokens ?? 0
+  const cacheCreation = usage.cache_creation_input_tokens ?? 0
   console.log(
-    `[AnthropicAdapter] tokens — input: ${u.input_tokens}, output: ${u.output_tokens}, cache_read: ${cacheRead}, cache_creation: ${cacheCreation}`,
+    `[AnthropicAdapter] tokens — input: ${usage.input_tokens}, output: ${usage.output_tokens}, cache_read: ${cacheRead}, cache_creation: ${cacheCreation}`,
   )
 }

@@ -27,9 +27,9 @@ function getMockStream() {
   return (Anthropic as unknown as Record<string, ReturnType<typeof vi.fn>>)['mockStream']!
 }
 
-/** Returns the first argument of the most recent call to a mock function. */
+/** Returns the first argument of the first call to a mock function. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-function lastCallArg(mockFn: ReturnType<typeof vi.fn>): any {
+function firstCallArg(mockFn: ReturnType<typeof vi.fn>): any {
   // Casting to any to avoid noUncheckedIndexedAccess errors in test helpers —
   // strict index checking is not useful when asserting mock call arguments.
   // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any
@@ -140,13 +140,13 @@ describe('AnthropicAdapter.complete() — happy path', () => {
   it('calls messages.create with model claude-haiku-4-5-20251001', async () => {
     mockCompletionResponse('ok')
     await new AnthropicAdapter('k').complete('sys', makeMessages('user'), {})
-    expect(lastCallArg(getMockCreate()).model).toBe('claude-haiku-4-5-20251001')
+    expect(firstCallArg(getMockCreate()).model).toBe('claude-haiku-4-5-20251001')
   })
 
   it('wraps system prompt with cache_control: ephemeral', async () => {
     mockCompletionResponse('ok')
     await new AnthropicAdapter('k').complete('My system prompt', makeMessages('user'), {})
-    expect(lastCallArg(getMockCreate()).system).toEqual([
+    expect(firstCallArg(getMockCreate()).system).toEqual([
       { type: 'text', text: 'My system prompt', cache_control: { type: 'ephemeral' } },
     ])
   })
@@ -154,25 +154,25 @@ describe('AnthropicAdapter.complete() — happy path', () => {
   it('defaults max_tokens to 1024 when not specified', async () => {
     mockCompletionResponse('ok')
     await new AnthropicAdapter('k').complete('sys', makeMessages('user'), {})
-    expect(lastCallArg(getMockCreate()).max_tokens).toBe(1024)
+    expect(firstCallArg(getMockCreate()).max_tokens).toBe(1024)
   })
 
   it('respects maxTokens from options', async () => {
     mockCompletionResponse('ok')
     await new AnthropicAdapter('k').complete('sys', makeMessages('user'), { maxTokens: 512 })
-    expect(lastCallArg(getMockCreate()).max_tokens).toBe(512)
+    expect(firstCallArg(getMockCreate()).max_tokens).toBe(512)
   })
 
   it('passes temperature from options when provided', async () => {
     mockCompletionResponse('ok')
     await new AnthropicAdapter('k').complete('sys', makeMessages('user'), { temperature: 0.7 })
-    expect(lastCallArg(getMockCreate()).temperature).toBe(0.7)
+    expect(firstCallArg(getMockCreate()).temperature).toBe(0.7)
   })
 
   it('omits temperature from SDK call when not provided', async () => {
     mockCompletionResponse('ok')
     await new AnthropicAdapter('k').complete('sys', makeMessages('user'), {})
-    expect('temperature' in lastCallArg(getMockCreate())).toBe(false)
+    expect('temperature' in firstCallArg(getMockCreate())).toBe(false)
   })
 })
 
@@ -182,7 +182,7 @@ describe('AnthropicAdapter.complete() — message filtering', () => {
   it('filters out system-role messages from history', async () => {
     mockCompletionResponse('ok')
     await new AnthropicAdapter('k').complete('sys', makeMessages('user', 'system', 'assistant', 'user'), {})
-    const roles = (lastCallArg(getMockCreate()).messages as Message[]).map((m) => m.role)
+    const roles = (firstCallArg(getMockCreate()).messages as Message[]).map((m) => m.role)
     expect(roles).not.toContain('system')
   })
 
@@ -194,7 +194,7 @@ describe('AnthropicAdapter.complete() — message filtering', () => {
       { role: 'user', content: 'Continue' },
     ]
     await new AnthropicAdapter('k').complete('sys', messages, {})
-    expect(lastCallArg(getMockCreate()).messages).toEqual([
+    expect(firstCallArg(getMockCreate()).messages).toEqual([
       { role: 'user', content: 'Hello' },
       { role: 'assistant', content: 'Greetings' },
       { role: 'user', content: 'Continue' },
@@ -204,13 +204,13 @@ describe('AnthropicAdapter.complete() — message filtering', () => {
   it('sends an empty messages array when all messages are system-role', async () => {
     mockCompletionResponse('ok')
     await new AnthropicAdapter('k').complete('sys', makeMessages('system', 'system'), {})
-    expect(lastCallArg(getMockCreate()).messages).toEqual([])
+    expect(firstCallArg(getMockCreate()).messages).toEqual([])
   })
 
   it('works with an empty message list', async () => {
     mockCompletionResponse('ok')
     await expect(new AnthropicAdapter('k').complete('sys', [], {})).resolves.toBe('ok')
-    expect(lastCallArg(getMockCreate()).messages).toEqual([])
+    expect(firstCallArg(getMockCreate()).messages).toEqual([])
   })
 })
 
@@ -289,13 +289,13 @@ describe('AnthropicAdapter.stream() — happy path', () => {
   it('calls messages.stream with model claude-haiku-4-5-20251001', async () => {
     getMockStream().mockReturnValue(makeStreamMock(['x']))
     await collectStream(new AnthropicAdapter('k').stream('sys', makeMessages('user'), {}))
-    expect(lastCallArg(getMockStream()).model).toBe('claude-haiku-4-5-20251001')
+    expect(firstCallArg(getMockStream()).model).toBe('claude-haiku-4-5-20251001')
   })
 
   it('uses cache_control: ephemeral on system prompt in stream call', async () => {
     getMockStream().mockReturnValue(makeStreamMock([]))
     await collectStream(new AnthropicAdapter('k').stream('My system', makeMessages('user'), {}))
-    expect(lastCallArg(getMockStream()).system).toEqual([
+    expect(firstCallArg(getMockStream()).system).toEqual([
       { type: 'text', text: 'My system', cache_control: { type: 'ephemeral' } },
     ])
   })
@@ -303,7 +303,7 @@ describe('AnthropicAdapter.stream() — happy path', () => {
   it('defaults max_tokens to 1024 in stream call', async () => {
     getMockStream().mockReturnValue(makeStreamMock([]))
     await collectStream(new AnthropicAdapter('k').stream('sys', makeMessages('user'), {}))
-    expect(lastCallArg(getMockStream()).max_tokens).toBe(1024)
+    expect(firstCallArg(getMockStream()).max_tokens).toBe(1024)
   })
 
   it('yields nothing for a stream with no text_delta events', async () => {
@@ -315,13 +315,13 @@ describe('AnthropicAdapter.stream() — happy path', () => {
   it('omits temperature from stream call when not provided', async () => {
     getMockStream().mockReturnValue(makeStreamMock([]))
     await collectStream(new AnthropicAdapter('k').stream('sys', makeMessages('user'), {}))
-    expect('temperature' in lastCallArg(getMockStream())).toBe(false)
+    expect('temperature' in firstCallArg(getMockStream())).toBe(false)
   })
 
   it('passes temperature to stream call when provided', async () => {
     getMockStream().mockReturnValue(makeStreamMock([]))
     await collectStream(new AnthropicAdapter('k').stream('sys', makeMessages('user'), { temperature: 0.5 }))
-    expect(lastCallArg(getMockStream()).temperature).toBe(0.5)
+    expect(firstCallArg(getMockStream()).temperature).toBe(0.5)
   })
 })
 
@@ -331,8 +331,23 @@ describe('AnthropicAdapter.stream() — message filtering', () => {
   it('filters system-role messages from stream call', async () => {
     getMockStream().mockReturnValue(makeStreamMock([]))
     await collectStream(new AnthropicAdapter('k').stream('sys', makeMessages('user', 'system', 'assistant'), {}))
-    const roles = (lastCallArg(getMockStream()).messages as Message[]).map((m) => m.role)
+    const roles = (firstCallArg(getMockStream()).messages as Message[]).map((m) => m.role)
     expect(roles).not.toContain('system')
+  })
+
+  it('preserves user and assistant messages in order in stream call', async () => {
+    getMockStream().mockReturnValue(makeStreamMock([]))
+    const messages: Message[] = [
+      { role: 'user', content: 'Hello' },
+      { role: 'assistant', content: 'Greetings' },
+      { role: 'user', content: 'Continue' },
+    ]
+    await collectStream(new AnthropicAdapter('k').stream('sys', messages, {}))
+    expect(firstCallArg(getMockStream()).messages).toEqual([
+      { role: 'user', content: 'Hello' },
+      { role: 'assistant', content: 'Greetings' },
+      { role: 'user', content: 'Continue' },
+    ])
   })
 })
 
@@ -360,5 +375,15 @@ describe('AnthropicAdapter.stream() — error handling', () => {
     getMockStream().mockReturnValue(mixedStream)
     const result = await collectStream(new AnthropicAdapter('k').stream('sys', makeMessages('user'), {}))
     expect(result).toEqual(['hi'])
+  })
+
+  it('does not hang when consumer breaks early', async () => {
+    getMockStream().mockReturnValue(makeStreamMock(['a', 'b', 'c']))
+    const chunks: string[] = []
+    for await (const chunk of new AnthropicAdapter('k').stream('sys', makeMessages('user'), {})) {
+      chunks.push(chunk)
+      break
+    }
+    expect(chunks).toEqual(['a'])
   })
 })
