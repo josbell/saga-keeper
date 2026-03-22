@@ -1,3 +1,4 @@
+import { randomUUID } from 'node:crypto'
 import type { StateCreator } from 'zustand'
 import type { SkaldMessage, TurnPhase } from '../types'
 
@@ -30,7 +31,7 @@ export const createSkaldFeedSlice: StateCreator<SkaldFeedSlice> = (set) => ({
     set((state) => {
       if (state.streamBuffer === '') return state
       const message: SkaldMessage = {
-        id: crypto.randomUUID(),
+        id: randomUUID(),
         role: 'skald',
         content: state.streamBuffer,
         turnId,

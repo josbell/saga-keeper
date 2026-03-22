@@ -8,13 +8,14 @@ export interface SessionSlice {
   events: SessionEvent[]
   pendingAction: PlayerAction | null
   setCampaign: (campaign: Campaign) => void
+  /** Clears the campaign reference only. Call clearSession() first for a full teardown. */
   clearCampaign: () => void
   setPendingAction: (action: PlayerAction | null) => void
   appendTurn: (turn: NarrativeTurn) => void
   appendEvent: (event: SessionEvent) => void
   setActiveTurnId: (turnId: string | null) => void
-  /** Resets in-session state (turns, events, pending action, activeTurnId).
-   *  Does NOT clear campaign — use clearCampaign() for full teardown. */
+  /** Resets in-session state (turns, events, pendingAction, activeTurnId).
+   *  Does NOT clear campaign. For a full teardown call clearSession() then clearCampaign(). */
   clearSession: () => void
 }
 

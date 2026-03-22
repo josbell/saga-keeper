@@ -62,6 +62,20 @@ describe('createWorldSlice — setEntities', () => {
     expect(store.getState().entities).toHaveLength(1)
     expect(store.getState().entities[0]?.id).toBe('new')
   })
+
+  it('clears selectedEntityId when the selected entity is absent from the new list', () => {
+    store.getState().setEntities([makeEntity({ id: 'a' })])
+    store.getState().selectEntity('a')
+    store.getState().setEntities([makeEntity({ id: 'b' })])
+    expect(store.getState().selectedEntityId).toBeNull()
+  })
+
+  it('preserves selectedEntityId when the selected entity is present in the new list', () => {
+    store.getState().setEntities([makeEntity({ id: 'a' })])
+    store.getState().selectEntity('a')
+    store.getState().setEntities([makeEntity({ id: 'a' }), makeEntity({ id: 'b' })])
+    expect(store.getState().selectedEntityId).toBe('a')
+  })
 })
 
 // ── upsertEntity ──────────────────────────────────────────────────────────────

@@ -67,10 +67,16 @@ describe('useGameStore — cross-slice isolation', () => {
     expect(useGameStore.getState().history).toHaveLength(1)
   })
 
-  it('store has no imports from @saga-keeper/ai-gateway or @saga-keeper/storage', () => {
-    // Structural: if the store file imported from those packages the module
-    // graph would fail to resolve in this node test environment (they depend
-    // on platform APIs not present here). Reaching this line proves clean deps.
-    expect(true).toBe(true)
+  it('clearHistory does not affect session turns', () => {
+    useGameStore.getState().appendTurn({
+      turnId: 'turn-1',
+      input: { type: 'free', userText: 'test' },
+      narration: 'test',
+      statDeltas: [],
+      extractedEntities: [],
+      timestamp: '2026-01-01T00:00:00.000Z',
+    })
+    useGameStore.getState().clearHistory()
+    expect(useGameStore.getState().turns).toHaveLength(1)
   })
 })
