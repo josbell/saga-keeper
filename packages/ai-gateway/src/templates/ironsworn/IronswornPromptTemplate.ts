@@ -1,7 +1,14 @@
 // IronswornPromptTemplate — versioned system prompt for rulesetId 'ironsworn-v1'
 // Adapts prompts from ironsworn-ai-experiment/src/lib/ai/prompts.ts
 
-import type { AIIntent, GameContext, CharacterSnapshot, WorldSnapshot, SessionEvent, OracleRoll } from '@saga-keeper/domain'
+import type {
+  AIIntent,
+  GameContext,
+  CharacterSnapshot,
+  WorldSnapshot,
+  SessionEvent,
+  OracleRoll,
+} from '@saga-keeper/domain'
 import type { IPromptTemplate } from '../PromptTemplate'
 
 const SUPPORTED_RULESET = 'ironsworn-v1'
@@ -84,9 +91,10 @@ export class IronswornPromptTemplate implements IPromptTemplate {
       return `- [${e.type}] **${e.name}**${desc}`
     })
     const hidden = world.totalEntityCount - world.entities.length
-    const header = hidden > 0
-      ? `## World (${world.entities.length} of ${world.totalEntityCount} entities shown)`
-      : `## World`
+    const header =
+      hidden > 0
+        ? `## World (${world.entities.length} of ${world.totalEntityCount} entities shown)`
+        : `## World`
     return `${header}\n${lines.join('\n')}`
   }
 
@@ -105,8 +113,11 @@ export class IronswornPromptTemplate implements IPromptTemplate {
 
 function toneDescription(tone: NonNullable<GameContext['narrativeTone']>): string {
   switch (tone) {
-    case 'grim': return 'The tone is grim and dark. Outcomes are harsh; hope is scarce.'
-    case 'heroic': return 'The tone is heroic and epic. Deeds matter; glory is within reach.'
-    case 'mythic': return 'The tone is mythic. The world is ancient, strange, and vast.'
+    case 'grim':
+      return 'The tone is grim and dark. Outcomes are harsh; hope is scarce.'
+    case 'heroic':
+      return 'The tone is heroic and epic. Deeds matter; glory is within reach.'
+    case 'mythic':
+      return 'The tone is mythic. The world is ancient, strange, and vast.'
   }
 }

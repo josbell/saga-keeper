@@ -1,5 +1,6 @@
 # Saga Keeper — Platform Architecture Specification
-*March 2026 · Version 1.0*
+
+_March 2026 · Version 1.0_
 
 ---
 
@@ -50,17 +51,20 @@ Realtime Bus ↔ Presence + Sync ↔ Co-op Session
 Each platform target is a thin shell. All business logic lives below this layer. Swapping React for React Native or Tauri requires no changes to L2–L5.
 
 **Platform shells:**
+
 - **Web Shell** — React + Vite. Responsive, CSS variables, dark mode. Priority target.
 - **Mobile Shell** — React Native (future). Touch gestures, native nav, offline-first.
 - **Desktop Shell** — Tauri/Electron (future). Native menus, local file system, offline.
 - **Design System** — `packages/ui`. Shared design tokens and typography. Base components (`Button`, `Input`, `Textarea`, `Card`, `Badge`, `DiceRoller`, `StatTrack`) are planned (tracked in issue #31). One source across all shells.
 
 **State management (web):**
+
 - All live game state lives in a Zustand store (`apps/web/src/store/`) with five slices: `characterSlice` (stats, conditions, vows, assets), `skaldFeedSlice` (messages, active turn phase), `oracleSlice` (history, last roll), `worldSlice` (entities, atlas), `sessionSlice` (active campaign, log reference).
 - All screens read from the store via the `useGameStore` hook. UI components make no direct calls into L4 or L5.
 - L3 services return state deltas to their caller. The L1 web shell (or turn orchestrator) commits those deltas to the relevant Zustand store slices. L3 has no dependency on `apps/web` or `useGameStore`.
 
 **Screen modules (Ironsworn default ruleset):**
+
 - Great Hall — Campaign home, multi-character overview
 - The Forge — Character creation wizard
 - Iron Sheet — Character tracker, dice roller
@@ -76,15 +80,15 @@ Pure TypeScript interfaces and domain types. No framework, no IO. The UI calls t
 
 **Domain interfaces:**
 
-| Domain | Responsibility |
-|---|---|
+| Domain            | Responsibility                                            |
+| ----------------- | --------------------------------------------------------- |
 | `CharacterDomain` | Stats, conditions, vows, XP. Ruleset-specific via plugin. |
-| `CampaignDomain` | Campaign CRUD, participant roster, session log. |
-| `DiceDomain` | Roll engine, outcome resolution, move lookup. |
-| `OracleDomain` | Table definitions, consultation, history log. |
-| `WorldDomain` | Entities, relations graph, atlas. |
-| `NarrativeDomain` | Story log, Skald session, narrative events. |
-| `CoopDomain` | Session sync, presence, turn model. |
+| `CampaignDomain`  | Campaign CRUD, participant roster, session log.           |
+| `DiceDomain`      | Roll engine, outcome resolution, move lookup.             |
+| `OracleDomain`    | Table definitions, consultation, history log.             |
+| `WorldDomain`     | Entities, relations graph, atlas.                         |
+| `NarrativeDomain` | Story log, Skald session, narrative events.               |
+| `CoopDomain`      | Session sync, presence, turn model.                       |
 
 ---
 
@@ -94,14 +98,15 @@ Each supported game is a `RulesetPlugin` that implements the L2 interfaces. The 
 
 **Planned plugins:**
 
-| Plugin | Status | Notes |
-|---|---|---|
-| Ironsworn | MVP | Solo + duo. Full move set, oracle tables, assets. |
-| Starforged | v2 | Inherits core; overrides stats, oracles, sector map. |
-| Ironsworn: Delve | v2 | Dungeon moves and site tables extension. |
-| Custom Plugin SDK | v3 | JSON schema + plugin manifest for community rulesets. |
+| Plugin            | Status | Notes                                                 |
+| ----------------- | ------ | ----------------------------------------------------- |
+| Ironsworn         | MVP    | Solo + duo. Full move set, oracle tables, assets.     |
+| Starforged        | v2     | Inherits core; overrides stats, oracles, sector map.  |
+| Ironsworn: Delve  | v2     | Dungeon moves and site tables extension.              |
+| Custom Plugin SDK | v3     | JSON schema + plugin manifest for community rulesets. |
 
 **Core services:**
+
 - **Dice Service** — Cryptographically fair rolls. Seeded replay for debugging.
 - **Oracle Service** — Weighted tables, auto-trigger detection, entity extraction.
 - **Session Service** — Campaign state machine, save/restore, history compaction.
@@ -114,11 +119,11 @@ A provider-agnostic abstraction. Every AI call goes through it. The app never ha
 
 #### AI Tiers (user-configurable)
 
-| Tier | Features |
-|---|---|
-| **Offline / Zero AI** | Dice rolls, move resolution, oracle table lookups (random). No LLM calls. Works fully offline. |
-| **Assisted** | + Oracle narrative generation, entity extraction, Skald move suggestions, World Forge AI Expand. |
-| **Full Skald** | + Full AI narration, auto-oracle during narration, character voice synthesis, campaign arc suggestions. |
+| Tier                  | Features                                                                                                |
+| --------------------- | ------------------------------------------------------------------------------------------------------- |
+| **Offline / Zero AI** | Dice rolls, move resolution, oracle table lookups (random). No LLM calls. Works fully offline.          |
+| **Assisted**          | + Oracle narrative generation, entity extraction, Skald move suggestions, World Forge AI Expand.        |
+| **Full Skald**        | + Full AI narration, auto-oracle during narration, character voice synthesis, campaign arc suggestions. |
 
 #### Core Gateway Interface
 
@@ -152,24 +157,24 @@ interface CompletionRequest {
 }
 
 type AIIntent =
-  | 'skald.narrate'      // Skald full narration turn
-  | 'skald.move'         // Skald resolving a specific move
-  | 'oracle.narrate'     // Wrapping a raw oracle roll in prose
-  | 'oracle.extract'     // Entity extraction from oracle result
-  | 'world.generate'     // AI Generate NPC / location
-  | 'world.expand'       // AI Expand existing entity
-  | 'forge.counsel'      // Skald's Counsel in character creation
-  | 'hall.reminder'      // Skald's Reminder on Great Hall
+  | 'skald.narrate' // Skald full narration turn
+  | 'skald.move' // Skald resolving a specific move
+  | 'oracle.narrate' // Wrapping a raw oracle roll in prose
+  | 'oracle.extract' // Entity extraction from oracle result
+  | 'world.generate' // AI Generate NPC / location
+  | 'world.expand' // AI Expand existing entity
+  | 'forge.counsel' // Skald's Counsel in character creation
+  | 'hall.reminder' // Skald's Reminder on Great Hall
 ```
 
 #### Game Context
 
 ```typescript
 interface GameContext {
-  ruleset: string               // e.g. 'ironsworn-v1'
+  ruleset: string // e.g. 'ironsworn-v1'
   characters: CharacterSnapshot[]
   world: WorldSnapshot
-  recentEvents: SessionEvent[]  // last N turns, token-budget aware
+  recentEvents: SessionEvent[] // last N turns, token-budget aware
   oracleHistory: OracleResult[]
   narrativeTone?: NarrativeTone // 'grim' | 'heroic' | 'mythic'
 }
@@ -179,14 +184,10 @@ interface GameContext {
 
 ```typescript
 interface ProviderAdapter {
-  id: string                    // 'anthropic' | 'openai' | 'ollama' | 'custom'
+  id: string // 'anthropic' | 'openai' | 'ollama' | 'custom'
   displayName: string
 
-  complete(
-    systemPrompt: string,
-    messages: Message[],
-    options: CompletionOptions
-  ): Promise<string>
+  complete(systemPrompt: string, messages: Message[], options: CompletionOptions): Promise<string>
 
   stream(
     systemPrompt: string,
@@ -201,7 +202,7 @@ interface ProviderCapabilities {
   streaming: boolean
   maxContextTokens: number
   supportsSystemPrompt: boolean
-  localOnly: boolean         // true for Ollama — affects co-op availability
+  localOnly: boolean // true for Ollama — affects co-op availability
 }
 ```
 
@@ -217,12 +218,12 @@ interface ProviderCapabilities {
 
 #### Planned Providers
 
-| Provider | Status | Notes |
-|---|---|---|
-| Anthropic (Claude) | MVP | Proxied. Streaming SSE. Default for all tiers. |
-| OpenAI | v2 | User-selectable. BYOK or proxied. |
-| Ollama (local) | v2 | No API key. `localOnly: true` — disables remote co-op. |
-| Custom model | v3+ | Your fine-tuned endpoint. Implements `ProviderAdapter`. Prompt templates tuned separately. |
+| Provider           | Status | Notes                                                                                      |
+| ------------------ | ------ | ------------------------------------------------------------------------------------------ |
+| Anthropic (Claude) | MVP    | Proxied. Streaming SSE. Default for all tiers.                                             |
+| OpenAI             | v2     | User-selectable. BYOK or proxied.                                                          |
+| Ollama (local)     | v2     | No API key. `localOnly: true` — disables remote co-op.                                     |
+| Custom model       | v3+    | Your fine-tuned endpoint. Implements `ProviderAdapter`. Prompt templates tuned separately. |
 
 #### Key AI Gateway Decisions
 
@@ -279,22 +280,22 @@ interface StorageAdapter {
 
 #### Concrete Adapters
 
-| Adapter | Status | Notes |
-|---|---|---|
-| `LocalAdapter` | MVP | IndexedDB (web), SQLite (mobile/desktop). No account required. `supportsRealtime: false`. Default for all new users. |
-| `CloudAdapter` | v2 | Supabase or Firebase. `requiresAuth: true`, `supportsRealtime: true`. Wraps LocalAdapter as write-through cache. Opt-in. |
+| Adapter        | Status | Notes                                                                                                                    |
+| -------------- | ------ | ------------------------------------------------------------------------------------------------------------------------ |
+| `LocalAdapter` | MVP    | IndexedDB (web), SQLite (mobile/desktop). No account required. `supportsRealtime: false`. Default for all new users.     |
+| `CloudAdapter` | v2     | Supabase or Firebase. `requiresAuth: true`, `supportsRealtime: true`. Wraps LocalAdapter as write-through cache. Opt-in. |
 
 #### CampaignArchive — Portable Format
 
 ```typescript
 interface CampaignArchive {
-  version: string              // archive schema version for migration
-  exportedAt: string           // ISO timestamp
-  rulesetId: string            // plugin needed to restore
+  version: string // archive schema version for migration
+  exportedAt: string // ISO timestamp
+  rulesetId: string // plugin needed to restore
   campaign: Campaign
   characters: Character[]
   world: WorldEntity[]
-  sessionLog: SessionEvent[]   // complete history
+  sessionLog: SessionEvent[] // complete history
 }
 // Stored as .sagakeeper.json — human-readable, git-friendly
 ```
@@ -305,28 +306,29 @@ interface CampaignArchive {
 
 ### What Syncs and How
 
-| Data | Sync Strategy | Notes |
-|---|---|---|
-| Character state | Owner-only write | One writer per character. Last-write-wins. Other players receive read-only snapshots. |
-| Session log / Skald feed | Append-only + broadcast | Events appended server-side, broadcast to all participants. Immutable. |
-| World Forge entities | CRDT merge | Both players can edit concurrently. Last-write-wins per field, vector clocks per entity. |
-| Private notes | Local-only | Never leaves the device. CloudAdapter explicitly excludes from sync scope. |
+| Data                     | Sync Strategy           | Notes                                                                                    |
+| ------------------------ | ----------------------- | ---------------------------------------------------------------------------------------- |
+| Character state          | Owner-only write        | One writer per character. Last-write-wins. Other players receive read-only snapshots.    |
+| Session log / Skald feed | Append-only + broadcast | Events appended server-side, broadcast to all participants. Immutable.                   |
+| World Forge entities     | CRDT merge              | Both players can edit concurrently. Last-write-wins per field, vector clocks per entity. |
+| Private notes            | Local-only              | Never leaves the device. CloudAdapter explicitly excludes from sync scope.               |
 
 ### Realtime Bus Events
 
 ```typescript
 type RealtimeEvent =
-  | { type: 'session.event';    payload: SessionEvent }
-  | { type: 'character.patch';  payload: CharacterPatch;  owner: string }
-  | { type: 'world.patch';      payload: WorldPatch;      vector: VectorClock }
-  | { type: 'presence.update';  payload: PresenceState }
-  | { type: 'turn.lock';        payload: TurnLockState }
-  | { type: 'turn.unlock';      payload: { actingPlayer: string } }
+  | { type: 'session.event'; payload: SessionEvent }
+  | { type: 'character.patch'; payload: CharacterPatch; owner: string }
+  | { type: 'world.patch'; payload: WorldPatch; vector: VectorClock }
+  | { type: 'presence.update'; payload: PresenceState }
+  | { type: 'turn.lock'; payload: TurnLockState }
+  | { type: 'turn.unlock'; payload: { actingPlayer: string } }
 ```
 
 ### Offline → Online Transition
 
 **Upgrading a local campaign:**
+
 1. User opts into cloud sync
 2. Auth prompt — create account
 3. `LocalAdapter.export()` → `CampaignArchive`
@@ -335,6 +337,7 @@ type RealtimeEvent =
 6. Local copy kept as backup
 
 **Reconnect after drop:**
+
 1. Local writes buffered in queue during gap
 2. On reconnect: replay buffered events
 3. Server reconciles append-only log
@@ -348,19 +351,19 @@ type RealtimeEvent =
 
 ### Modes
 
-| Mode | Description |
-|---|---|
+| Mode        | Description                                                                                                          |
+| ----------- | -------------------------------------------------------------------------------------------------------------------- |
 | **Same-PC** | Character switcher in UI. No network. Both characters on one device. Input bar border color tracks active character. |
-| **Remote** | Share link → both players join on their own devices. Shared Skald feed, private notes stay local. |
+| **Remote**  | Share link → both players join on their own devices. Shared Skald feed, private notes stay local.                    |
 
 ### Shared vs Private
 
-| Shared | Private |
-|---|---|
-| Skald chat feed | Each player's private notes |
-| World Forge | Character secrets / hidden motivations |
-| Oracle history | Information one character doesn't have |
-| Vow progress | |
+| Shared          | Private                                |
+| --------------- | -------------------------------------- |
+| Skald chat feed | Each player's private notes            |
+| World Forge     | Character secrets / hidden motivations |
+| Oracle history  | Information one character doesn't have |
+| Vow progress    |                                        |
 
 ### Turn Lock
 
@@ -374,7 +377,7 @@ Optional setting that pauses the Skald from advancing until both players confirm
 
 ```typescript
 interface RulesetManifest {
-  id: string               // 'ironsworn-v1', 'starforged-v1'
+  id: string // 'ironsworn-v1', 'starforged-v1'
   displayName: string
   version: string
   author: string
@@ -383,12 +386,12 @@ interface RulesetManifest {
 }
 
 type RulesetFeature =
-  | 'vows'           // progress track vows
-  | 'assets'         // asset cards
-  | 'oracle-tables'  // fate consultation tables
-  | 'world-truths'   // setting customisation (Ironsworn)
-  | 'sectors'        // sector map (Starforged)
-  | 'legacy-tracks'  // legacy XP tracks (Starforged)
+  | 'vows' // progress track vows
+  | 'assets' // asset cards
+  | 'oracle-tables' // fate consultation tables
+  | 'world-truths' // setting customisation (Ironsworn)
+  | 'sectors' // sector map (Starforged)
+  | 'legacy-tracks' // legacy XP tracks (Starforged)
 ```
 
 ### Core Plugin Interface
@@ -436,10 +439,10 @@ interface RulesetPlugin {
 ```typescript
 interface MoveOutcome {
   result: 'strong-hit' | 'weak-hit' | 'miss'
-  match: boolean                  // doubles on challenge dice
-  consequences: StatDelta[]       // health, spirit, supply, momentum changes
-  narrativeHints: string[]        // injected into Skald context
-  followUpMoves?: Move[]          // suggested next moves
+  match: boolean // doubles on challenge dice
+  consequences: StatDelta[] // health, spirit, supply, momentum changes
+  narrativeHints: string[] // injected into Skald context
+  followUpMoves?: Move[] // suggested next moves
 }
 ```
 
@@ -456,7 +459,7 @@ const ironswornManifest: RulesetManifest = {
   version: '1.0.0',
   author: 'Shawn Tomkin',
   playerCount: { min: 1, max: 2 },
-  features: ['vows', 'assets', 'oracle-tables', 'world-truths']
+  features: ['vows', 'assets', 'oracle-tables', 'world-truths'],
 }
 ```
 
@@ -465,27 +468,34 @@ const ironswornManifest: RulesetManifest = {
 ```typescript
 interface IronswornCharacter extends CharacterState {
   // Core stats
-  edge: number; heart: number; iron: number
-  shadow: number; wits: number
+  edge: number
+  heart: number
+  iron: number
+  shadow: number
+  wits: number
 
   // Condition meters
-  health: number     // 0–5
-  spirit: number     // 0–5
-  supply: number     // 0–5
-  momentum: number   // -6 to +10
+  health: number // 0–5
+  spirit: number // 0–5
+  supply: number // 0–5
+  momentum: number // -6 to +10
 
   // Debilities
   debilities: {
-    wounded: boolean;    shaken: boolean
-    unprepared: boolean; encumbered: boolean
-    maimed: boolean;     corrupted: boolean
-    cursed: boolean;     tormented: boolean
+    wounded: boolean
+    shaken: boolean
+    unprepared: boolean
+    encumbered: boolean
+    maimed: boolean
+    corrupted: boolean
+    cursed: boolean
+    tormented: boolean
     weak: boolean
   }
 
-  vows: Vow[]          // rank: troublesome|dangerous|formidable|extreme|epic
+  vows: Vow[] // rank: troublesome|dangerous|formidable|extreme|epic
   bonds: Bond[]
-  assets: AssetCard[]  // max 3 starting, expandable
+  assets: AssetCard[] // max 3 starting, expandable
   experience: { earned: number; spent: number }
 }
 ```
@@ -516,8 +526,8 @@ A single Skald turn touches every layer of the architecture. This is the happy p
 
 ```typescript
 type PlayerAction =
-  | { type: 'move';   moveId: string; statKey: string; userText?: string }
-  | { type: 'free';   userText: string }
+  | { type: 'move'; moveId: string; statKey: string; userText?: string }
+  | { type: 'free'; userText: string }
   | { type: 'oracle'; question: string; odds?: Odds }
 ```
 
@@ -565,6 +575,7 @@ The Skald auto-consults the oracle when the move outcome or scene creates an ope
 3. Stream completes — full response available in `NarrativeDomain` buffer.
 
 **Tier degradation:**
+
 - Assisted: same flow as Full Skald here.
 - Offline: Phase 5 skipped entirely. Move outcome card and raw oracle result shown. Player narrates themselves.
 
@@ -602,12 +613,12 @@ interface SessionEvent {
 
 ### Turn Latency Budget
 
-| Visible immediately | Runs after narration renders |
-|---|---|
-| Move outcome card (Phase 2 complete) | Entity extraction (~1s) |
+| Visible immediately                          | Runs after narration renders            |
+| -------------------------------------------- | --------------------------------------- |
+| Move outcome card (Phase 2 complete)         | Entity extraction (~1s)                 |
 | Oracle strip if triggered (Phase 4 complete) | Entity chip suggestions below narration |
-| Skald typing indicator (Phase 5 start) | Session log write (async, invisible) |
-| Narration tokens streaming in | Character state commit (reactive) |
+| Skald typing indicator (Phase 5 start)       | Session log write (async, invisible)    |
+| Narration tokens streaming in                | Character state commit (reactive)       |
 
 ### Invariants
 
@@ -650,17 +661,17 @@ Adding a new game means writing one `RulesetPlugin` at L3. All other layers are 
 
 ## Locked Decisions
 
-| Decision | Choice | Rationale |
-|---|---|---|
-| Account model | Account-optional | Zero friction for solo players. Cloud sync opt-in at co-op gate. |
-| Co-op transport | WebSocket (Supabase/Partykit) for MVP | Low ops overhead. WebRTC stays on table for future peer-to-peer. |
-| AI provider MVP | Anthropic (proxied) | Best narrative quality. Proxy protects prompts and enables cost control. |
-| Provider exposure | User-selectable (not MVP) | Power users can choose. Custom model slot reserved at v3+. |
-| Prompt ownership | Gateway layer only | Templates are versioned files. UI has no prompt strings. |
-| Storage default | LocalAdapter (IndexedDB) | Works offline, no account required. |
-| Session log | Append-only | Simplifies sync. Enables complete chronicle replay. Crash-safe. |
-| Custom model path | `ProviderAdapter` implementation | Zero app-layer changes. Template tuning only. |
+| Decision          | Choice                                | Rationale                                                                |
+| ----------------- | ------------------------------------- | ------------------------------------------------------------------------ |
+| Account model     | Account-optional                      | Zero friction for solo players. Cloud sync opt-in at co-op gate.         |
+| Co-op transport   | WebSocket (Supabase/Partykit) for MVP | Low ops overhead. WebRTC stays on table for future peer-to-peer.         |
+| AI provider MVP   | Anthropic (proxied)                   | Best narrative quality. Proxy protects prompts and enables cost control. |
+| Provider exposure | User-selectable (not MVP)             | Power users can choose. Custom model slot reserved at v3+.               |
+| Prompt ownership  | Gateway layer only                    | Templates are versioned files. UI has no prompt strings.                 |
+| Storage default   | LocalAdapter (IndexedDB)              | Works offline, no account required.                                      |
+| Session log       | Append-only                           | Simplifies sync. Enables complete chronicle replay. Crash-safe.          |
+| Custom model path | `ProviderAdapter` implementation      | Zero app-layer changes. Template tuning only.                            |
 
 ---
 
-*Saga Keeper platform spec — generated from architecture design session, March 2026*
+_Saga Keeper platform spec — generated from architecture design session, March 2026_

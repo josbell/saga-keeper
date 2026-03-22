@@ -21,13 +21,29 @@ const CHARACTER: CharacterState = {
   name: 'Aldric',
   rulesetId: 'ironsworn-v1',
   data: {
-    edge: 2, heart: 3, iron: 1, shadow: 2, wits: 1,
-    health: 5, spirit: 5, supply: 5, momentum: 2,
+    edge: 2,
+    heart: 3,
+    iron: 1,
+    shadow: 2,
+    wits: 1,
+    health: 5,
+    spirit: 5,
+    supply: 5,
+    momentum: 2,
     debilities: {
-      wounded: false, shaken: false, unprepared: false, encumbered: false,
-      maimed: false, corrupted: false, cursed: false, tormented: false, weak: false,
+      wounded: false,
+      shaken: false,
+      unprepared: false,
+      encumbered: false,
+      maimed: false,
+      corrupted: false,
+      cursed: false,
+      tormented: false,
+      weak: false,
     },
-    vows: [], bonds: [], assetIds: [],
+    vows: [],
+    bonds: [],
+    assetIds: [],
     experience: { earned: 0, spent: 0 },
     tracks: { combat: 0, journey: 0, bonds: 0 },
   },
@@ -49,7 +65,12 @@ const CAMPAIGN: Campaign = {
 // DiceRoll stubs for controlled outcomes
 function makeRoll(total: number, c0: number, c1: number) {
   return {
-    request: { action: 'd6' as const, challenge: ['d10', 'd10'] as ['d10', 'd10'], modifier: 0, seed: 'deadbeef' },
+    request: {
+      action: 'd6' as const,
+      challenge: ['d10', 'd10'] as ['d10', 'd10'],
+      modifier: 0,
+      seed: 'deadbeef',
+    },
     actionDie: total,
     challengeDice: [c0, c1] as [number, number],
     modifier: 0,
@@ -71,7 +92,9 @@ const AI_RESPONSE: CompletionResponse = { text: AI_NARRATION, intent: 'skald.mov
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-function appendedTypes(mockStorage: { session: { appendBatch: ReturnType<typeof vi.fn> } }): string[] {
+function appendedTypes(mockStorage: {
+  session: { appendBatch: ReturnType<typeof vi.fn> }
+}): string[] {
   const calls = mockStorage.session.appendBatch.mock.calls as unknown[][]
   if (calls.length === 0) return []
   if (calls.length !== 1) {
@@ -83,13 +106,24 @@ function appendedTypes(mockStorage: { session: { appendBatch: ReturnType<typeof 
   return ((calls[0]![1] as SessionEvent[]) ?? []).map((e) => e.type)
 }
 
-function makeStorage(overrides?: Partial<{
-  recentEvents: SessionEvent[]
-  worldEntities: WorldEntity[]
-}>) {
+function makeStorage(
+  overrides?: Partial<{
+    recentEvents: SessionEvent[]
+    worldEntities: WorldEntity[]
+  }>
+) {
   const storage = {
-    campaigns: { get: vi.fn().mockResolvedValue(CAMPAIGN), list: vi.fn(), create: vi.fn(), update: vi.fn(), delete: vi.fn() },
-    characters: { get: vi.fn().mockResolvedValue(CHARACTER), save: vi.fn().mockImplementation(async (c: CharacterState) => c) },
+    campaigns: {
+      get: vi.fn().mockResolvedValue(CAMPAIGN),
+      list: vi.fn(),
+      create: vi.fn(),
+      update: vi.fn(),
+      delete: vi.fn(),
+    },
+    characters: {
+      get: vi.fn().mockResolvedValue(CHARACTER),
+      save: vi.fn().mockImplementation(async (c: CharacterState) => c),
+    },
     session: {
       append: vi.fn().mockResolvedValue(undefined),
       appendBatch: vi.fn().mockResolvedValue(undefined),
@@ -98,22 +132,34 @@ function makeStorage(overrides?: Partial<{
     },
     world: {
       list: vi.fn().mockResolvedValue(overrides?.worldEntities ?? []),
-      get: vi.fn(), save: vi.fn(), delete: vi.fn(),
+      get: vi.fn(),
+      save: vi.fn(),
+      delete: vi.fn(),
     },
     export: vi.fn(),
     import: vi.fn(),
     type: 'local' as const,
     supportsRealtime: false,
     requiresAuth: false,
-  } as unknown as StorageAdapter & { session: { append: ReturnType<typeof vi.fn>; appendBatch: ReturnType<typeof vi.fn> }; characters: { save: ReturnType<typeof vi.fn> } }
+  } as unknown as StorageAdapter & {
+    session: { append: ReturnType<typeof vi.fn>; appendBatch: ReturnType<typeof vi.fn> }
+    characters: { save: ReturnType<typeof vi.fn> }
+  }
   return storage
 }
 
-function makeAi(responseOverride?: Partial<CompletionResponse>): AIGateway & { complete: ReturnType<typeof vi.fn> } {
+function makeAi(
+  responseOverride?: Partial<CompletionResponse>
+): AIGateway & { complete: ReturnType<typeof vi.fn> } {
   return {
     complete: vi.fn().mockResolvedValue({ ...AI_RESPONSE, ...responseOverride }),
     stream: vi.fn(),
-    getCapabilities: vi.fn().mockReturnValue({ streaming: false, maxContextTokens: 8000, supportsSystemPrompt: true, localOnly: false }),
+    getCapabilities: vi.fn().mockReturnValue({
+      streaming: false,
+      maxContextTokens: 8000,
+      supportsSystemPrompt: true,
+      localOnly: false,
+    }),
     getTier: vi.fn().mockReturnValue('full-skald'),
   } as unknown as AIGateway & { complete: ReturnType<typeof vi.fn> }
 }
@@ -134,7 +180,11 @@ describe('NarrativeDomain.processTurn — move (strong-hit)', () => {
   })
 
   it('returns a NarrativeTurn with the required shape', async () => {
-    const turn = await domain.processTurn('camp-1', { type: 'move', moveId: 'face-danger', statKey: 'edge' })
+    const turn = await domain.processTurn('camp-1', {
+      type: 'move',
+      moveId: 'face-danger',
+      statKey: 'edge',
+    })
     expect(turn.turnId).toBeTypeOf('string')
     expect(turn.input).toEqual({ type: 'move', moveId: 'face-danger', statKey: 'edge' })
     expect(turn.move).toBe('face-danger')
@@ -145,7 +195,11 @@ describe('NarrativeDomain.processTurn — move (strong-hit)', () => {
   })
 
   it('populates roll with actionDie, challengeDice, modifier, total, result, match', async () => {
-    const turn = await domain.processTurn('camp-1', { type: 'move', moveId: 'face-danger', statKey: 'edge' })
+    const turn = await domain.processTurn('camp-1', {
+      type: 'move',
+      moveId: 'face-danger',
+      statKey: 'edge',
+    })
     expect(turn.roll).toBeDefined()
     expect(turn.roll!.actionDie).toBe(STRONG_HIT_ROLL.actionDie)
     expect(turn.roll!.challengeDice).toEqual(STRONG_HIT_ROLL.challengeDice)
@@ -154,12 +208,20 @@ describe('NarrativeDomain.processTurn — move (strong-hit)', () => {
   })
 
   it('narration comes from AI response text', async () => {
-    const turn = await domain.processTurn('camp-1', { type: 'move', moveId: 'face-danger', statKey: 'edge' })
+    const turn = await domain.processTurn('camp-1', {
+      type: 'move',
+      moveId: 'face-danger',
+      statKey: 'edge',
+    })
     expect(turn.narration).toBe(AI_NARRATION)
   })
 
   it('statDeltas reflects move consequences (momentum +1 on strong-hit face-danger)', async () => {
-    const turn = await domain.processTurn('camp-1', { type: 'move', moveId: 'face-danger', statKey: 'edge' })
+    const turn = await domain.processTurn('camp-1', {
+      type: 'move',
+      moveId: 'face-danger',
+      statKey: 'edge',
+    })
     expect(turn.statDeltas).toEqual([{ stat: 'momentum', before: 2, after: 3 }])
   })
 
@@ -227,7 +289,11 @@ describe('NarrativeDomain.processTurn — move (weak-hit, no deltas)', () => {
   })
 
   it('statDeltas is empty', async () => {
-    const turn = await domain.processTurn('camp-1', { type: 'move', moveId: 'face-danger', statKey: 'edge' })
+    const turn = await domain.processTurn('camp-1', {
+      type: 'move',
+      moveId: 'face-danger',
+      statKey: 'edge',
+    })
     expect(turn.statDeltas).toEqual([])
   })
 })
@@ -248,7 +314,11 @@ describe('NarrativeDomain.processTurn — move (miss, oracle triggered)', () => 
   })
 
   it('oracleResults is populated on a miss with exactly one auto-triggered roll', async () => {
-    const turn = await domain.processTurn('camp-1', { type: 'move', moveId: 'face-danger', statKey: 'edge' })
+    const turn = await domain.processTurn('camp-1', {
+      type: 'move',
+      moveId: 'face-danger',
+      statKey: 'edge',
+    })
     expect(turn.oracleResults).toBeDefined()
     expect(turn.oracleResults).toHaveLength(1)
     expect(turn.oracleResults![0]!.tableId).toBe('pay-the-price')
@@ -267,12 +337,16 @@ describe('NarrativeDomain.processTurn — entity extraction', () => {
       ironswornPlugin,
       makeAi({ text: 'You meet [[Aldric]] and [[The Iron Hold]] on the path.' }),
       new OracleService(),
-      mockDice,
+      mockDice
     )
   })
 
   it('extracts [[EntityName]] patterns from AI response', async () => {
-    const turn = await domain.processTurn('camp-1', { type: 'move', moveId: 'face-danger', statKey: 'edge' })
+    const turn = await domain.processTurn('camp-1', {
+      type: 'move',
+      moveId: 'face-danger',
+      statKey: 'edge',
+    })
     expect(turn.extractedEntities).toEqual(['Aldric', 'The Iron Hold'])
   })
 
@@ -286,8 +360,18 @@ describe('NarrativeDomain.processTurn — no entities in response', () => {
   it('extractedEntities is empty when AI response has no [[ ]] patterns', async () => {
     const storage = makeStorage()
     const mockDice = { roll: vi.fn().mockReturnValue(STRONG_HIT_ROLL), replay: DiceService.replay }
-    const domain = new NarrativeDomain(storage, ironswornPlugin, makeAi(), new OracleService(), mockDice)
-    const turn = await domain.processTurn('camp-1', { type: 'move', moveId: 'face-danger', statKey: 'edge' })
+    const domain = new NarrativeDomain(
+      storage,
+      ironswornPlugin,
+      makeAi(),
+      new OracleService(),
+      mockDice
+    )
+    const turn = await domain.processTurn('camp-1', {
+      type: 'move',
+      moveId: 'face-danger',
+      statKey: 'edge',
+    })
     expect(turn.extractedEntities).toEqual([])
     expect(appendedTypes(storage)).not.toContain('entity.extracted')
   })
@@ -298,7 +382,13 @@ describe('NarrativeDomain.processTurn — move validation', () => {
 
   beforeEach(() => {
     const mockDice = { roll: vi.fn().mockReturnValue(STRONG_HIT_ROLL), replay: DiceService.replay }
-    domain = new NarrativeDomain(makeStorage(), ironswornPlugin, makeAi(), new OracleService(), mockDice)
+    domain = new NarrativeDomain(
+      makeStorage(),
+      ironswornPlugin,
+      makeAi(),
+      new OracleService(),
+      mockDice
+    )
   })
 
   it('throws when moveId is missing', async () => {
@@ -321,7 +411,13 @@ describe('NarrativeDomain.processTurn — move validation', () => {
     const emptyCampaign = { ...CAMPAIGN, characterIds: [] }
     const storage = makeStorage()
     ;(storage.campaigns.get as ReturnType<typeof vi.fn>).mockResolvedValue(emptyCampaign)
-    const emptyDomain = new NarrativeDomain(storage, ironswornPlugin, makeAi(), new OracleService(), DiceService)
+    const emptyDomain = new NarrativeDomain(
+      storage,
+      ironswornPlugin,
+      makeAi(),
+      new OracleService(),
+      DiceService
+    )
     await expect(
       emptyDomain.processTurn('camp-1', { type: 'free', userText: 'Hello.' })
     ).rejects.toThrow(/no characters/)
@@ -419,13 +515,29 @@ const CHARACTER_2: CharacterState = {
   name: 'Mira',
   rulesetId: 'ironsworn-v1',
   data: {
-    edge: 1, heart: 2, iron: 3, shadow: 1, wits: 2,
-    health: 5, spirit: 5, supply: 5, momentum: 2,
+    edge: 1,
+    heart: 2,
+    iron: 3,
+    shadow: 1,
+    wits: 2,
+    health: 5,
+    spirit: 5,
+    supply: 5,
+    momentum: 2,
     debilities: {
-      wounded: false, shaken: false, unprepared: false, encumbered: false,
-      maimed: false, corrupted: false, cursed: false, tormented: false, weak: false,
+      wounded: false,
+      shaken: false,
+      unprepared: false,
+      encumbered: false,
+      maimed: false,
+      corrupted: false,
+      cursed: false,
+      tormented: false,
+      weak: false,
     },
-    vows: [], bonds: [], assetIds: [],
+    vows: [],
+    bonds: [],
+    assetIds: [],
     experience: { earned: 0, spent: 0 },
     tracks: { combat: 0, journey: 0, bonds: 0 },
   },
@@ -443,9 +555,15 @@ describe('NarrativeDomain.processTurn — character selection', () => {
     const storage = makeStorage()
     ;(storage.campaigns.get as ReturnType<typeof vi.fn>).mockResolvedValue(MULTI_CHAR_CAMPAIGN)
     ;(storage.characters.get as ReturnType<typeof vi.fn>).mockImplementation(async (id: string) =>
-      id === 'char-2' ? CHARACTER_2 : CHARACTER,
+      id === 'char-2' ? CHARACTER_2 : CHARACTER
     )
-    const domain = new NarrativeDomain(storage, ironswornPlugin, makeAi(), new OracleService(), DiceService)
+    const domain = new NarrativeDomain(
+      storage,
+      ironswornPlugin,
+      makeAi(),
+      new OracleService(),
+      DiceService
+    )
     await domain.processTurn('camp-1', { type: 'free', userText: 'Hello.', characterId: 'char-2' })
     expect(storage.characters.get).toHaveBeenCalledWith('char-2')
   })
@@ -453,25 +571,54 @@ describe('NarrativeDomain.processTurn — character selection', () => {
   it('falls back to characterIds[0] when action.characterId is omitted', async () => {
     const storage = makeStorage()
     ;(storage.campaigns.get as ReturnType<typeof vi.fn>).mockResolvedValue(MULTI_CHAR_CAMPAIGN)
-    const domain = new NarrativeDomain(storage, ironswornPlugin, makeAi(), new OracleService(), DiceService)
+    const domain = new NarrativeDomain(
+      storage,
+      ironswornPlugin,
+      makeAi(),
+      new OracleService(),
+      DiceService
+    )
     await domain.processTurn('camp-1', { type: 'free', userText: 'Hello.' })
     expect(storage.characters.get).toHaveBeenCalledWith('char-1')
   })
 
   it('throws when action.characterId is not in campaign.characterIds', async () => {
     const storage = makeStorage()
-    const domain = new NarrativeDomain(storage, ironswornPlugin, makeAi(), new OracleService(), DiceService)
+    const domain = new NarrativeDomain(
+      storage,
+      ironswornPlugin,
+      makeAi(),
+      new OracleService(),
+      DiceService
+    )
     await expect(
-      domain.processTurn('camp-1', { type: 'free', userText: 'Hello.', characterId: 'unknown-char' }),
+      domain.processTurn('camp-1', {
+        type: 'free',
+        userText: 'Hello.',
+        characterId: 'unknown-char',
+      })
     ).rejects.toThrow(/does not belong to campaign/)
   })
 
   it('throws "does not belong" (not "no characters") when characterId is explicit but campaign is empty', async () => {
     const storage = makeStorage()
-    ;(storage.campaigns.get as ReturnType<typeof vi.fn>).mockResolvedValue({ ...CAMPAIGN, characterIds: [] })
-    const domain = new NarrativeDomain(storage, ironswornPlugin, makeAi(), new OracleService(), DiceService)
+    ;(storage.campaigns.get as ReturnType<typeof vi.fn>).mockResolvedValue({
+      ...CAMPAIGN,
+      characterIds: [],
+    })
+    const domain = new NarrativeDomain(
+      storage,
+      ironswornPlugin,
+      makeAi(),
+      new OracleService(),
+      DiceService
+    )
     await expect(
-      domain.processTurn('camp-1', { type: 'free', userText: 'Hello.', characterId: 'explicit-char' }),
+      domain.processTurn('camp-1', {
+        type: 'free',
+        userText: 'Hello.',
+        characterId: 'explicit-char',
+      })
     ).rejects.toThrow(/does not belong to campaign/)
   })
 })
@@ -493,8 +640,13 @@ describe('NarrativeDomain — GameContext assembly', () => {
 
   it('GameContext.recentEvents matches what storage returned', async () => {
     const fakeEvents: SessionEvent[] = Array.from({ length: 5 }, (_, i) => ({
-      id: `evt-${i}`, campaignId: 'camp-1', turnId: 'turn-1',
-      type: 'player.input' as const, playerId: 'local', payload: {}, timestamp: new Date().toISOString(),
+      id: `evt-${i}`,
+      campaignId: 'camp-1',
+      turnId: 'turn-1',
+      type: 'player.input' as const,
+      playerId: 'local',
+      payload: {},
+      timestamp: new Date().toISOString(),
     }))
     const storage = makeStorage({ recentEvents: fakeEvents })
     const ai = makeAi()
@@ -506,8 +658,26 @@ describe('NarrativeDomain — GameContext assembly', () => {
 
   it('world.totalEntityCount reflects world list length', async () => {
     const fakeEntities: WorldEntity[] = [
-      { id: 'e1', campaignId: 'camp-1', type: 'npc', name: 'Kira', attributes: {}, connections: [], createdAt: '', updatedAt: '' },
-      { id: 'e2', campaignId: 'camp-1', type: 'location', name: 'The Hold', attributes: {}, connections: [], createdAt: '', updatedAt: '' },
+      {
+        id: 'e1',
+        campaignId: 'camp-1',
+        type: 'npc',
+        name: 'Kira',
+        attributes: {},
+        connections: [],
+        createdAt: '',
+        updatedAt: '',
+      },
+      {
+        id: 'e2',
+        campaignId: 'camp-1',
+        type: 'location',
+        name: 'The Hold',
+        attributes: {},
+        connections: [],
+        createdAt: '',
+        updatedAt: '',
+      },
     ]
     const storage = makeStorage({ worldEntities: fakeEntities })
     const ai = makeAi()

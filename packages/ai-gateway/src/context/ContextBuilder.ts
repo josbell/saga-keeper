@@ -37,7 +37,7 @@ export class ContextBuilder implements IContextBuilder {
 
   constructor(
     private readonly template: IPromptTemplate,
-    opts: ContextBuilderOptions = {},
+    opts: ContextBuilderOptions = {}
   ) {
     this.maxTokens = opts.maxTokens ?? 4000
     this.charsPerToken = opts.charsPerToken
@@ -63,7 +63,7 @@ export class ContextBuilder implements IContextBuilder {
     const { items: trimmedEvents } = budget.trimToFit(
       context.recentEvents,
       (e) => `- ${e.type}: ${JSON.stringify(e.payload)}`,
-      eventBudgetChars,
+      eventBudgetChars
     )
 
     // Entities without a meaningful name are excluded — they contribute noise to the
@@ -72,7 +72,7 @@ export class ContextBuilder implements IContextBuilder {
     const { items: trimmedEntities } = budget.trimToFit(
       namedEntities,
       (e) => `${e.name}: ${e.description ?? ''}`,
-      entityBudgetChars,
+      entityBudgetChars
     )
 
     const trimmedContext: GameContext = {

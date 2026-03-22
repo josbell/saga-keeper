@@ -118,7 +118,7 @@ export class LocalAdapter implements StorageAdapter {
     append: async (campaignId: string, event: SessionEvent): Promise<void> => {
       if (event.campaignId !== campaignId) {
         throw new Error(
-          `Event campaignId "${event.campaignId}" does not match campaign "${campaignId}"`,
+          `Event campaignId "${event.campaignId}" does not match campaign "${campaignId}"`
         )
       }
       await this.db.sessionEvents.add(event)
@@ -129,7 +129,7 @@ export class LocalAdapter implements StorageAdapter {
       const bad = events.find((e) => e.campaignId !== campaignId)
       if (bad) {
         throw new Error(
-          `Event campaignId "${bad.campaignId}" does not match campaign "${campaignId}"`,
+          `Event campaignId "${bad.campaignId}" does not match campaign "${campaignId}"`
         )
       }
       await this.db.transaction('rw', this.db.sessionEvents, async () => {
@@ -194,7 +194,7 @@ export class LocalAdapter implements StorageAdapter {
           this.session.getAll(campaignId),
         ])
         const characters = await Promise.all(
-          campaign.characterIds.map((id) => this.characters.get(id)),
+          campaign.characterIds.map((id) => this.characters.get(id))
         )
         return {
           version: '1',
@@ -205,7 +205,7 @@ export class LocalAdapter implements StorageAdapter {
           world,
           sessionLog,
         }
-      },
+      }
     )
   }
 
@@ -218,7 +218,7 @@ export class LocalAdapter implements StorageAdapter {
         await this.db.characters.bulkPut(archive.characters)
         await this.db.worldEntities.bulkPut(archive.world)
         await this.db.sessionEvents.bulkPut(archive.sessionLog)
-      },
+      }
     )
     return archive.campaign
   }

@@ -84,7 +84,10 @@ describe('campaigns', () => {
     const created = await adapter.campaigns.create(newCampaign)
     // Small delay so updatedAt can differ
     await new Promise((r) => setTimeout(r, 2))
-    const updated = await adapter.campaigns.update(created.id, { name: 'Renamed', status: 'complete' })
+    const updated = await adapter.campaigns.update(created.id, {
+      name: 'Renamed',
+      status: 'complete',
+    })
     expect(updated.name).toBe('Renamed')
     expect(updated.status).toBe('complete')
     expect(updated.rulesetId).toBe('ironsworn-v1') // untouched field preserved
@@ -145,7 +148,7 @@ describe('campaigns', () => {
 
   it('update throws on non-existent id', async () => {
     await expect(adapter.campaigns.update('ghost-id', { name: 'Renamed' })).rejects.toThrow(
-      'Campaign not found: ghost-id',
+      'Campaign not found: ghost-id'
     )
   })
 })
@@ -235,7 +238,7 @@ describe('session', () => {
     for (let i = 1; i <= 5; i++) {
       await adapter.session.append(
         'camp-1',
-        makeEvent(`ev-${i}`, 'camp-1', `2024-01-01T00:00:0${i}.000Z`),
+        makeEvent(`ev-${i}`, 'camp-1', `2024-01-01T00:00:0${i}.000Z`)
       )
     }
     const recent = await adapter.session.getRecent('camp-1', 3)
@@ -256,7 +259,7 @@ describe('session', () => {
   it('append throws when event.campaignId does not match the given campaignId', async () => {
     const ev = makeEvent('ev-mismatch', 'camp-2', '2024-01-01T00:00:01.000Z')
     await expect(adapter.session.append('camp-1', ev)).rejects.toThrow(
-      'Event campaignId "camp-2" does not match campaign "camp-1"',
+      'Event campaignId "camp-2" does not match campaign "camp-1"'
     )
   })
 
@@ -284,7 +287,7 @@ describe('session', () => {
       makeEvent('ev-bad', 'camp-2', '2024-01-01T00:00:02.000Z'),
     ]
     await expect(adapter.session.appendBatch('camp-1', events)).rejects.toThrow(
-      'Event campaignId "camp-2" does not match campaign "camp-1"',
+      'Event campaignId "camp-2" does not match campaign "camp-1"'
     )
     // Nothing should have been written
     const all = await adapter.session.getAll('camp-1')
@@ -318,12 +321,15 @@ describe('session', () => {
 
   it('appendBatch rolls back ALL writes when a mid-batch ConstraintError occurs inside the transaction', async () => {
     // Pre-seed an event with a known id so the second item in the batch collides
-    await adapter.session.append('camp-1', makeEvent('dup-id', 'camp-1', '2024-01-01T00:00:00.000Z'))
+    await adapter.session.append(
+      'camp-1',
+      makeEvent('dup-id', 'camp-1', '2024-01-01T00:00:00.000Z')
+    )
 
     // Batch: first item is new (would succeed alone), second item duplicates 'dup-id'
     const batch = [
       makeEvent('new-before-dup', 'camp-1', '2024-01-01T00:00:01.000Z'),
-      makeEvent('dup-id',         'camp-1', '2024-01-01T00:00:02.000Z'),
+      makeEvent('dup-id', 'camp-1', '2024-01-01T00:00:02.000Z'),
     ]
     await expect(adapter.session.appendBatch('camp-1', batch)).rejects.toThrow()
 
@@ -545,7 +551,7 @@ describe('ArchiveSerializer', () => {
 
   it('deserialize throws a descriptive error on invalid JSON', () => {
     expect(() => serializer.deserialize('not-valid-json{')).toThrow(
-      'Invalid archive: could not parse JSON',
+      'Invalid archive: could not parse JSON'
     )
   })
 
@@ -556,7 +562,9 @@ describe('ArchiveSerializer', () => {
 
   it('deserialize throws when required fields are missing', () => {
     const missing = JSON.stringify({ version: '1', exportedAt: '2024-01-01T00:00:00.000Z' })
-    expect(() => serializer.deserialize(missing)).toThrow('Invalid archive: missing required fields')
+    expect(() => serializer.deserialize(missing)).toThrow(
+      'Invalid archive: missing required fields'
+    )
   })
 
   it('deserialize throws a descriptive error when JSON is null', () => {
