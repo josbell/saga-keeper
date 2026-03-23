@@ -236,3 +236,25 @@ describe('IronswornPromptTemplate.render — narrative tone', () => {
     expect(() => template.render('ironsworn-v1', 'skald.narrate', MINIMAL_CONTEXT)).not.toThrow()
   })
 })
+
+describe('IronswornPromptTemplate.render — event.generate intent', () => {
+  it('does not throw', () => {
+    expect(() => template.render('ironsworn-v1', 'event.generate', MINIMAL_CONTEXT)).not.toThrow()
+  })
+
+  it('output contains "event generator"', () => {
+    const out = template.render('ironsworn-v1', 'event.generate', MINIMAL_CONTEXT)
+    expect(out).toContain('event generator')
+  })
+
+  it('output contains "JSON"', () => {
+    const out = template.render('ironsworn-v1', 'event.generate', MINIMAL_CONTEXT)
+    expect(out).toContain('JSON')
+  })
+
+  it('output does not contain prose section headers from other intents', () => {
+    const out = template.render('ironsworn-v1', 'event.generate', MINIMAL_CONTEXT)
+    expect(out).not.toContain('Skald')
+    expect(out).not.toContain('oracle interpreter')
+  })
+})
