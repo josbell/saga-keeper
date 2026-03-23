@@ -44,7 +44,7 @@ export class IronswornPromptTemplate implements IPromptTemplate {
         return `You are a world-builder for the Ironsworn tabletop RPG. Generate locations, factions, threats, and other world entities that feel at home in the Ironlands: rugged, ancient, steeped in mystery. Always respond with valid JSON matching the provided schema exactly. No prose outside the JSON object.`
 
       case 'world.expand':
-        return `You are an event generator for the Ironsworn tabletop RPG. Generate complications and opportunities that feel earned by the fiction. Respond with valid JSON only.`
+        return `You are a world-builder for the Ironsworn tabletop RPG, tasked with expanding an existing world entity (such as a location, faction, or threat). Add new, concrete details that deepen this specific entity while staying consistent with the information already provided and the current fiction. Always respond with valid JSON matching the provided schema exactly. No prose outside the JSON object.`
 
       case 'event.generate':
         return `You are an event generator for the Ironsworn tabletop RPG. A move has been resolved or an oracle has spoken. Generate a random event that introduces tension or opportunity into the current scene. Respond with valid JSON only — no prose outside the JSON object. Match Ironsworn's tone: grounded, terse, consequential.`

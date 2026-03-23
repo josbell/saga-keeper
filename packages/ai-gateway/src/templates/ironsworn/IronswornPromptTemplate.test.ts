@@ -105,9 +105,10 @@ describe('IronswornPromptTemplate.render — intent preambles', () => {
     expect(out.toLowerCase()).toMatch(/world-builder|world/)
   })
 
-  it('world.expand contains "event"', () => {
+  it('world.expand contains "world-builder" and "expanding"', () => {
     const out = template.render('ironsworn-v1', 'world.expand', MINIMAL_CONTEXT)
-    expect(out.toLowerCase()).toContain('event')
+    expect(out.toLowerCase()).toContain('world-builder')
+    expect(out.toLowerCase()).toContain('expanding')
   })
 
   it('hall.reminder contains "scribe" or "recap"', () => {
