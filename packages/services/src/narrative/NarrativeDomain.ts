@@ -205,7 +205,7 @@ export class NarrativeDomain implements INarrativeDomain {
 
     await this.storage.session.appendBatch(campaignId, events)
 
-    // ── Build and return NarrativeTurn ─────────────────────────────────────────
+    // ── Build and return TurnResult ───────────────────────────────────────────
     return {
       turnId,
       input: action,
