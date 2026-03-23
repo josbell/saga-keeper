@@ -15,11 +15,12 @@ export function StatTrack({
   onChange,
   readOnly = false,
 }: StatTrackProps) {
+  const clampedValue = Math.min(value, max)
   return (
     <div className={styles.track} data-variant={variant}>
       {Array.from({ length: max }, (_, i) => {
         const pipValue = i + 1
-        const filled = pipValue <= value
+        const filled = pipValue <= clampedValue
         return (
           <button
             key={i}

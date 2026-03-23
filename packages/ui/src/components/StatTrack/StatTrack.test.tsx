@@ -34,6 +34,15 @@ describe('StatTrack — rendering', () => {
       expect(btn.getAttribute('aria-pressed')).toBe('true')
     })
   })
+
+  it('clamps value > max: renders only max pips, all filled', () => {
+    render(<StatTrack value={7} max={5} />)
+    const buttons = screen.getAllByRole('button')
+    expect(buttons).toHaveLength(5)
+    buttons.forEach((btn) => {
+      expect(btn.getAttribute('aria-pressed')).toBe('true')
+    })
+  })
 })
 
 describe('StatTrack — interaction', () => {

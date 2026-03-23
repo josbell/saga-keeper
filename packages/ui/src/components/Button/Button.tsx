@@ -6,6 +6,7 @@ export interface ButtonProps {
   onClick?: () => void
   children: React.ReactNode
   type?: 'button' | 'submit' | 'reset'
+  className?: string
 }
 
 export function Button({
@@ -14,11 +15,12 @@ export function Button({
   onClick,
   children,
   type = 'button',
+  className,
 }: ButtonProps) {
   return (
     <button
       type={type}
-      className={styles.button}
+      className={[styles.button, className].filter(Boolean).join(' ')}
       data-variant={variant}
       disabled={disabled}
       onClick={onClick}

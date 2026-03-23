@@ -53,4 +53,20 @@ describe('DiceRoller — rolling', () => {
     expect(screen.getByTestId('challenge-die-1')).toBeDefined()
     expect(screen.getByTestId('challenge-die-2')).toBeDefined()
   })
+
+  it('updates the result on each subsequent roll', async () => {
+    const onRoll = vi.fn()
+    render(<DiceRoller statValue={2} onRoll={onRoll} />)
+    const rollBtn = screen.getByRole('button', { name: /roll/i })
+
+    await userEvent.click(rollBtn)
+    expect(onRoll).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId('outcome-label')).toBeDefined()
+
+    await userEvent.click(rollBtn)
+    expect(onRoll).toHaveBeenCalledTimes(2)
+    // outcome-label still present and valid after second roll
+    const label = screen.getByTestId('outcome-label')
+    expect(['Strong Hit', 'Weak Hit', 'Miss']).toContain(label.textContent)
+  })
 })

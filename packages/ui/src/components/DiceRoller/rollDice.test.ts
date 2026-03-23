@@ -28,6 +28,22 @@ describe('rollDice — outcome classification', () => {
     const result = rollDice(0, { random: seqRng(0.0, 0.9, 0.8) })
     expect(result.outcome).toBe('miss')
   })
+
+  it('treats a tie (action score === challenge die) as a miss for that die', () => {
+    // d6: 0.4 → 3, stat=2 → score=5; d10: 0.4 → 5 (tie), d10: 0.4 → 5 (tie) → miss
+    // Math.floor(0.4*6)+1=3, Math.floor(0.4*10)+1=5; 5>5 is false
+    const result = rollDice(2, { random: seqRng(0.4, 0.4, 0.4) })
+    expect(result.actionScore).toBe(5)
+    expect(result.challengeDie1).toBe(5)
+    expect(result.challengeDie2).toBe(5)
+    expect(result.outcome).toBe('miss')
+  })
+
+  it('returns weak-hit when action score ties one die but beats the other', () => {
+    // d6: 0.4 → 3, stat=2 → score=5; d10: 0.4 → 5 (tie=miss), d10: 0.0 → 1 (beat) → weak-hit
+    const result = rollDice(2, { random: seqRng(0.4, 0.4, 0.0) })
+    expect(result.outcome).toBe('weak-hit')
+  })
 })
 
 describe('rollDice — result shape', () => {

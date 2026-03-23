@@ -28,6 +28,11 @@ describe('Button — rendering', () => {
     render(<Button>Go</Button>)
     expect(screen.getByRole('button').getAttribute('data-variant')).toBe('primary')
   })
+
+  it('forwards className to the button element', () => {
+    render(<Button className="extra">Go</Button>)
+    expect(screen.getByRole('button').classList.contains('extra')).toBe(true)
+  })
 })
 
 describe('Button — disabled state', () => {
