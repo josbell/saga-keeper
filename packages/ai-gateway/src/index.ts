@@ -3,6 +3,7 @@
 // Depends on: @saga-keeper/domain
 
 export * from './gateway/AIGatewayImpl'
+export * from './gateway/generateNPC'
 export * from './context/ContextBuilder'
 export * from './context/TokenBudget'
 export * from './templates/PromptTemplate'
