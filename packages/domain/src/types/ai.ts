@@ -17,6 +17,7 @@ export type AIIntent =
   | 'npc.generate'
   | 'world.generate'
   | 'world.expand'
+  | 'event.generate'
   | 'forge.counsel'
   | 'hall.reminder'
 
@@ -33,6 +34,14 @@ export interface GameContext {
 export interface Message {
   role: 'user' | 'assistant' | 'system'
   content: string
+}
+
+/** Narrative context accepted by the `event.generate` intent. */
+export interface EventGenerationContext {
+  /** Current scene description. */
+  scene: string
+  /** Active vow or quest driving the narrative. */
+  vow?: string
 }
 
 /** Narrative context accepted by the `npc.generate` intent. */

@@ -105,9 +105,10 @@ describe('IronswornPromptTemplate.render — intent preambles', () => {
     expect(out.toLowerCase()).toMatch(/world-builder|world/)
   })
 
-  it('world.expand contains "event"', () => {
+  it('world.expand contains "world-builder" and "expanding"', () => {
     const out = template.render('ironsworn-v1', 'world.expand', MINIMAL_CONTEXT)
-    expect(out.toLowerCase()).toContain('event')
+    expect(out.toLowerCase()).toContain('world-builder')
+    expect(out.toLowerCase()).toContain('expanding')
   })
 
   it('hall.reminder contains "scribe" or "recap"', () => {
@@ -234,5 +235,47 @@ describe('IronswornPromptTemplate.render — narrative tone', () => {
 
   it('no crash when narrativeTone is absent', () => {
     expect(() => template.render('ironsworn-v1', 'skald.narrate', MINIMAL_CONTEXT)).not.toThrow()
+  })
+})
+
+describe('IronswornPromptTemplate.render — event.generate intent', () => {
+  it('does not throw', () => {
+    expect(() => template.render('ironsworn-v1', 'event.generate', MINIMAL_CONTEXT)).not.toThrow()
+  })
+
+  it('output contains "event generator"', () => {
+    const out = template.render('ironsworn-v1', 'event.generate', MINIMAL_CONTEXT)
+    expect(out).toContain('event generator')
+  })
+
+  it('output contains "JSON"', () => {
+    const out = template.render('ironsworn-v1', 'event.generate', MINIMAL_CONTEXT)
+    expect(out).toContain('JSON')
+  })
+
+  it('output references Ironsworn', () => {
+    const out = template.render('ironsworn-v1', 'event.generate', MINIMAL_CONTEXT)
+    expect(out).toContain('Ironsworn')
+  })
+
+  it('output contains "random event"', () => {
+    const out = template.render('ironsworn-v1', 'event.generate', MINIMAL_CONTEXT)
+    expect(out).toContain('random event')
+  })
+
+  it('output provides tone guidance', () => {
+    const out = template.render('ironsworn-v1', 'event.generate', MINIMAL_CONTEXT)
+    expect(out.toLowerCase()).toMatch(/grounded|terse|consequential|grim|evocative/)
+  })
+
+  it('output does not contain prose section headers from other intents', () => {
+    const out = template.render('ironsworn-v1', 'event.generate', MINIMAL_CONTEXT)
+    expect(out).not.toContain('Skald')
+    expect(out).not.toContain('oracle interpreter')
+  })
+
+  it('includes character context block when characters are present', () => {
+    const out = template.render('ironsworn-v1', 'event.generate', MINIMAL_CONTEXT)
+    expect(out).toContain('Aldric')
   })
 })

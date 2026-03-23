@@ -26,6 +26,7 @@ const INTENT_OUTPUT_ESTIMATES: Readonly<Record<AIIntent, number>> = {
   'skald.move': 512,
   'world.generate': 512,
   'world.expand': 512,
+  'event.generate': 512,
   'forge.counsel': 512,
   'hall.reminder': 1024,
   'npc.generate': 512,
