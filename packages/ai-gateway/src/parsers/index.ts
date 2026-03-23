@@ -20,7 +20,7 @@ export const NPCSchema = z.object({
 export type NPC = z.infer<typeof NPCSchema>
 
 /**
- * Random event produced by the `world.expand` intent.
+ * Random event produced by the `event.generate` intent.
  * All string fields use `.min(1)` to reject empty-string placeholders.
  */
 export const RandomEventSchema = z.object({

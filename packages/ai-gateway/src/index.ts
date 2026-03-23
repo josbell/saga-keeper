@@ -4,6 +4,7 @@
 
 export * from './gateway/AIGatewayImpl'
 export * from './gateway/generateNPC'
+export * from './gateway/generateEvent'
 export * from './context/ContextBuilder'
 export * from './context/TokenBudget'
 export * from './templates/PromptTemplate'
