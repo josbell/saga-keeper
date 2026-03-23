@@ -45,3 +45,45 @@ describe('buildEventUserPrompt — vow field', () => {
     expect(out).not.toContain('Active vow:')
   })
 })
+
+describe('buildEventUserPrompt — output format', () => {
+  it('JSON instruction contains all four RandomEvent field names', () => {
+    const out = buildEventUserPrompt(FULL_CTX)
+    expect(out).toContain('trigger')
+    expect(out).toContain('complication')
+    expect(out).toContain('opportunity')
+    expect(out).toContain('oracle_hint')
+  })
+
+  it('JSON instruction uses exact expected phrasing', () => {
+    const out = buildEventUserPrompt(FULL_CTX)
+    expect(out).toContain(
+      'Return JSON with fields: trigger, complication, opportunity, oracle_hint'
+    )
+  })
+
+  it('scene label and value appear on the same line', () => {
+    const out = buildEventUserPrompt(FULL_CTX)
+    const lines = out.split('\n')
+    const sceneLine = lines.find((l) => l.startsWith('Current scene:'))
+    expect(sceneLine).toBeDefined()
+    expect(sceneLine).toContain('A fog-shrouded forest crossing at dusk')
+  })
+
+  it('JSON instruction is separated from context by a blank line', () => {
+    const out = buildEventUserPrompt(FULL_CTX)
+    expect(out).toContain('\n\n')
+  })
+
+  it('works with an empty scene string', () => {
+    const out = buildEventUserPrompt({ scene: '' })
+    expect(out).toContain('Current scene:')
+    expect(out).toContain('trigger, complication, opportunity, oracle_hint')
+  })
+
+  it('works with a scene containing special characters', () => {
+    const scene = 'A ruin — half-buried & forgotten; stones cracked "like old bones"'
+    const out = buildEventUserPrompt({ scene })
+    expect(out).toContain(scene)
+  })
+})

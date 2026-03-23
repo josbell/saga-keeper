@@ -252,9 +252,29 @@ describe('IronswornPromptTemplate.render — event.generate intent', () => {
     expect(out).toContain('JSON')
   })
 
+  it('output references Ironsworn', () => {
+    const out = template.render('ironsworn-v1', 'event.generate', MINIMAL_CONTEXT)
+    expect(out).toContain('Ironsworn')
+  })
+
+  it('output contains "random event"', () => {
+    const out = template.render('ironsworn-v1', 'event.generate', MINIMAL_CONTEXT)
+    expect(out).toContain('random event')
+  })
+
+  it('output provides tone guidance', () => {
+    const out = template.render('ironsworn-v1', 'event.generate', MINIMAL_CONTEXT)
+    expect(out.toLowerCase()).toMatch(/grounded|terse|consequential|grim|evocative/)
+  })
+
   it('output does not contain prose section headers from other intents', () => {
     const out = template.render('ironsworn-v1', 'event.generate', MINIMAL_CONTEXT)
     expect(out).not.toContain('Skald')
     expect(out).not.toContain('oracle interpreter')
+  })
+
+  it('includes character context block when characters are present', () => {
+    const out = template.render('ironsworn-v1', 'event.generate', MINIMAL_CONTEXT)
+    expect(out).toContain('Aldric')
   })
 })

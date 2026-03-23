@@ -150,6 +150,43 @@ describe('generateEvent — happy path', () => {
   })
 })
 
+describe('generateEvent — EventGenerationContext edge cases', () => {
+  it('handles empty scene string without throwing', async () => {
+    const adapter = makeAdapter(VALID_EVENT_JSON)
+    const builder = makeContextBuilder()
+    await expect(
+      generateEvent({ adapter, contextBuilder: builder }, { scene: '' }, MINIMAL_GAME_CONTEXT)
+    ).resolves.toBeDefined()
+  })
+
+  it('passes scene with special characters through to adapter unchanged', async () => {
+    const adapter = makeAdapter(VALID_EVENT_JSON)
+    const builder = makeContextBuilder()
+    const specialScene = 'Ruins — half-buried & forgotten; "cracked like old bones"'
+    await generateEvent(
+      { adapter, contextBuilder: builder },
+      { scene: specialScene },
+      MINIMAL_GAME_CONTEXT
+    )
+    const callArgs = (adapter.complete as ReturnType<typeof vi.fn>).mock.calls[0]!
+    const userMsg = callArgs[1][0].content as string
+    expect(userMsg).toContain(specialScene)
+  })
+
+  it('handles very long vow text without throwing', async () => {
+    const adapter = makeAdapter(VALID_EVENT_JSON)
+    const builder = makeContextBuilder()
+    const longVow = 'A'.repeat(600)
+    await expect(
+      generateEvent(
+        { adapter, contextBuilder: builder },
+        { scene: 'A dark hall', vow: longVow },
+        MINIMAL_GAME_CONTEXT
+      )
+    ).resolves.toBeDefined()
+  })
+})
+
 describe('generateEvent — validation', () => {
   it('throws when AI returns invalid JSON', async () => {
     const adapter = makeAdapter('not json at all')
