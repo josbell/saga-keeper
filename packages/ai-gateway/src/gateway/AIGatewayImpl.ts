@@ -19,6 +19,9 @@ import type { ICostGuard } from '../cost/CostGuard'
 import type { IPromptTemplate } from '../templates/PromptTemplate'
 import type { TemplateRegistry } from '../templates/TemplateRegistry'
 
+/** Chars-per-token ratio for rough token estimation (shared with CostGuard default). */
+const CHARS_PER_TOKEN = 4
+
 // ── Error types ──────────────────────────────────────────────────────────────
 
 export class TierBlockedError extends Error {
@@ -95,8 +98,9 @@ export class AIGatewayImpl implements AIGateway {
 
     const text = await this.adapter.complete(systemPrompt, messages, request.options ?? {})
 
-    // Estimate tokens used from response length (rough, but consistent with adapter telemetry)
-    const tokensUsed = Math.ceil(text.length / 4) + (request.options?.maxTokens ?? 0)
+    // Estimate tokens used from response text length (output only — input was already
+    // accounted for in the pre-call cost estimate via estimateCost).
+    const tokensUsed = Math.ceil(text.length / CHARS_PER_TOKEN)
     this.costGuard.recordSpend(this.sessionId, tokensUsed)
 
     return { text, intent: request.intent, tokensUsed }
@@ -118,7 +122,7 @@ export class AIGatewayImpl implements AIGateway {
     }
     yield { delta: '', done: true }
 
-    const tokensUsed = Math.ceil(accumulated.length / 4)
+    const tokensUsed = Math.ceil(accumulated.length / CHARS_PER_TOKEN)
     this.costGuard.recordSpend(this.sessionId, tokensUsed)
   }
 
