@@ -28,6 +28,7 @@ const INTENT_OUTPUT_ESTIMATES: Readonly<Record<AIIntent, number>> = {
   'world.expand': 512,
   'forge.counsel': 512,
   'hall.reminder': 1024,
+  'npc.generate': 512,
 }
 
 // ── CostGuard implementation ─────────────────────────────────────────────────

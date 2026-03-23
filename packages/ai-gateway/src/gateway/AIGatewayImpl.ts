@@ -19,9 +19,6 @@ import type { ICostGuard } from '../cost/CostGuard'
 import type { IPromptTemplate } from '../templates/PromptTemplate'
 import type { TemplateRegistry } from '../templates/TemplateRegistry'
 
-/** Chars-per-token ratio for rough token estimation (shared with CostGuard default). */
-const CHARS_PER_TOKEN = 4
-
 // ── Error types ──────────────────────────────────────────────────────────────
 
 export class TierBlockedError extends Error {
@@ -88,42 +85,33 @@ export class AIGatewayImpl implements AIGateway {
   }
 
   async complete(request: CompletionRequest): Promise<CompletionResponse> {
-    await this.enforceGuards(request.intent, request)
+    const { systemPrompt, estimated } = await this.enforceGuards(request.intent, request)
 
-    const systemPrompt = this.buildSystemPrompt(request)
-    const messages = request.history ?? []
+    const messages = [...(request.history ?? [])]
     if (request.userMessage !== undefined) {
       messages.push({ role: 'user', content: request.userMessage })
     }
 
     const text = await this.adapter.complete(systemPrompt, messages, request.options ?? {})
+    this.costGuard.recordSpend(this.sessionId, estimated)
 
-    // Estimate tokens used from response text length (output only — input was already
-    // accounted for in the pre-call cost estimate via estimateCost).
-    const tokensUsed = Math.ceil(text.length / CHARS_PER_TOKEN)
-    this.costGuard.recordSpend(this.sessionId, tokensUsed)
-
-    return { text, intent: request.intent, tokensUsed }
+    return { text, intent: request.intent, tokensUsed: estimated }
   }
 
   async *stream(request: CompletionRequest): AsyncIterable<StreamChunk> {
-    await this.enforceGuards(request.intent, request)
+    const { systemPrompt, estimated } = await this.enforceGuards(request.intent, request)
 
-    const systemPrompt = this.buildSystemPrompt(request)
-    const messages = request.history ?? []
+    const messages = [...(request.history ?? [])]
     if (request.userMessage !== undefined) {
       messages.push({ role: 'user', content: request.userMessage })
     }
 
-    let accumulated = ''
     for await (const delta of this.adapter.stream(systemPrompt, messages, request.options ?? {})) {
-      accumulated += delta
       yield { delta, done: false }
     }
     yield { delta: '', done: true }
 
-    const tokensUsed = Math.ceil(accumulated.length / CHARS_PER_TOKEN)
-    this.costGuard.recordSpend(this.sessionId, tokensUsed)
+    this.costGuard.recordSpend(this.sessionId, estimated)
   }
 
   getCapabilities(): ProviderCapabilities {
@@ -136,7 +124,10 @@ export class AIGatewayImpl implements AIGateway {
 
   // ── Private helpers ──────────────────────────────────────────────────────
 
-  private async enforceGuards(intent: AIIntent, request: CompletionRequest): Promise<void> {
+  private async enforceGuards(
+    intent: AIIntent,
+    request: CompletionRequest
+  ): Promise<{ systemPrompt: string; estimated: number }> {
     // 1. Feature gate: is this intent allowed for the tier?
     if (!this.tierGuard.isAllowed(this.tier, intent)) {
       throw new TierBlockedError(intent, this.tierGuard.getFallback(intent))
@@ -148,16 +139,14 @@ export class AIGatewayImpl implements AIGateway {
       throw new QuotaExceededError()
     }
 
-    // 3. Cost estimate: will this request push the session over budget?
-    const contextText = this.contextBuilder.build(intent, request.context)
-    const estimated = this.costGuard.estimateCost(intent, contextText.length)
+    // 3. Cost estimate: build prompt once, reuse for dispatch.
+    const systemPrompt = this.contextBuilder.build(intent, request.context)
+    const estimated = this.costGuard.estimateCost(intent, systemPrompt.length)
     const budgetStatus = this.costGuard.checkBudget(this.sessionId, estimated)
     if (budgetStatus === 'block') {
       throw new BudgetExceededError(estimated)
     }
-  }
 
-  private buildSystemPrompt(request: CompletionRequest): string {
-    return this.contextBuilder.build(request.intent, request.context)
+    return { systemPrompt, estimated }
   }
 }

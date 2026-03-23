@@ -53,6 +53,7 @@ const TIER_ALLOWED_INTENTS: Readonly<Record<AITier, ReadonlySet<AIIntent>>> = {
     'world.expand',
     'forge.counsel',
     'hall.reminder',
+    'npc.generate',
   ]),
 }
 
@@ -65,6 +66,7 @@ const INTENT_FALLBACK_MESSAGES: Readonly<Record<AIIntent, string>> = {
   'world.expand': 'World expansion requires the full-skald tier.',
   'forge.counsel': 'Forge counsel requires the full-skald tier.',
   'hall.reminder': 'Session recaps require the full-skald tier.',
+  'npc.generate': 'NPC generation requires the full-skald tier.',
 }
 
 // ── In-memory RateLimitStore ─────────────────────────────────────────────────
