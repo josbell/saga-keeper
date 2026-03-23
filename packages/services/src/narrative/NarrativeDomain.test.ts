@@ -623,6 +623,61 @@ describe('NarrativeDomain.processTurn — character selection', () => {
   })
 })
 
+// ── TurnResult.sessionEvents ──────────────────────────────────────────────────
+
+describe('NarrativeDomain.processTurn — TurnResult.sessionEvents', () => {
+  it('move (strong-hit): sessionEvents is an array', async () => {
+    const storage = makeStorage()
+    const mockDice = { roll: vi.fn().mockReturnValue(STRONG_HIT_ROLL), replay: DiceService.replay }
+    const domain = new NarrativeDomain(storage, ironswornPlugin, makeAi(), new OracleService(), mockDice)
+    const turn = await domain.processTurn('camp-1', { type: 'move', moveId: 'face-danger', statKey: 'edge' })
+    expect(Array.isArray((turn as unknown as { sessionEvents: unknown }).sessionEvents)).toBe(true)
+  })
+
+  it('move (strong-hit): sessionEvents deep-equals what was passed to appendBatch', async () => {
+    const storage = makeStorage()
+    const mockDice = { roll: vi.fn().mockReturnValue(STRONG_HIT_ROLL), replay: DiceService.replay }
+    const domain = new NarrativeDomain(storage, ironswornPlugin, makeAi(), new OracleService(), mockDice)
+    const turn = await domain.processTurn('camp-1', { type: 'move', moveId: 'face-danger', statKey: 'edge' })
+    const storedEvents = (storage.session.appendBatch.mock.calls[0] as unknown[])[1] as SessionEvent[]
+    expect((turn as unknown as { sessionEvents: SessionEvent[] }).sessionEvents).toEqual(storedEvents)
+  })
+
+  it('move (strong-hit): sessionEvents[0].type is player.input', async () => {
+    const storage = makeStorage()
+    const mockDice = { roll: vi.fn().mockReturnValue(STRONG_HIT_ROLL), replay: DiceService.replay }
+    const domain = new NarrativeDomain(storage, ironswornPlugin, makeAi(), new OracleService(), mockDice)
+    const turn = await domain.processTurn('camp-1', { type: 'move', moveId: 'face-danger', statKey: 'edge' })
+    const events = (turn as unknown as { sessionEvents: SessionEvent[] }).sessionEvents
+    expect(events[0]!.type).toBe('player.input')
+  })
+
+  it('free turn: sessionEvents contains exactly player.input and skald.narrated', async () => {
+    const storage = makeStorage()
+    const domain = new NarrativeDomain(storage, ironswornPlugin, makeAi({ intent: 'skald.narrate' }), new OracleService(), DiceService)
+    const turn = await domain.processTurn('camp-1', { type: 'free', userText: 'I look around.' })
+    const types = (turn as unknown as { sessionEvents: SessionEvent[] }).sessionEvents.map((e) => e.type)
+    expect(types).toEqual(['player.input', 'skald.narrated'])
+  })
+
+  it('oracle turn: sessionEvents contains oracle.consulted', async () => {
+    const storage = makeStorage()
+    const domain = new NarrativeDomain(storage, ironswornPlugin, makeAi({ intent: 'oracle.narrate' }), new OracleService(), DiceService)
+    const turn = await domain.processTurn('camp-1', { type: 'oracle', odds: 'fifty-fifty' })
+    const types = (turn as unknown as { sessionEvents: SessionEvent[] }).sessionEvents.map((e) => e.type)
+    expect(types).toContain('oracle.consulted')
+  })
+
+  it('move (miss): sessionEvents contains oracle.consulted', async () => {
+    const storage = makeStorage()
+    const mockDice = { roll: vi.fn().mockReturnValue(MISS_ROLL), replay: DiceService.replay }
+    const domain = new NarrativeDomain(storage, ironswornPlugin, makeAi(), new OracleService(), mockDice)
+    const turn = await domain.processTurn('camp-1', { type: 'move', moveId: 'face-danger', statKey: 'edge' })
+    const types = (turn as unknown as { sessionEvents: SessionEvent[] }).sessionEvents.map((e) => e.type)
+    expect(types).toContain('oracle.consulted')
+  })
+})
+
 // ── GameContext assembly ──────────────────────────────────────────────────────
 
 describe('NarrativeDomain — GameContext assembly', () => {
