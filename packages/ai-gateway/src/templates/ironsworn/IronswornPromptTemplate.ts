@@ -37,8 +37,11 @@ export class IronswornPromptTemplate implements IPromptTemplate {
       case 'skald.move':
         return `You are a move resolver for the Ironsworn tabletop RPG. A move has been triggered, dice rolled, and an outcome determined. Narrate the move outcome in 2–3 sentences in the second person ("You…"). Be precise about what the outcome means mechanically. Match Ironsworn's tone: grounded, terse, evocative.`
 
-      case 'world.generate':
+      case 'npc.generate':
         return `You are a character generator for the Ironsworn tabletop RPG. Generate NPCs that feel at home in the Ironlands: weathered, purposeful, carrying secrets. Always respond with valid JSON matching the provided schema exactly. No prose outside the JSON object.`
+
+      case 'world.generate':
+        return `You are a world-builder for the Ironsworn tabletop RPG. Generate locations, factions, threats, and other world entities that feel at home in the Ironlands: rugged, ancient, steeped in mystery. Always respond with valid JSON matching the provided schema exactly. No prose outside the JSON object.`
 
       case 'world.expand':
         return `You are an event generator for the Ironsworn tabletop RPG. Generate complications and opportunities that feel earned by the fiction. Respond with valid JSON only.`

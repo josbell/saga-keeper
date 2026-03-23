@@ -14,6 +14,7 @@ export type AIIntent =
   | 'skald.move'
   | 'oracle.narrate'
   | 'oracle.extract'
+  | 'npc.generate'
   | 'world.generate'
   | 'world.expand'
   | 'forge.counsel'
@@ -32,6 +33,16 @@ export interface GameContext {
 export interface Message {
   role: 'user' | 'assistant' | 'system'
   content: string
+}
+
+/** Narrative context accepted by the `npc.generate` intent. */
+export interface NPCGenerationContext {
+  /** Current scene description. */
+  scene: string
+  /** Active vow or quest driving the narrative. */
+  vow?: string
+  /** Optional encounter or situation prompting the NPC introduction. */
+  encounter?: string
 }
 
 export interface CompletionOptions {

@@ -37,6 +37,15 @@ export interface NarrativeTurn {
   timestamp: string
 }
 
+/** Return value of NarrativeDomain.processTurn(). Extends NarrativeTurn with the
+ *  SessionEvents produced and committed to storage during this turn.
+ *  L1 hooks use sessionEvents to hydrate the Zustand store without L3 needing
+ *  Zustand dependencies.
+ */
+export interface TurnResult extends NarrativeTurn {
+  sessionEvents: SessionEvent[]
+}
+
 export interface PlayerAction {
   type: 'move' | 'free' | 'oracle'
   moveId?: string
