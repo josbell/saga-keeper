@@ -1,0 +1,25 @@
+.input {
+  width: 100%;
+  padding: 0.45em 0.75em;
+  border: 1px solid var(--color-iron);
+  border-radius: 2px;
+  background: var(--color-ember);
+  color: var(--color-parchment);
+  font-family: inherit;
+  font-size: 0.875rem;
+  transition: border-color 0.15s;
+}
+
+.input::placeholder {
+  color: var(--color-bone);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-gold);
+}
+
+.input:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
