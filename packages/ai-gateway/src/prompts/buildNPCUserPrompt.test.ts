@@ -35,6 +35,16 @@ describe('buildNPCUserPrompt', () => {
     expect(result).not.toContain('Encounter')
   })
 
+  it('omits vow line when not provided', () => {
+    const result = buildNPCUserPrompt({ scene: 'A foggy river crossing' })
+    expect(result).not.toContain('Active vow')
+  })
+
+  it('includes scene even without vow', () => {
+    const result = buildNPCUserPrompt({ scene: 'A foggy river crossing' })
+    expect(result).toContain('A foggy river crossing')
+  })
+
   it('includes instruction to return JSON with NPC schema fields', () => {
     const result = buildNPCUserPrompt({
       scene: 'A foggy river crossing',

@@ -42,11 +42,10 @@ export async function generateNPC(
   const systemPrompt = deps.contextBuilder.build('npc.generate', gameContext)
   const userMessage = buildNPCUserPrompt(npcContext)
 
-  const raw = await deps.adapter.complete(
-    systemPrompt,
-    [{ role: 'user', content: userMessage }],
-    { maxTokens: 512, ...options }
-  )
+  const raw = await deps.adapter.complete(systemPrompt, [{ role: 'user', content: userMessage }], {
+    maxTokens: 512,
+    ...options,
+  })
 
   const npc = parseStructuredOutput(NPCSchema, raw)
 

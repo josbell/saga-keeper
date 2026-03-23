@@ -11,7 +11,9 @@ import type { NPCGenerationContext } from '@saga-keeper/domain'
 export function buildNPCUserPrompt(ctx: NPCGenerationContext): string {
   const lines: string[] = []
   lines.push(`Current scene: ${ctx.scene}`)
-  lines.push(`Active vow: ${ctx.vow}`)
+  if (ctx.vow) {
+    lines.push(`Active vow: ${ctx.vow}`)
+  }
   if (ctx.encounter) {
     lines.push(`Encounter: ${ctx.encounter}`)
   }

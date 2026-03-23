@@ -4,7 +4,7 @@
 import { z } from 'zod'
 
 /**
- * NPC produced by the `world.generate` intent.
+ * NPC produced by the `npc.generate` intent.
  * All string fields use `.min(1)` to reject empty-string placeholders that
  * AI models occasionally emit when they have insufficient context.
  */

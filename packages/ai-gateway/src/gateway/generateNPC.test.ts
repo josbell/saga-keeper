@@ -62,7 +62,11 @@ describe('generateNPC — happy path', () => {
   it('returns a validated NPC object', async () => {
     const adapter = makeAdapter(VALID_NPC_JSON)
     const builder = makeContextBuilder()
-    const result = await generateNPC({ adapter, contextBuilder: builder }, NPC_CONTEXT, MINIMAL_GAME_CONTEXT)
+    const result = await generateNPC(
+      { adapter, contextBuilder: builder },
+      NPC_CONTEXT,
+      MINIMAL_GAME_CONTEXT
+    )
     expect(result.npc).toEqual({
       name: 'Kira',
       role: 'Wandering healer',
@@ -76,7 +80,11 @@ describe('generateNPC — happy path', () => {
   it('returns the raw response string', async () => {
     const adapter = makeAdapter(VALID_NPC_JSON)
     const builder = makeContextBuilder()
-    const result = await generateNPC({ adapter, contextBuilder: builder }, NPC_CONTEXT, MINIMAL_GAME_CONTEXT)
+    const result = await generateNPC(
+      { adapter, contextBuilder: builder },
+      NPC_CONTEXT,
+      MINIMAL_GAME_CONTEXT
+    )
     expect(result.raw).toBe(VALID_NPC_JSON)
   })
 
@@ -121,12 +129,9 @@ describe('generateNPC — happy path', () => {
   it('passes custom CompletionOptions to adapter', async () => {
     const adapter = makeAdapter(VALID_NPC_JSON)
     const builder = makeContextBuilder()
-    await generateNPC(
-      { adapter, contextBuilder: builder },
-      NPC_CONTEXT,
-      MINIMAL_GAME_CONTEXT,
-      { temperature: 0.9 }
-    )
+    await generateNPC({ adapter, contextBuilder: builder }, NPC_CONTEXT, MINIMAL_GAME_CONTEXT, {
+      temperature: 0.9,
+    })
     expect(adapter.complete).toHaveBeenCalledWith(
       expect.any(String),
       expect.any(Array),

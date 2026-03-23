@@ -40,7 +40,7 @@ export interface NPCGenerationContext {
   /** Current scene description. */
   scene: string
   /** Active vow or quest driving the narrative. */
-  vow: string
+  vow?: string
   /** Optional encounter or situation prompting the NPC introduction. */
   encounter?: string
 }
