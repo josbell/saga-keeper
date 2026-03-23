@@ -46,6 +46,9 @@ export class IronswornPromptTemplate implements IPromptTemplate {
       case 'world.expand':
         return `You are an event generator for the Ironsworn tabletop RPG. Generate complications and opportunities that feel earned by the fiction. Respond with valid JSON only.`
 
+      case 'event.generate':
+        return `You are an event generator for the Ironsworn tabletop RPG. A move has been resolved or an oracle has spoken. Generate a random event that introduces tension or opportunity into the current scene. Respond with valid JSON only — no prose outside the JSON object. Match Ironsworn's tone: grounded, terse, consequential.`
+
       case 'hall.reminder':
         return `You are a session scribe for the Ironsworn tabletop RPG. The player will give you their raw session notes. Write a concise narrative recap in the second person ("You ventured…") matching Ironsworn's voice. 150–250 words. Preserve mechanical details (progress made, vows sworn/fulfilled, bonds formed). Do not editorialize or add fiction the player did not mention.`
 

@@ -17,8 +17,10 @@ const ALL_INTENTS: AIIntent[] = [
   'skald.move',
   'world.generate',
   'world.expand',
+  'event.generate',
   'forge.counsel',
   'hall.reminder',
+  'npc.generate',
 ]
 
 const ASSISTED_INTENTS: AIIntent[] = [
@@ -31,8 +33,10 @@ const ASSISTED_INTENTS: AIIntent[] = [
 const FULL_SKALD_ONLY_INTENTS: AIIntent[] = [
   'world.generate',
   'world.expand',
+  'event.generate',
   'forge.counsel',
   'hall.reminder',
+  'npc.generate',
 ]
 
 function makeGuard(store?: RateLimitStore): TierGuard {
@@ -93,6 +97,30 @@ describe('TierGuard.getFallback()', () => {
     for (const intent of FULL_SKALD_ONLY_INTENTS) {
       expect(guard.getFallback(intent)).toContain('full-skald')
     }
+  })
+})
+
+// ── event.generate — tier access ─────────────────────────────────────────────
+
+describe('TierGuard — event.generate intent', () => {
+  const guard = makeGuard()
+
+  it('is allowed for full-skald tier', () => {
+    expect(guard.isAllowed('full-skald', 'event.generate')).toBe(true)
+  })
+
+  it('is blocked for assisted tier', () => {
+    expect(guard.isAllowed('assisted', 'event.generate')).toBe(false)
+  })
+
+  it('is blocked for offline tier', () => {
+    expect(guard.isAllowed('offline', 'event.generate')).toBe(false)
+  })
+
+  it('getFallback returns a non-empty string mentioning full-skald', () => {
+    const msg = guard.getFallback('event.generate')
+    expect(msg.length).toBeGreaterThan(0)
+    expect(msg).toContain('full-skald')
   })
 })
 
