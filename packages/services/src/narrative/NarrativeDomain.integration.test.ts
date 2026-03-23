@@ -113,7 +113,11 @@ function makeMockAdapter(fixedText = MOCK_NARRATION): ProviderAdapter & { system
       systemPrompts.push(systemPrompt)
       return fixedText
     },
-    stream: async function* () {},
+    stream: async function* (
+      _systemPrompt: string,
+      _messages: Message[],
+      _options: CompletionOptions,
+    ) {},
     getCapabilities: () => ({
       streaming: false,
       maxContextTokens: 8000,

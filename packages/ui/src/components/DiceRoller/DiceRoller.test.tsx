@@ -21,7 +21,7 @@ describe('DiceRoller — rendering', () => {
 
   it('shows no outcome before the first roll', () => {
     render(<DiceRoller />)
-    expect(screen.queryByText(/strong-hit|weak-hit|miss/i)).toBeNull()
+    expect(screen.queryByTestId('outcome-label')).toBeNull()
   })
 })
 

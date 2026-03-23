@@ -1,29 +1,22 @@
 import styles from './Button.module.css'
 
-export interface ButtonProps {
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: 'primary' | 'ghost' | 'danger'
-  disabled?: boolean
-  onClick?: () => void
-  children: React.ReactNode
-  type?: 'button' | 'submit' | 'reset'
-  className?: string
 }
 
 export function Button({
   variant = 'primary',
-  disabled = false,
-  onClick,
+  className,
   children,
   type = 'button',
-  className,
+  ...props
 }: ButtonProps) {
   return (
     <button
       type={type}
       className={[styles.button, className].filter(Boolean).join(' ')}
       data-variant={variant}
-      disabled={disabled}
-      onClick={onClick}
+      {...props}
     >
       {children}
     </button>

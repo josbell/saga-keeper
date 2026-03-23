@@ -29,6 +29,9 @@ export function StatTrack({
             aria-pressed={filled}
             aria-label={`Set to ${pipValue}`}
             onClick={readOnly ? undefined : () => onChange?.(pipValue)}
+            disabled={readOnly}
+            aria-disabled={readOnly}
+            tabIndex={readOnly ? -1 : 0}
           />
         )
       })}
