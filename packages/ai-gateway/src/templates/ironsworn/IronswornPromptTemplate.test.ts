@@ -95,9 +95,14 @@ describe('IronswornPromptTemplate.render — intent preambles', () => {
     expect(out.toLowerCase()).toContain('move')
   })
 
-  it('world.generate contains "character generator" or "npc"', () => {
-    const out = template.render('ironsworn-v1', 'world.generate', MINIMAL_CONTEXT)
+  it('npc.generate contains "character generator" or "npc"', () => {
+    const out = template.render('ironsworn-v1', 'npc.generate', MINIMAL_CONTEXT)
     expect(out.toLowerCase()).toMatch(/character generator|npc/)
+  })
+
+  it('world.generate contains "world-builder" or "world"', () => {
+    const out = template.render('ironsworn-v1', 'world.generate', MINIMAL_CONTEXT)
+    expect(out.toLowerCase()).toMatch(/world-builder|world/)
   })
 
   it('world.expand contains "event"', () => {
