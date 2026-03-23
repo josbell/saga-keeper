@@ -22,6 +22,8 @@ import type {
   CharacterState,
   SessionEvent,
   AITier,
+  Message,
+  CompletionOptions,
 } from '@saga-keeper/domain'
 
 // ── Fixtures ──────────────────────────────────────────────────────────────────
@@ -107,7 +109,7 @@ function makeMockAdapter(fixedText = MOCK_NARRATION): ProviderAdapter & { system
     id: 'mock',
     displayName: 'Mock Adapter',
     systemPrompts,
-    complete: async (systemPrompt: string) => {
+    complete: async (systemPrompt: string, _messages: Message[], _options: CompletionOptions) => {
       systemPrompts.push(systemPrompt)
       return fixedText
     },
@@ -366,5 +368,16 @@ describe('Integration — offline tier path', () => {
       statKey: 'edge',
     })
     expect(turn.statDeltas).toEqual([{ stat: 'momentum', before: 2, after: 3 }])
+  })
+
+  it('sessionEvents contains skald.narrated with empty text on offline tier', async () => {
+    const turn = await domain.processTurn('camp-1', {
+      type: 'move',
+      moveId: 'face-danger',
+      statKey: 'edge',
+    })
+    const narrated = turn.sessionEvents.find((e) => e.type === 'skald.narrated')
+    expect(narrated).toBeDefined()
+    expect(narrated!.payload['text']).toBe('')
   })
 })

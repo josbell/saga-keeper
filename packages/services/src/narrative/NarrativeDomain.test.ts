@@ -674,6 +674,57 @@ describe('NarrativeDomain.processTurn — TurnResult.sessionEvents', () => {
   })
 })
 
+// ── Offline tier ──────────────────────────────────────────────────────────────
+
+describe('NarrativeDomain.processTurn — offline tier', () => {
+  function makeOfflineAi(): AIGateway {
+    return {
+      complete: vi.fn(), // must NOT be called
+      stream: vi.fn(),
+      getCapabilities: vi.fn().mockReturnValue({
+        streaming: false,
+        maxContextTokens: 8000,
+        supportsSystemPrompt: true,
+        localOnly: false,
+      }),
+      getTier: vi.fn().mockReturnValue('offline'),
+    } as unknown as AIGateway
+  }
+
+  it('narration is empty string when tier is offline', async () => {
+    const storage = makeStorage()
+    const mockDice = { roll: vi.fn().mockReturnValue(STRONG_HIT_ROLL), replay: DiceService.replay }
+    const domain = new NarrativeDomain(storage, ironswornPlugin, makeOfflineAi(), new OracleService(), mockDice)
+    const turn = await domain.processTurn('camp-1', { type: 'move', moveId: 'face-danger', statKey: 'edge' })
+    expect(turn.narration).toBe('')
+  })
+
+  it('ai.complete is never called on offline tier', async () => {
+    const storage = makeStorage()
+    const offlineAi = makeOfflineAi() as AIGateway & { complete: ReturnType<typeof vi.fn> }
+    const mockDice = { roll: vi.fn().mockReturnValue(STRONG_HIT_ROLL), replay: DiceService.replay }
+    const domain = new NarrativeDomain(storage, ironswornPlugin, offlineAi, new OracleService(), mockDice)
+    await domain.processTurn('camp-1', { type: 'move', moveId: 'face-danger', statKey: 'edge' })
+    expect(offlineAi.complete).not.toHaveBeenCalled()
+  })
+
+  it('appendBatch still called on offline tier', async () => {
+    const storage = makeStorage()
+    const mockDice = { roll: vi.fn().mockReturnValue(STRONG_HIT_ROLL), replay: DiceService.replay }
+    const domain = new NarrativeDomain(storage, ironswornPlugin, makeOfflineAi(), new OracleService(), mockDice)
+    await domain.processTurn('camp-1', { type: 'move', moveId: 'face-danger', statKey: 'edge' })
+    expect(storage.session.appendBatch).toHaveBeenCalledOnce()
+  })
+
+  it('statDeltas still populated on offline tier', async () => {
+    const storage = makeStorage()
+    const mockDice = { roll: vi.fn().mockReturnValue(STRONG_HIT_ROLL), replay: DiceService.replay }
+    const domain = new NarrativeDomain(storage, ironswornPlugin, makeOfflineAi(), new OracleService(), mockDice)
+    const turn = await domain.processTurn('camp-1', { type: 'move', moveId: 'face-danger', statKey: 'edge' })
+    expect(turn.statDeltas).toEqual([{ stat: 'momentum', before: 2, after: 3 }])
+  })
+})
+
 // ── GameContext assembly ──────────────────────────────────────────────────────
 
 describe('NarrativeDomain — GameContext assembly', () => {
