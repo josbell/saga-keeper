@@ -126,6 +126,9 @@ importers:
         specifier: workspace:*
         version: link:../domain
     devDependencies:
+      '@saga-keeper/ai-gateway':
+        specifier: workspace:*
+        version: link:../ai-gateway
       '@saga-keeper/ruleset-ironsworn':
         specifier: workspace:*
         version: link:../rulesets/ironsworn

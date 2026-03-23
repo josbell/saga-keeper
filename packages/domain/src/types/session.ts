@@ -35,6 +35,8 @@ export interface NarrativeTurn {
   statDeltas: import('./character').StatDelta[]
   extractedEntities: string[]
   timestamp: string
+  /** Populated for move-type actions; available even on the offline tier */
+  outcome?: import('./ruleset').MoveOutcome
 }
 
 /** Return value of NarrativeDomain.processTurn(). Extends NarrativeTurn with the
