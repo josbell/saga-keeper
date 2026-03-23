@@ -17,7 +17,7 @@ build/
 coverage/
 
 # Claude Code
-claude/
+.claude/
 
 # Editor
 .vscode/
