@@ -1,8 +1,9 @@
+import type { ReactNode } from 'react'
 import styles from './Card.module.css'
 
 export interface CardProps {
   variant?: 'default' | 'hero'
-  children: React.ReactNode
+  children: ReactNode
   className?: string
 }
 
