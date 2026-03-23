@@ -1,7 +1,7 @@
 // NarrativeDomain — orchestrates a full Skald turn (spec §8)
 import type {
   PlayerAction,
-  NarrativeTurn,
+  TurnResult,
   OracleResultRecord,
   StorageAdapter,
   RulesetPlugin,
@@ -19,7 +19,7 @@ import type { IOracleService } from '../oracle/OracleService'
 import type { IDiceService } from '../dice/DiceService'
 
 export interface INarrativeDomain {
-  processTurn(campaignId: string, action: PlayerAction): Promise<NarrativeTurn>
+  processTurn(campaignId: string, action: PlayerAction): Promise<TurnResult>
 }
 
 // ── Internal helpers ──────────────────────────────────────────────────────────
@@ -76,7 +76,7 @@ export class NarrativeDomain implements INarrativeDomain {
     private readonly dice: IDiceService
   ) {}
 
-  async processTurn(campaignId: string, action: PlayerAction): Promise<NarrativeTurn> {
+  async processTurn(campaignId: string, action: PlayerAction): Promise<TurnResult> {
     const turnId = crypto.randomUUID()
 
     // ── Load campaign + character ──────────────────────────────────────────────
@@ -205,7 +205,7 @@ export class NarrativeDomain implements INarrativeDomain {
 
     await this.storage.session.appendBatch(campaignId, events)
 
-    // ── Build and return NarrativeTurn ─────────────────────────────────────────
+    // ── Build and return TurnResult ───────────────────────────────────────────
     return {
       turnId,
       input: action,
@@ -227,6 +227,7 @@ export class NarrativeDomain implements INarrativeDomain {
       statDeltas: deltas,
       extractedEntities,
       timestamp: new Date().toISOString(),
+      sessionEvents: events,
     }
   }
 }
