@@ -5,6 +5,13 @@ import type { CharacterState } from '@saga-keeper/domain'
 import { IronSheetScreen } from './IronSheetScreen'
 import { useGameStore } from '@/store'
 
+const mockNavigate = vi.fn()
+
+vi.mock('react-router-dom', () => ({
+  useNavigate: () => mockNavigate,
+  useLocation: () => ({ pathname: '/iron-sheet' }),
+}))
+
 vi.mock('@/store', () => ({
   useGameStore: vi.fn(),
 }))
@@ -38,6 +45,7 @@ function setupStore(character: CharacterState | null) {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockNavigate.mockClear()
   setupStore(makeCharacter())
 })
 
@@ -118,7 +126,9 @@ describe('IronSheetScreen — stat selection', () => {
     fireEvent.click(screen.getByTestId('stat-heart'))
     const pressedStones = screen
       .getAllByRole('button')
-      .filter((b) => b.getAttribute('aria-pressed') === 'true' && b.dataset['testid']?.startsWith('stat-'))
+      .filter(
+        (b) => b.getAttribute('aria-pressed') === 'true' && b.dataset['testid']?.startsWith('stat-')
+      )
     expect(pressedStones.length).toBeLessThanOrEqual(1)
   })
 })
@@ -136,7 +146,9 @@ describe('IronSheetScreen — store mutations', () => {
     render(<IronSheetScreen />)
     const slider = screen.getByRole('slider')
     fireEvent.keyDown(slider, { key: 'ArrowRight' })
-    expect(mockPatchCharacterData).toHaveBeenCalledWith(expect.objectContaining({ momentum: expect.any(Number) }))
+    expect(mockPatchCharacterData).toHaveBeenCalledWith(
+      expect.objectContaining({ momentum: expect.any(Number) })
+    )
   })
 
   it('toggling a debility chip calls patchCharacterData', () => {
@@ -168,5 +180,11 @@ describe('IronSheetScreen — accessibility', () => {
     const activeTab = nav.querySelector('[aria-current="page"]')
     expect(activeTab).toBeTruthy()
     expect(activeTab!.textContent).toMatch(/iron sheet/i)
+  })
+
+  it('clicking Oracle nav button calls navigate with /oracle', () => {
+    render(<IronSheetScreen />)
+    fireEvent.click(screen.getByRole('button', { name: /oracle/i }))
+    expect(mockNavigate).toHaveBeenCalledWith('/oracle')
   })
 })

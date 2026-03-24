@@ -42,18 +42,15 @@ describe('DebilityChips — rendering', () => {
   })
 
   it('active chip has aria-pressed="true"', () => {
-    render(
-      <DebilityChips debilities={{ ...allFalse, wounded: true }} onToggle={vi.fn()} />
-    )
-    expect(screen.getByText('Wounded').closest('button')!.getAttribute('aria-pressed')).toBe(
-      'true'
-    )
+    render(<DebilityChips debilities={{ ...allFalse, wounded: true }} onToggle={vi.fn()} />)
+    expect(screen.getByText('Wounded').closest('button')!.getAttribute('aria-pressed')).toBe('true')
   })
 
   it('renders with all debilities active (all aria-pressed=true)', () => {
-    const allTrue = Object.fromEntries(
-      Object.keys(allFalse).map((k) => [k, true])
-    ) as Record<DebilityKey, boolean>
+    const allTrue = Object.fromEntries(Object.keys(allFalse).map((k) => [k, true])) as Record<
+      DebilityKey,
+      boolean
+    >
     render(<DebilityChips debilities={allTrue} onToggle={vi.fn()} />)
     screen.getAllByRole('button').forEach((btn) => {
       expect(btn.getAttribute('aria-pressed')).toBe('true')

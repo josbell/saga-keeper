@@ -18,9 +18,7 @@ export interface DiceRollerSectionProps {
 export function DiceRollerSection({ selectedStat, statValue }: DiceRollerSectionProps) {
   return (
     <section className={styles.section} aria-label="Dice Roller">
-      {selectedStat === null ? (
-        <p className={styles.prompt}>Select a stat above to roll</p>
-      ) : null}
+      {selectedStat === null ? <p className={styles.prompt}>Select a stat above to roll</p> : null}
       <DiceRoller
         statValue={statValue ?? 0}
         {...(selectedStat ? { statName: STAT_LABELS[selectedStat] } : {})}

@@ -1,21 +1,27 @@
 /* Global reset and CSS variables */
 /* Full design system tokens defined in @saga-keeper/ui */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
 
 :root {
   /* Colour tokens — see design-notes.md for full palette */
-  --color-void:      #0d0b08;
-  --color-ash:       #13100d;
-  --color-ember:     #1e1710;
-  --color-iron:      #2a241c;
-  --color-stone:     #3d3428;
-  --color-bone:      #7a6a52;
+  --color-void: #0d0b08;
+  --color-ash: #13100d;
+  --color-ember: #1e1710;
+  --color-iron: #2a241c;
+  --color-stone: #3d3428;
+  --color-bone: #7a6a52;
   --color-parchment: #c4a96e;
-  --color-gold:      #d4941a;
+  --color-gold: #d4941a;
   --color-gold-bright: #f0b429;
-  --color-blood:     #8b1a1a;
+  --color-blood: #8b1a1a;
   --color-blood-bright: #c0392b;
-  --color-ice:       #7ab3cc;
+  --color-ice: #7ab3cc;
   --color-ice-bright: #a8d4e8;
 
   font-family: 'Cinzel', Georgia, serif;

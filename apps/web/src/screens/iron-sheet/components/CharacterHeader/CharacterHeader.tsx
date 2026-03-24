@@ -34,9 +34,7 @@ export function CharacterHeader({
       <div className={styles.info}>
         <h2 className={styles.name}>{name}</h2>
         <p className={styles.epithet}>{epithet ?? '—'}</p>
-        <p className={styles.vow}>
-          {leadingVowTitle ?? 'No active vow'}
-        </p>
+        <p className={styles.vow}>{leadingVowTitle ?? 'No active vow'}</p>
       </div>
 
       {/* Rank + XP */}
