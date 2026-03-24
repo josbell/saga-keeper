@@ -1,9 +1,13 @@
 import { defineConfig } from 'vitest/config'
+import react from '@vitejs/plugin-react'
 import { resolve } from 'path'
 
 export default defineConfig({
+  plugins: [react()],
   test: {
-    environment: 'node',
+    environment: 'happy-dom',
+    css: false,
+    globals: true,
   },
   resolve: {
     alias: {

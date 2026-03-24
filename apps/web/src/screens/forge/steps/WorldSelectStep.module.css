@@ -1,0 +1,19 @@
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.label {
+  font-size: 8px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #5f5447;
+}
+
+.prompt {
+  font-size: 13px;
+  color: var(--color-parchment);
+  font-style: italic;
+  line-height: 1.7;
+}

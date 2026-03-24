@@ -1,0 +1,327 @@
+.screen {
+  background: var(--color-void);
+  border-radius: 12px;
+  overflow: hidden;
+  font-family: 'Cinzel', Georgia, serif;
+  color: var(--color-parchment);
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: 47px 1fr;
+}
+
+/* ── Topbar ── */
+.topbar {
+  background: var(--color-ash);
+  border-bottom: 1px solid var(--color-iron);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 24px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logoTitle {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 15px;
+  color: var(--color-gold-bright);
+  letter-spacing: 2px;
+}
+
+.logoSub {
+  font-size: 9px;
+  color: #5f5447;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.exitBtn {
+  background: transparent;
+  border: 1px solid var(--color-iron);
+  border-radius: 3px;
+  padding: 5px 12px;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #5f5447;
+  cursor: pointer;
+}
+
+.exitBtn:hover {
+  color: var(--color-parchment);
+  border-color: var(--color-stone);
+}
+
+/* ── Body grid ── */
+.body {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  height: 100%;
+  min-height: 0;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  background: #0f0d0a;
+  border-right: 1px solid var(--color-ember);
+  padding: 24px 14px;
+  overflow-y: auto;
+}
+
+.sidebarTitle {
+  font-size: 8px;
+  letter-spacing: 5px;
+  color: var(--color-bone);
+  text-transform: uppercase;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--color-ember);
+}
+
+.stepItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 10px 8px;
+  border-radius: 3px;
+  margin-bottom: 4px;
+  border: 1px solid transparent;
+}
+
+.stepItem.done {
+  opacity: 0.6;
+}
+
+.stepItem.current {
+  background: rgba(212, 148, 26, 0.07);
+  border-color: rgba(212, 148, 26, 0.2);
+}
+
+.stepItem.locked {
+  opacity: 0.3;
+}
+
+.stepBadge {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-family: 'Cinzel Decorative', serif;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.stepBadge.done {
+  background: var(--color-iron);
+  border: 1px solid var(--color-stone);
+  color: #5f5447;
+}
+
+.stepBadge.current {
+  background: rgba(212, 148, 26, 0.15);
+  border: 1px solid rgba(212, 148, 26, 0.5);
+  color: var(--color-gold-bright);
+}
+
+.stepBadge.locked {
+  background: var(--color-ash);
+  border: 1px solid var(--color-ember);
+  color: var(--color-iron);
+}
+
+.stepInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.stepName {
+  font-size: 10px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin-bottom: 2px;
+}
+
+.stepItem.done .stepName {
+  color: #5f5447;
+}
+
+.stepItem.current .stepName {
+  color: var(--color-gold);
+}
+
+.stepItem.locked .stepName {
+  color: var(--color-iron);
+}
+
+.stepSub {
+  font-size: 8px;
+  color: var(--color-stone);
+  font-style: italic;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.stepItem.current .stepSub {
+  color: #5f5447;
+}
+
+.connector {
+  width: 1px;
+  height: 10px;
+  background: var(--color-ember);
+  margin-left: 18px;
+  margin-bottom: 4px;
+}
+
+/* ── Character preview ── */
+.preview {
+  margin-top: 24px;
+  padding: 12px;
+  background: var(--color-ash);
+  border: 1px solid var(--color-ember);
+  border-radius: 4px;
+}
+
+.previewLabel {
+  font-size: 7px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--color-bone);
+  margin-bottom: 8px;
+}
+
+.previewName {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 13px;
+  color: var(--color-gold);
+  margin-bottom: 4px;
+}
+
+.previewEmpty {
+  font-size: 9px;
+  color: var(--color-stone);
+  font-style: italic;
+}
+
+/* ── Main content area ── */
+.main:focus {
+  outline: none;
+}
+
+.main {
+  padding: 28px 32px;
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.breadcrumb {
+  font-size: 8px;
+  letter-spacing: 4px;
+  color: var(--color-stone);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+}
+
+.title {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 24px;
+  color: var(--color-gold-bright);
+  margin-bottom: 6px;
+  letter-spacing: 1px;
+}
+
+.subtitle {
+  font-size: 11px;
+  color: var(--color-parchment);
+  font-style: italic;
+  margin-bottom: 24px;
+  line-height: 1.6;
+}
+
+.content {
+  flex: 1;
+}
+
+/* ── Validation errors ── */
+.validationErrors {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  padding: 12px 16px;
+  background: rgba(139, 26, 26, 0.12);
+  border: 1px solid rgba(192, 57, 43, 0.4);
+  border-radius: 4px;
+}
+
+.validationErrors li {
+  font-size: 11px;
+  color: var(--color-blood-bright);
+  line-height: 1.5;
+}
+
+.validationErrors li::before {
+  content: '✕  ';
+}
+
+/* ── Footer nav ── */
+.footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 20px;
+  margin-top: 20px;
+  border-top: 1px solid var(--color-ember);
+}
+
+.prevBtn {
+  background: var(--color-ember);
+  border: 1px solid var(--color-iron);
+  border-radius: 3px;
+  padding: 8px 18px;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #5f5447;
+  cursor: pointer;
+}
+
+.prevBtn:hover {
+  color: var(--color-parchment);
+}
+
+.stepIndicator {
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--color-stone);
+  text-transform: uppercase;
+}
+
+.nextBtn {
+  background: linear-gradient(135deg, rgba(139, 26, 26, 0.75), rgba(192, 57, 43, 0.55));
+  border: 1px solid rgba(192, 57, 43, 0.45);
+  border-radius: 3px;
+  padding: 9px 22px;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: var(--color-parchment);
+  cursor: pointer;
+}
+
+.nextBtn:hover {
+  background: linear-gradient(135deg, rgba(192, 57, 43, 0.85), rgba(192, 57, 43, 0.7));
+  color: var(--color-gold-bright);
+}

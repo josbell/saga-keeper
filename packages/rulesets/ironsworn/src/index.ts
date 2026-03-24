@@ -4,4 +4,4 @@
 
 export { ironswornPlugin } from './IronswornPlugin'
 export { ironswornManifest } from './manifest'
-export type { IronswornCharacterData } from './character/schema'
+export type { IronswornCharacterData, IronswornVow } from './character/schema'

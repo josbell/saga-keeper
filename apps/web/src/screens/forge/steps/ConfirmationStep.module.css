@@ -1,0 +1,136 @@
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.section {
+  background: var(--color-ash);
+  border: 1px solid var(--color-iron);
+  border-radius: 4px;
+  padding: 14px 16px;
+}
+
+.sectionTitle {
+  font-size: 8px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--color-parchment);
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sectionTitle::before {
+  content: '⟡';
+  color: var(--color-gold);
+  font-size: 10px;
+}
+
+.characterName {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 20px;
+  color: var(--color-gold-bright);
+  margin-bottom: 6px;
+}
+
+.background {
+  font-size: 12px;
+  color: var(--color-parchment);
+  font-style: italic;
+  line-height: 1.6;
+}
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.statCell {
+  text-align: center;
+}
+
+.statCellRune {
+  font-size: 16px;
+  color: var(--color-gold);
+  margin-bottom: 2px;
+}
+
+.statCellName {
+  font-size: 7px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: #5f5447;
+  margin-bottom: 4px;
+}
+
+.statCellValue {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 22px;
+  color: var(--color-gold-bright);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 32px;
+  background: rgba(212, 148, 26, 0.08);
+  border: 1px solid rgba(212, 148, 26, 0.2);
+  border-radius: 3px;
+  padding: 2px 5px;
+}
+
+.assetList {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.assetItem {
+  font-size: 11px;
+  color: var(--color-parchment);
+  letter-spacing: 0.5px;
+}
+
+.vowTitle {
+  font-family: 'Cinzel', serif;
+  font-size: 13px;
+  color: var(--color-parchment);
+  margin-bottom: 4px;
+  font-style: italic;
+}
+
+.vowRank {
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-blood-bright);
+}
+
+.worldText {
+  font-size: 11px;
+  color: var(--color-parchment);
+  line-height: 1.6;
+  font-style: italic;
+}
+
+.commitBtn {
+  align-self: flex-end;
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(135deg, var(--color-blood), var(--color-blood-bright));
+  border: 1px solid rgba(192, 57, 43, 0.6);
+  border-radius: 4px;
+  padding: 12px 28px;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  color: var(--color-parchment);
+  cursor: pointer;
+}
+
+.commitBtn:hover {
+  filter: brightness(1.15);
+  color: var(--color-gold-bright);
+}
