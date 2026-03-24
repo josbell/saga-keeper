@@ -39,6 +39,7 @@ export function AssetPickerStep({ draft, onDraftChange }: StepProps) {
             >
               <span className={styles.assetName}>{asset.name}</span>
               <span className={styles.assetType}>{asset.type}</span>
+              <span className={styles.assetDesc}>{asset.description}</span>
             </button>
           )
         })}
