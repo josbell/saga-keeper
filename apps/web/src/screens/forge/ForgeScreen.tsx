@@ -5,6 +5,7 @@ import { INITIAL_DRAFT, type ForgeDraft, type StepProps } from './types'
 import { WorldSelectStep } from './steps/WorldSelectStep'
 import { NameBackgroundStep } from './steps/NameBackgroundStep'
 import { StatAssignmentStep } from './steps/StatAssignmentStep'
+import { AssetPickerStep } from './steps/AssetPickerStep'
 
 function renderStep(step: CreationStep, props: StepProps) {
   switch (step.component) {
@@ -15,7 +16,7 @@ function renderStep(step: CreationStep, props: StepProps) {
     case 'stat-assignment':
       return <StatAssignmentStep {...props} />
     case 'asset-picker':
-      return <div data-testid="step-asset-picker" />
+      return <AssetPickerStep {...props} />
     case 'vow-composer':
       return <div data-testid="step-vow-composer" />
     case 'confirmation':
