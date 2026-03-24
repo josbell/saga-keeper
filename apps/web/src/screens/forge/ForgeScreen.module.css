@@ -213,6 +213,10 @@
 }
 
 /* ── Main content area ── */
+.main:focus {
+  outline: none;
+}
+
 .main {
   padding: 28px 32px;
   display: flex;

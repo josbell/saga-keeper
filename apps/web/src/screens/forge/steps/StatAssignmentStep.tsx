@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { ironswornPlugin } from '@saga-keeper/ruleset-ironsworn'
 import type { StepProps, StatKey } from '../types'
 import styles from './StatAssignmentStep.module.css'
@@ -31,8 +31,20 @@ function computePool(draft: StepProps['draft']): number[] {
 export function StatAssignmentStep({ draft, onDraftChange }: StepProps) {
   const [selectedToken, setSelectedToken] = useState<number | null>(null)
   const [dragOverTarget, setDragOverTarget] = useState<StatKey | 'pool' | null>(null)
+  const poolRef = useRef<HTMLDivElement>(null)
 
   const pool = computePool(draft)
+
+  function handlePoolKeyDown(e: React.KeyboardEvent, idx: number) {
+    const buttons = poolRef.current ? Array.from(poolRef.current.querySelectorAll('button')) : []
+    if (e.key === 'ArrowRight' && idx < buttons.length - 1) {
+      e.preventDefault()
+      ;(buttons[idx + 1] as HTMLElement).focus()
+    } else if (e.key === 'ArrowLeft' && idx > 0) {
+      e.preventDefault()
+      ;(buttons[idx - 1] as HTMLElement).focus()
+    }
+  }
 
   // ── Click-to-assign ──────────────────────────────────────────────────────
   function handleTokenClick(value: number) {
@@ -87,6 +99,7 @@ export function StatAssignmentStep({ draft, onDraftChange }: StepProps) {
       <div>
         <div className={styles.sectionHeading}>Available Values</div>
         <div
+          ref={poolRef}
           data-testid="budget-pool"
           className={`${styles.pool}${dragOverTarget === 'pool' ? ' ' + styles.dragOver : ''}`}
           onDragOver={(e) => {
@@ -103,8 +116,10 @@ export function StatAssignmentStep({ draft, onDraftChange }: StepProps) {
               type="button"
               className={styles.chip}
               aria-pressed={selectedToken === value}
+              tabIndex={idx === 0 ? 0 : -1}
               draggable
               onClick={() => handleTokenClick(value)}
+              onKeyDown={(e) => handlePoolKeyDown(e, idx)}
               onDragStart={(e) => startDrag(e, { kind: 'pool', value })}
             >
               {value}

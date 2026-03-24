@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { ironswornPlugin, type IronswornCharacterData } from '@saga-keeper/ruleset-ironsworn'
 import type { AIGateway, CharacterState, CreationStep } from '@saga-keeper/domain'
 import { useGameStore } from '@/store'
@@ -86,12 +86,19 @@ function renderStep(step: CreationStep, props: StepProps) {
 export function ForgeScreen({ gateway = STUB_GATEWAY }: { gateway?: AIGateway } = {}) {
   const [stepIndex, setStepIndex] = useState(0)
   const [draft, setDraft] = useState<ForgeDraft>(INITIAL_DRAFT)
+  const mainRef = useRef<HTMLElement>(null)
 
   const steps = ironswornPlugin.creation.steps
   const totalSteps = steps.length
   const step = steps[Math.min(stepIndex, totalSteps - 1)]!
 
   useForgeCounsel(gateway, step, draft)
+
+  // Move keyboard focus into the main content area whenever the step changes
+  // so keyboard users don't have to tab back through the header/sidebar.
+  useEffect(() => {
+    mainRef.current?.focus()
+  }, [stepIndex])
 
   function handleDraftChange(patch: Partial<ForgeDraft>) {
     setDraft((prev) => ({ ...prev, ...patch }))
@@ -194,8 +201,8 @@ export function ForgeScreen({ gateway = STUB_GATEWAY }: { gateway?: AIGateway } 
           </div>
         </aside>
 
-        {/* Main area */}
-        <main className={styles.main}>
+        {/* Main area — tabIndex={-1} lets useEffect focus it programmatically */}
+        <main ref={mainRef} tabIndex={-1} className={styles.main}>
           <div className={styles.breadcrumb}>Character Creation</div>
           <h2 className={styles.title}>{step.title}</h2>
           <p className={styles.subtitle}>{STEP_SUBTITLES[step.id] ?? ''}</p>
