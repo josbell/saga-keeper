@@ -1,0 +1,31 @@
+.track {
+  display: flex;
+  gap: 3px;
+}
+
+.pip {
+  width: 16px;
+  height: 16px;
+  border: 1px solid var(--color-iron);
+  border-radius: 2px;
+  background: var(--color-ember);
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.1s;
+}
+
+.pip[aria-pressed='true'] {
+  background: var(--color-blood);
+  border-color: var(--color-blood-bright);
+}
+
+/* Variant overrides */
+.track[data-variant='spirit'] .pip[aria-pressed='true'] {
+  background: var(--color-ice);
+  border-color: var(--color-ice-bright);
+}
+
+.track[data-variant='supply'] .pip[aria-pressed='true'] {
+  background: var(--color-gold);
+  border-color: var(--color-gold-bright);
+}

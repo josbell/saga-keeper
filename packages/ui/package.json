@@ -3,16 +3,25 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "exports": { ".": "./src/index.ts" },
+  "exports": {
+    ".": "./src/index.ts"
+  },
   "scripts": {
     "build": "tsc --project tsconfig.json",
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\"",
     "clean": "rm -rf dist"
   },
-  "peerDependencies": { "react": "^18.3.0", "react-dom": "^18.3.0" },
+  "peerDependencies": {
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
   "devDependencies": {
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@types/react": "^18.3.0",
+    "happy-dom": "^20.8.7",
     "typescript": "*",
     "vitest": "*"
   }

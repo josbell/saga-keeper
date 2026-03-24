@@ -1,0 +1,29 @@
+.badge {
+  display: inline-block;
+  padding: 0.2em 0.6em;
+  border-radius: 2px;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  border: 1px solid currentColor;
+}
+
+.badge[data-variant='active'] {
+  color: var(--color-gold-bright);
+}
+
+.badge[data-variant='co-op'] {
+  color: var(--color-ice-bright);
+}
+
+.badge[data-variant='saga-complete'] {
+  color: var(--color-bone);
+}
+
+.badge[data-variant='abandoned'] {
+  color: var(--color-stone);
+}
+
+.badge[data-variant='debility'] {
+  color: var(--color-blood-bright);
+}

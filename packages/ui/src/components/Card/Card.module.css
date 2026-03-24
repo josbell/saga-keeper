@@ -1,0 +1,20 @@
+.card {
+  background: var(--color-ash);
+  border: 1px solid var(--color-iron);
+  border-radius: 3px;
+  padding: 1rem;
+}
+
+/* Hero variant: signature two-color top border gradient */
+.card[data-variant='hero'] {
+  border-top: 2px solid transparent;
+  border-image: linear-gradient(
+      90deg,
+      transparent,
+      var(--color-gold) 20%,
+      var(--color-blood) 50%,
+      var(--color-gold) 80%,
+      transparent
+    )
+    1;
+}

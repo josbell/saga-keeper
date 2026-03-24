@@ -159,11 +159,18 @@ export class NarrativeDomain implements INarrativeDomain {
     }
 
     // ── Phase 6: Call AI gateway ───────────────────────────────────────────────
-    const response = await this.ai.complete({
-      intent,
-      context,
-      ...(action.userText !== undefined && { userMessage: action.userText }),
-    })
+    const isOffline = this.ai.getTier() === 'offline'
+    let narration = ''
+    let tokensUsed = 0
+    if (!isOffline) {
+      const response = await this.ai.complete({
+        intent,
+        context,
+        ...(action.userText !== undefined && { userMessage: action.userText }),
+      })
+      narration = response.text
+      tokensUsed = response.tokensUsed
+    }
 
     // ── Phase 7: Extract entities, commit character, append events ─────────────
 
@@ -171,7 +178,7 @@ export class NarrativeDomain implements INarrativeDomain {
     const extractedEntities: string[] = []
     const entityPattern = /\[\[([^\]]+)\]\]/g
     let match: RegExpExecArray | null
-    while ((match = entityPattern.exec(response.text)) !== null) {
+    while ((match = entityPattern.exec(narration)) !== null) {
       extractedEntities.push(match[1]!)
     }
 
@@ -198,7 +205,7 @@ export class NarrativeDomain implements INarrativeDomain {
     if (diceRoll) events.push(make('dice.rolled', { diceRoll }))
     if (outcome) events.push(make('move.resolved', { moveId: action.moveId, outcome }))
     if (oracleRolls.length > 0) events.push(make('oracle.consulted', { oracleRolls }))
-    events.push(make('skald.narrated', { text: response.text, tokensUsed: response.tokensUsed }))
+    events.push(make('skald.narrated', { text: narration, tokensUsed }))
     if (extractedEntities.length > 0)
       events.push(make('entity.extracted', { entities: extractedEntities }))
     if (deltas.length > 0) events.push(make('character.mutated', { deltas }))
@@ -223,8 +230,9 @@ export class NarrativeDomain implements INarrativeDomain {
           },
         }),
       ...(oracleRolls.length > 0 && { oracleResults: oracleRolls }),
-      narration: response.text,
+      narration,
       statDeltas: deltas,
+      ...(outcome !== undefined && { outcome }),
       extractedEntities,
       timestamp: new Date().toISOString(),
       sessionEvents: events,
