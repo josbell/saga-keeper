@@ -76,12 +76,11 @@ describe('VowTracker — interaction', () => {
     const onProgressChange = vi.fn()
     render(
       <VowTracker
-        vows={[makeVow({ id: 'vow-1', progress: 0 })]}
+        vows={[makeVow({ id: 'vow-1', title: 'Avenge my kin', progress: 0 })]}
         onProgressChange={onProgressChange}
       />
     )
-    const buttons = screen.getAllByRole('button')
-    fireEvent.click(buttons[2]!) // index 2 → progress value 3
+    fireEvent.click(screen.getByRole('button', { name: 'Avenge my kin: progress 3 of 10' }))
     expect(onProgressChange).toHaveBeenCalledWith('vow-1', 3)
   })
 
@@ -89,21 +88,20 @@ describe('VowTracker — interaction', () => {
     const onProgressChange = vi.fn()
     render(
       <VowTracker
-        vows={[makeVow({ id: 'vow-1', progress: 10 })]}
+        vows={[makeVow({ id: 'vow-1', title: 'Avenge my kin', progress: 10 })]}
         onProgressChange={onProgressChange}
       />
     )
-    const buttons = screen.getAllByRole('button')
-    fireEvent.click(buttons[9]!) // final box, currently filled
+    fireEvent.click(screen.getByRole('button', { name: 'Avenge my kin: progress 10 of 10' }))
     expect(onProgressChange).toHaveBeenCalledWith('vow-1', 0)
   })
 })
 
 describe('VowTracker — accessibility', () => {
-  it('progress buttons have aria-label "Progress N"', () => {
-    render(<VowTracker vows={[makeVow()]} onProgressChange={vi.fn()} />)
-    expect(screen.getByRole('button', { name: 'Progress 1' })).toBeTruthy()
-    expect(screen.getByRole('button', { name: 'Progress 10' })).toBeTruthy()
+  it('progress buttons include the vow title and box number in their label', () => {
+    render(<VowTracker vows={[makeVow({ title: 'Avenge my kin' })]} onProgressChange={vi.fn()} />)
+    expect(screen.getByRole('button', { name: 'Avenge my kin: progress 1 of 10' })).toBeTruthy()
+    expect(screen.getByRole('button', { name: 'Avenge my kin: progress 10 of 10' })).toBeTruthy()
   })
 
   it('each vow is wrapped in an <article> element', () => {

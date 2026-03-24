@@ -28,13 +28,13 @@
 }
 
 /* Negative side filled: blood red */
-.step[data-negative][aria-pressed='true'] {
+.step[data-negative][data-filled='true'] {
   background: var(--color-blood);
   border-color: var(--color-blood-bright);
 }
 
 /* Positive side filled: gold */
-.step:not([data-negative])[aria-pressed='true'] {
+.step:not([data-negative])[data-filled='true'] {
   background: var(--color-gold);
   border-color: var(--color-gold-bright);
 }

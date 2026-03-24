@@ -24,7 +24,7 @@ export function CharacterHeader({
         {portraitUrl ? (
           <img src={portraitUrl} alt={name} className={styles.avatarImg} />
         ) : (
-          <div className={styles.avatarPlaceholder} aria-label="Portrait placeholder">
+          <div className={styles.avatarPlaceholder} role="img" aria-label="Portrait placeholder">
             ᚢ
           </div>
         )}
@@ -42,15 +42,16 @@ export function CharacterHeader({
       {/* Rank + XP */}
       <div className={styles.rank}>
         {experienceEarned > 0 && (
-          <div className={styles.xpDots}>
+          <div
+            className={styles.xpDots}
+            aria-label={`Experience: ${experienceSpent} of ${experienceEarned} XP spent`}
+          >
             {Array.from({ length: experienceEarned }, (_, i) => (
-              <button
+              <span
                 key={i}
-                type="button"
                 className={styles.xpDot}
-                aria-label={`XP ${i + 1}`}
-                aria-pressed={i < experienceSpent}
-                tabIndex={-1}
+                data-filled={i < experienceSpent}
+                aria-hidden="true"
               />
             ))}
           </div>

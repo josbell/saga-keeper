@@ -111,7 +111,7 @@
   transition: all 0.2s;
 }
 
-.xpDot[aria-pressed='true'] {
+.xpDot[data-filled='true'] {
   background: var(--color-gold);
   border-color: var(--color-gold-bright);
   box-shadow: 0 0 6px rgba(212, 148, 26, 0.6);

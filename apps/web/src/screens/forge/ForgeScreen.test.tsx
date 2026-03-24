@@ -5,8 +5,10 @@ import { useGameStore } from '@/store'
 import type { ForgeDraft } from './types'
 import { ironswornPlugin } from '@saga-keeper/ruleset-ironsworn'
 
+const mockNavigate = vi.fn()
+
 vi.mock('react-router-dom', () => ({
-  useNavigate: () => vi.fn(),
+  useNavigate: () => mockNavigate,
 }))
 
 // A draft that satisfies ironswornPlugin.creation.validate
@@ -34,6 +36,7 @@ const VALID_DRAFT: ForgeDraft = {
 
 beforeEach(() => {
   useGameStore.setState(useGameStore.getInitialState())
+  mockNavigate.mockClear()
 })
 
 const STEP_TITLES = [
@@ -154,5 +157,10 @@ describe('ForgeScreen — store commit', () => {
     navigateToConfirmation()
     const data = useGameStore.getState().character?.data as Record<string, unknown>
     expect(data?.health).toBe(5)
+  })
+
+  it('navigates to /iron-sheet after valid confirmation', () => {
+    navigateToConfirmation()
+    expect(mockNavigate).toHaveBeenCalledWith('/iron-sheet')
   })
 })

@@ -49,7 +49,7 @@ export function VowTracker({ vows, onProgressChange }: VowTrackerProps) {
                   type="button"
                   className={styles.progressBox}
                   aria-pressed={filled}
-                  aria-label={`Progress ${boxNum}`}
+                  aria-label={`${vow.title}: progress ${boxNum} of ${PROGRESS_BOXES}`}
                   data-complete={isFinal && isComplete ? 'true' : undefined}
                   onClick={handleClick}
                 />

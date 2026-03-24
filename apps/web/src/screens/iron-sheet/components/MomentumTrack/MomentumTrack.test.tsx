@@ -28,33 +28,32 @@ describe('MomentumTrack — rendering', () => {
     expect(screen.getByRole('slider').getAttribute('aria-valuemax')).toBe('10')
   })
 
-  it('negative-side steps at or below value are aria-pressed=true', () => {
+  it('negative-side steps at or below value are data-filled=true', () => {
     render(<MomentumTrack value={-3} />)
-    // Steps -6, -5, -4, -3 should be filled (aria-pressed=true), -2, -1 should not
     const btn = screen.getByRole('button', { name: '-3' })
-    expect(btn.getAttribute('aria-pressed')).toBe('true')
+    expect(btn.getAttribute('data-filled')).toBe('true')
     const btnAbove = screen.getByRole('button', { name: '-2' })
-    expect(btnAbove.getAttribute('aria-pressed')).toBe('false')
+    expect(btnAbove.getAttribute('data-filled')).toBe('false')
   })
 
-  it('positive-side steps at or below value are aria-pressed=true', () => {
+  it('positive-side steps at or below value are data-filled=true', () => {
     render(<MomentumTrack value={4} />)
     const btn = screen.getByRole('button', { name: '4' })
-    expect(btn.getAttribute('aria-pressed')).toBe('true')
+    expect(btn.getAttribute('data-filled')).toBe('true')
     const btnAbove = screen.getByRole('button', { name: '5' })
-    expect(btnAbove.getAttribute('aria-pressed')).toBe('false')
+    expect(btnAbove.getAttribute('data-filled')).toBe('false')
   })
 
   it('value=10 renders all positive steps filled', () => {
     render(<MomentumTrack value={10} />)
     const btn = screen.getByRole('button', { name: '10' })
-    expect(btn.getAttribute('aria-pressed')).toBe('true')
+    expect(btn.getAttribute('data-filled')).toBe('true')
   })
 
   it('value=-6 renders all negative steps filled', () => {
     render(<MomentumTrack value={-6} />)
     const btn = screen.getByRole('button', { name: '-6' })
-    expect(btn.getAttribute('aria-pressed')).toBe('true')
+    expect(btn.getAttribute('data-filled')).toBe('true')
   })
 
   it('zero step gets data-zero="true"', () => {

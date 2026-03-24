@@ -41,7 +41,7 @@ export function MomentumTrack({ value, onChange, readOnly = false }: MomentumTra
             key={step}
             type="button"
             className={styles.step}
-            aria-pressed={filled}
+            data-filled={filled}
             aria-label={String(step)}
             data-negative={isNegative || undefined}
             data-zero={step === 0 ? 'true' : undefined}
