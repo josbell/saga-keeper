@@ -7,6 +7,7 @@ const mockNavigate = vi.fn()
 
 vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
+  useLocation: () => ({ pathname: '/oracle' }),
 }))
 
 beforeEach(() => {

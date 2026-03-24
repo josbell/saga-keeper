@@ -54,18 +54,24 @@ export function OracleHistory({
         <p className={styles.empty}>No revelations yet</p>
       ) : (
         <ul className={styles.list} aria-label="Oracle history" aria-live="polite">
-          {combined.map((entry, i) => (
-            <li key={i} className={styles.item}>
-              {entry.kind === 'roll' ? (
-                <RollEntry
-                  roll={entry.data}
-                  tableName={tableNameById[entry.data.tableId] ?? entry.data.tableId}
-                />
-              ) : (
-                <FatesEntry fates={entry.data} />
-              )}
-            </li>
-          ))}
+          {combined.map((entry) => {
+            const key =
+              entry.kind === 'roll'
+                ? `roll-${entry.data.timestamp}-${entry.data.tableId}`
+                : `fates-${entry.data.timestamp}`
+            return (
+              <li key={key} className={styles.item}>
+                {entry.kind === 'roll' ? (
+                  <RollEntry
+                    roll={entry.data}
+                    tableName={tableNameById[entry.data.tableId] ?? entry.data.tableId}
+                  />
+                ) : (
+                  <FatesEntry fates={entry.data} />
+                )}
+              </li>
+            )
+          })}
         </ul>
       )}
     </aside>

@@ -72,12 +72,12 @@ describe('OracleTableBrowser — expand/collapse', () => {
     expect(groupBtn.getAttribute('aria-expanded')).toBe('true')
   })
 
-  it('table items in a collapsed group are not rendered', () => {
+  it('collapsed group list has hidden attribute', () => {
     render(<OracleTableBrowser tables={TABLES} selectedTableId={null} onSelect={vi.fn()} />)
     const groupBtn = screen.getAllByRole('button').find((b) => b.textContent?.includes('Core'))!
     fireEvent.click(groupBtn)
-    expect(screen.queryByRole('button', { name: 'Action' })).toBeNull()
-    expect(screen.queryByRole('button', { name: 'Theme' })).toBeNull()
+    const list = document.getElementById('oracle-group-core')!
+    expect(list.hidden).toBe(true)
   })
 
   it('collapsing one group does not affect another group', () => {

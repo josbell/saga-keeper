@@ -43,7 +43,7 @@ export function AskFatesPanel({
             key={odds}
             type="button"
             className={styles.oddsPill}
-            aria-pressed={selectedOdds === odds ? 'true' : 'false'}
+            aria-pressed={selectedOdds === odds}
             onClick={() => onOddsSelect(odds)}
           >
             {ODDS_LABELS[odds]}

@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { ironswornPlugin } from '@saga-keeper/ruleset-ironsworn'
 import { useGameStore } from '@/store'
 import { OracleTableBrowser } from './components/OracleTableBrowser/OracleTableBrowser'
@@ -9,13 +9,14 @@ import styles from './OracleScreen.module.css'
 
 const NAV_ITEMS = [
   { label: 'Iron Sheet', path: '/iron-sheet' },
-  { label: 'Oracle', path: null },
+  { label: 'Oracle', path: '/oracle' },
   { label: 'Skald', path: null },
   { label: 'World Forge', path: null },
 ]
 
 export function OracleScreen() {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const tables = ironswornPlugin.oracle.getTables()
   const draft = useGameStore((state) => state.draft)
   const lastFates = useGameStore((state) => state.lastFates)
@@ -53,7 +54,8 @@ export function OracleScreen() {
               key={label}
               type="button"
               className={styles.navBtn}
-              aria-current={path === null ? 'page' : undefined}
+              aria-current={path === pathname ? 'page' : undefined}
+              disabled={path === null}
               onClick={path ? () => navigate(path) : undefined}
             >
               {label}
@@ -81,7 +83,7 @@ export function OracleScreen() {
           ) : (
             <OracleTableRollPanel
               table={selectedTable}
-              lastResult={lastResult}
+              lastResult={lastResult?.tableId === selectedTable.id ? lastResult : null}
               onRoll={handleTableRoll}
             />
           )}

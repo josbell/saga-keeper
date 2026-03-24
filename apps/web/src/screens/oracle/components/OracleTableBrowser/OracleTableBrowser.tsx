@@ -59,24 +59,22 @@ export function OracleTableBrowser({ tables, selectedTableId, onSelect }: Oracle
                 {isExpanded ? '▾' : '▸'}
               </span>
             </button>
-            {isExpanded && (
-              <ul id={listId} className={styles.tableList}>
-                {tables
-                  .filter((t) => t.category === category)
-                  .map((table) => (
-                    <li key={table.id} className={styles.tableItem}>
-                      <button
-                        type="button"
-                        className={styles.tableBtn}
-                        aria-pressed={selectedTableId === table.id ? 'true' : 'false'}
-                        onClick={() => onSelect(table.id)}
-                      >
-                        {table.name}
-                      </button>
-                    </li>
-                  ))}
-              </ul>
-            )}
+            <ul id={listId} className={styles.tableList} hidden={!isExpanded}>
+              {tables
+                .filter((t) => t.category === category)
+                .map((table) => (
+                  <li key={table.id} className={styles.tableItem}>
+                    <button
+                      type="button"
+                      className={styles.tableBtn}
+                      aria-pressed={selectedTableId === table.id}
+                      onClick={() => onSelect(table.id)}
+                    >
+                      {table.name}
+                    </button>
+                  </li>
+                ))}
+            </ul>
           </div>
         )
       })}

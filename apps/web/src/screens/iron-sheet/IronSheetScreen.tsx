@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useLocation } from 'react-router-dom'
 import { ironswornPlugin, type IronswornCharacterData } from '@saga-keeper/ruleset-ironsworn'
 import { useGameStore } from '@/store'
 import { CharacterHeader } from './components/CharacterHeader/CharacterHeader'
@@ -13,7 +13,7 @@ import { DiceRollerSection } from './components/DiceRollerSection/DiceRollerSect
 import styles from './IronSheetScreen.module.css'
 
 const NAV_ITEMS = [
-  { label: 'Iron Sheet', path: null },
+  { label: 'Iron Sheet', path: '/iron-sheet' },
   { label: 'Oracle', path: '/oracle' },
   { label: 'Skald', path: null },
   { label: 'World Forge', path: null },
@@ -21,6 +21,7 @@ const NAV_ITEMS = [
 
 export function IronSheetScreen() {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
   const character = useGameStore((state) => state.character)
   const patchCharacterData = useGameStore((state) => state.patchCharacterData)
   const [selectedStat, setSelectedStat] = useState<StatKey | null>(null)
@@ -32,7 +33,7 @@ export function IronSheetScreen() {
   if (!character) {
     return (
       <div className={styles.screen}>
-        {renderHeader(navigate)}
+        {renderHeader(navigate, pathname)}
         <main className={styles.empty} role="main" tabIndex={-1}>
           <p>No character loaded</p>
         </main>
@@ -62,7 +63,7 @@ export function IronSheetScreen() {
 
   return (
     <div className={styles.screen}>
-      {renderHeader(navigate)}
+      {renderHeader(navigate, pathname)}
       <div className={styles.body}>
         <aside className={styles.sidebar}>{/* Session nav placeholder */}</aside>
         <main className={styles.main} role="main" tabIndex={-1}>
@@ -106,7 +107,7 @@ export function IronSheetScreen() {
   )
 }
 
-function renderHeader(navigate: ReturnType<typeof useNavigate>) {
+function renderHeader(navigate: ReturnType<typeof useNavigate>, currentPath: string) {
   return (
     <header className={styles.header}>
       <div className={styles.headerLogo}>
@@ -118,7 +119,8 @@ function renderHeader(navigate: ReturnType<typeof useNavigate>) {
             key={label}
             type="button"
             className={styles.navBtn}
-            aria-current={path === null ? 'page' : undefined}
+            aria-current={path === currentPath ? 'page' : undefined}
+            disabled={path === null}
             onClick={path ? () => navigate(path) : undefined}
           >
             {label}
