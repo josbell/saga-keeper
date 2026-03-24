@@ -1,0 +1,15 @@
+.section {
+  margin-bottom: 28px;
+  background: rgba(19, 16, 13, 0.8);
+  border: 1px solid rgba(212, 148, 26, 0.15);
+  border-radius: 4px;
+  padding: 20px;
+}
+
+.prompt {
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: var(--color-stone);
+  text-transform: uppercase;
+  margin: 0 0 12px;
+}
