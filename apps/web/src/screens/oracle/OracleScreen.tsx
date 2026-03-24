@@ -1,4 +1,7 @@
 import { useNavigate } from 'react-router-dom'
+import { ironswornPlugin } from '@saga-keeper/ruleset-ironsworn'
+import { useGameStore } from '@/store'
+import { OracleTableBrowser } from './components/OracleTableBrowser/OracleTableBrowser'
 import styles from './OracleScreen.module.css'
 
 const NAV_ITEMS = [
@@ -10,6 +13,9 @@ const NAV_ITEMS = [
 
 export function OracleScreen() {
   const navigate = useNavigate()
+  const tables = ironswornPlugin.oracle.getTables()
+  const draft = useGameStore((state) => state.draft)
+  const setDraft = useGameStore((state) => state.setDraft)
 
   return (
     <div className={styles.screen}>
@@ -32,7 +38,13 @@ export function OracleScreen() {
         </nav>
       </header>
       <div className={styles.body}>
-        <aside className={styles.sidebar} aria-label="Oracle Tables" />
+        <aside className={styles.sidebar} aria-label="Oracle Tables">
+          <OracleTableBrowser
+            tables={tables}
+            selectedTableId={draft.tableId}
+            onSelect={(tableId) => setDraft({ tableId, odds: null })}
+          />
+        </aside>
         <main className={styles.main} role="main" tabIndex={-1}>
           <h1 className={styles.pageTitle}>Oracle</h1>
         </main>
