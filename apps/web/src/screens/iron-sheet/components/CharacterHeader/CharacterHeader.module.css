@@ -1,0 +1,118 @@
+.header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 24px;
+  align-items: start;
+  padding: 24px;
+  background: rgba(30, 23, 16, 0.6);
+  border: 1px solid rgba(212, 148, 26, 0.2);
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 28px;
+}
+
+.header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-gold),
+    var(--color-blood),
+    var(--color-gold),
+    transparent
+  );
+}
+
+.avatar {
+  flex-shrink: 0;
+}
+
+.avatarImg {
+  width: 88px;
+  height: 88px;
+  border-radius: 3px;
+  border: 2px solid rgba(212, 148, 26, 0.4);
+  object-fit: cover;
+}
+
+.avatarPlaceholder {
+  width: 88px;
+  height: 88px;
+  border-radius: 3px;
+  border: 2px solid rgba(212, 148, 26, 0.2);
+  background: var(--color-iron);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: var(--color-stone);
+}
+
+.info {
+  min-width: 0;
+}
+
+.name {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 30px;
+  font-weight: 900;
+  color: var(--color-gold-bright);
+  letter-spacing: 2px;
+  line-height: 1;
+  margin: 0 0 6px;
+}
+
+.epithet {
+  font-size: 12px;
+  letter-spacing: 3px;
+  color: var(--color-bone);
+  text-transform: uppercase;
+  margin: 0 0 12px;
+}
+
+.vow {
+  font-size: 13px;
+  color: var(--color-parchment);
+  font-style: italic;
+  padding: 8px 12px;
+  background: rgba(139, 26, 26, 0.15);
+  border-left: 2px solid var(--color-blood);
+  border-radius: 0 2px 2px 0;
+  max-width: 400px;
+  margin: 0;
+}
+
+.rank {
+  text-align: right;
+}
+
+.xpDots {
+  display: flex;
+  gap: 4px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  max-width: 120px;
+}
+
+.xpDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 148, 26, 0.4);
+  background: transparent;
+  padding: 0;
+  cursor: default;
+  transition: all 0.2s;
+}
+
+.xpDot[aria-pressed='true'] {
+  background: var(--color-gold);
+  border-color: var(--color-gold-bright);
+  box-shadow: 0 0 6px rgba(212, 148, 26, 0.6);
+}
