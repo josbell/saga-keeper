@@ -9,9 +9,9 @@ const defaultProps = {
 }
 
 describe('CharacterHeader — rendering', () => {
-  it('renders the character name in an h1', () => {
+  it('renders the character name in a heading', () => {
     render(<CharacterHeader {...defaultProps} />)
-    expect(screen.getByRole('heading', { level: 1, name: /Aldric/i })).toBeTruthy()
+    expect(screen.getByRole('heading', { name: /Aldric/i })).toBeTruthy()
   })
 
   it('renders epithet when provided', () => {

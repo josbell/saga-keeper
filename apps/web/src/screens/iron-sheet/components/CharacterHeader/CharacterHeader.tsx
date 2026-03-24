@@ -32,7 +32,7 @@ export function CharacterHeader({
 
       {/* Character info */}
       <div className={styles.info}>
-        <h1 className={styles.name}>{name}</h1>
+        <h2 className={styles.name}>{name}</h2>
         <p className={styles.epithet}>{epithet ?? '—'}</p>
         <p className={styles.vow}>
           {leadingVowTitle ?? 'No active vow'}
