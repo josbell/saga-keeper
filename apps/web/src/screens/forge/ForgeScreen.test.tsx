@@ -1,8 +1,13 @@
 import { render, screen, fireEvent } from '@testing-library/react'
+import { vi } from 'vitest'
 import { ForgeScreen } from './ForgeScreen'
 import { useGameStore } from '@/store'
 import type { ForgeDraft } from './types'
 import { ironswornPlugin } from '@saga-keeper/ruleset-ironsworn'
+
+vi.mock('react-router-dom', () => ({
+  useNavigate: () => vi.fn(),
+}))
 
 // A draft that satisfies ironswornPlugin.creation.validate
 const VALID_DRAFT: ForgeDraft = {
