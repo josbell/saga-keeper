@@ -1,0 +1,24 @@
+.section {
+  margin-bottom: 28px;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.meter {
+  background: rgba(19, 16, 13, 0.8);
+  border: 1px solid rgba(212, 148, 26, 0.15);
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.label {
+  font-size: 10px;
+  letter-spacing: 3px;
+  color: var(--color-bone);
+  text-transform: uppercase;
+  margin: 0 0 10px;
+}
