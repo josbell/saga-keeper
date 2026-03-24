@@ -119,6 +119,14 @@
   font-size: 28px;
   color: var(--color-gold-bright);
   line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  background: rgba(212, 148, 26, 0.1);
+  border: 1px solid rgba(212, 148, 26, 0.25);
+  border-radius: 3px;
+  padding: 2px 6px;
 }
 
 .statEmpty {
