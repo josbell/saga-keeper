@@ -6,6 +6,7 @@ import { WorldSelectStep } from './steps/WorldSelectStep'
 import { NameBackgroundStep } from './steps/NameBackgroundStep'
 import { StatAssignmentStep } from './steps/StatAssignmentStep'
 import { AssetPickerStep } from './steps/AssetPickerStep'
+import { VowComposerStep } from './steps/VowComposerStep'
 
 function renderStep(step: CreationStep, props: StepProps) {
   switch (step.component) {
@@ -18,7 +19,7 @@ function renderStep(step: CreationStep, props: StepProps) {
     case 'asset-picker':
       return <AssetPickerStep {...props} />
     case 'vow-composer':
-      return <div data-testid="step-vow-composer" />
+      return <VowComposerStep {...props} />
     case 'confirmation':
       return <div data-testid="step-confirmation" />
     default:
