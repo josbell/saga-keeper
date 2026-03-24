@@ -23,6 +23,28 @@
   font-family: 'Cinzel Decorative', serif;
 }
 
+.group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.groupHeading {
+  font-size: 8px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  color: var(--color-bone);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.groupHeading::before {
+  content: '⟡';
+  color: var(--color-gold);
+  font-size: 10px;
+}
+
 .list {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
@@ -67,12 +89,7 @@
 }
 
 .assetType {
-  display: block;
-  font-size: 8px;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: #5f5447;
-  margin-bottom: 5px;
+  display: none;
 }
 
 .assetDesc {
