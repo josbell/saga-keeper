@@ -1,0 +1,118 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.empty {
+  color: var(--color-stone, #3d3428);
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  margin-top: 48px;
+}
+
+.heading {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 13px;
+  letter-spacing: 4px;
+  color: var(--color-parchment, #c4a96e);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+/* ── Entry list ── */
+.entryList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 240px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  border: 1px solid rgba(212, 148, 26, 0.1);
+  border-radius: 2px;
+}
+
+.entryItem {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  padding: 4px 10px;
+  font-size: 11px;
+  transition: background 0.15s;
+}
+
+.entryItem:hover {
+  background: rgba(212, 148, 26, 0.05);
+}
+
+.entryRange {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 9px;
+  color: var(--color-bone, #7a6a52);
+  min-width: 36px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.entryResult {
+  color: var(--color-parchment, #c4a96e);
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+/* ── Roll button ── */
+.rollBtn {
+  align-self: flex-start;
+  background: rgba(212, 148, 26, 0.1);
+  border: 1px solid rgba(212, 148, 26, 0.4);
+  color: var(--color-gold, #d4941a);
+  padding: 10px 24px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 2px;
+}
+
+.rollBtn:hover {
+  background: rgba(212, 148, 26, 0.2);
+  border-color: var(--color-gold-bright, #f0b429);
+  color: var(--color-gold-bright, #f0b429);
+}
+
+/* ── Result card ── */
+.result {
+  background: rgba(19, 16, 13, 0.8);
+  border: 1px solid rgba(212, 148, 26, 0.25);
+  border-radius: 3px;
+  padding: 20px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.resultHeader {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-bone, #7a6a52);
+}
+
+.rollNumber {
+  font-family: 'Cinzel Decorative', serif;
+}
+
+.resultText {
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  color: var(--color-gold-bright, #f0b429);
+  letter-spacing: 2px;
+  margin: 0;
+}

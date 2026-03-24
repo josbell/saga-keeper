@@ -3,6 +3,7 @@ import { ironswornPlugin } from '@saga-keeper/ruleset-ironsworn'
 import { useGameStore } from '@/store'
 import { OracleTableBrowser } from './components/OracleTableBrowser/OracleTableBrowser'
 import { AskFatesPanel } from './components/AskFatesPanel/AskFatesPanel'
+import { OracleTableRollPanel } from './components/OracleTableRollPanel/OracleTableRollPanel'
 import styles from './OracleScreen.module.css'
 
 const NAV_ITEMS = [
@@ -17,8 +18,10 @@ export function OracleScreen() {
   const tables = ironswornPlugin.oracle.getTables()
   const draft = useGameStore((state) => state.draft)
   const lastFates = useGameStore((state) => state.lastFates)
+  const lastResult = useGameStore((state) => state.lastResult)
   const setDraft = useGameStore((state) => state.setDraft)
   const recordFates = useGameStore((state) => state.recordFates)
+  const recordOracleRoll = useGameStore((state) => state.recordOracleRoll)
 
   const selectedTable = tables.find((t) => t.id === draft.tableId) ?? null
 
@@ -26,6 +29,12 @@ export function OracleScreen() {
     if (!draft.odds) return
     const result = ironswornPlugin.oracle.rollAskFates(draft.odds)
     recordFates(result)
+  }
+
+  function handleTableRoll() {
+    if (!draft.tableId) return
+    const result = ironswornPlugin.oracle.roll(draft.tableId)
+    recordOracleRoll(result)
   }
 
   return (
@@ -58,12 +67,18 @@ export function OracleScreen() {
         </aside>
         <main className={styles.main} role="main" tabIndex={-1}>
           <h1 className={styles.pageTitle}>Oracle</h1>
-          {selectedTable === null && (
+          {selectedTable === null ? (
             <AskFatesPanel
               selectedOdds={draft.odds}
               lastFates={lastFates}
               onOddsSelect={(odds) => setDraft({ odds })}
               onRoll={handleFatesRoll}
+            />
+          ) : (
+            <OracleTableRollPanel
+              table={selectedTable}
+              lastResult={lastResult}
+              onRoll={handleTableRoll}
             />
           )}
         </main>
