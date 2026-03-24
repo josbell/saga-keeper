@@ -1,0 +1,143 @@
+.panel {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  height: 100%;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.heading {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 9px;
+  letter-spacing: 3px;
+  color: var(--color-bone, #7a6a52);
+  text-transform: uppercase;
+  margin: 0;
+}
+
+.clearBtn {
+  background: transparent;
+  border: 1px solid rgba(212, 148, 26, 0.2);
+  color: var(--color-bone, #7a6a52);
+  padding: 3px 8px;
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 2px;
+}
+
+.clearBtn:hover {
+  border-color: rgba(212, 148, 26, 0.5);
+  color: var(--color-parchment, #c4a96e);
+}
+
+.empty {
+  color: var(--color-stone, #3d3428);
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  text-align: center;
+  margin-top: 24px;
+}
+
+/* ── History list ── */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.item {
+  border: 1px solid rgba(212, 148, 26, 0.1);
+  border-radius: 2px;
+  background: rgba(19, 16, 13, 0.5);
+}
+
+/* ── Entry ── */
+.entry {
+  padding: 10px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.entryMeta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 9px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+}
+
+.entryLabel {
+  font-family: 'Cinzel', serif;
+  color: var(--color-gold, #d4941a);
+}
+
+.entryRoll {
+  font-family: 'Cinzel Decorative', serif;
+  color: var(--color-bone, #7a6a52);
+}
+
+.entryResult {
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  color: var(--color-parchment, #c4a96e);
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.entryTime {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  color: var(--color-stone, #3d3428);
+  letter-spacing: 1px;
+}
+
+/* ── Fates outcome ── */
+.fatesOutcome {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.fatesAnswer {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 14px;
+  color: var(--color-gold-bright, #f0b429);
+  letter-spacing: 2px;
+}
+
+.fatesOdds {
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  color: var(--color-bone, #7a6a52);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+}
+
+.extremeBadge {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-parchment, #c4a96e);
+  background: rgba(212, 148, 26, 0.15);
+  border: 1px solid rgba(212, 148, 26, 0.4);
+  padding: 2px 6px;
+  border-radius: 2px;
+}

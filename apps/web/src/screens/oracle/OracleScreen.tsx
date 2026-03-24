@@ -4,6 +4,7 @@ import { useGameStore } from '@/store'
 import { OracleTableBrowser } from './components/OracleTableBrowser/OracleTableBrowser'
 import { AskFatesPanel } from './components/AskFatesPanel/AskFatesPanel'
 import { OracleTableRollPanel } from './components/OracleTableRollPanel/OracleTableRollPanel'
+import { OracleHistory } from './components/OracleHistory/OracleHistory'
 import styles from './OracleScreen.module.css'
 
 const NAV_ITEMS = [
@@ -19,9 +20,12 @@ export function OracleScreen() {
   const draft = useGameStore((state) => state.draft)
   const lastFates = useGameStore((state) => state.lastFates)
   const lastResult = useGameStore((state) => state.lastResult)
+  const history = useGameStore((state) => state.history)
+  const fatesHistory = useGameStore((state) => state.fatesHistory)
   const setDraft = useGameStore((state) => state.setDraft)
   const recordFates = useGameStore((state) => state.recordFates)
   const recordOracleRoll = useGameStore((state) => state.recordOracleRoll)
+  const clearHistory = useGameStore((state) => state.clearHistory)
 
   const selectedTable = tables.find((t) => t.id === draft.tableId) ?? null
 
@@ -82,7 +86,13 @@ export function OracleScreen() {
             />
           )}
         </main>
-        <aside className={styles.rightPanel} aria-label="Recent Revelations" />
+        <OracleHistory
+          history={history}
+          fatesHistory={fatesHistory}
+          tables={tables}
+          onClearHistory={clearHistory}
+          className={styles.rightPanel}
+        />
       </div>
     </div>
   )
