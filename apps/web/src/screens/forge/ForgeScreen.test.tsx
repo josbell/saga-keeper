@@ -1,5 +1,10 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { ForgeScreen } from './ForgeScreen'
+import { useGameStore } from '@/store'
+
+beforeEach(() => {
+  useGameStore.setState(useGameStore.getInitialState())
+})
 
 const STEP_TITLES = [
   'Your World',
@@ -78,5 +83,46 @@ describe('ForgeScreen — navigation', () => {
         fireEvent.click(screen.getByRole('button', { name: /next/i }))
       }
     }
+  })
+})
+
+describe('ForgeScreen — store commit', () => {
+  function navigateToConfirmation() {
+    render(<ForgeScreen />)
+    // Navigate through steps 1-5 using the shell Next button
+    for (let i = 0; i < 5; i++) {
+      fireEvent.click(screen.getByRole('button', { name: /next/i }))
+    }
+    // Step 6 (Confirmation) — click "Begin your journey"
+    fireEvent.click(screen.getByRole('button', { name: /begin your journey/i }))
+  }
+
+  it('calls setCharacter on confirmation — character is not null', () => {
+    navigateToConfirmation()
+    expect(useGameStore.getState().character).not.toBeNull()
+  })
+
+  it('committed character has rulesetId "ironsworn-v1"', () => {
+    navigateToConfirmation()
+    expect(useGameStore.getState().character?.rulesetId).toBe('ironsworn-v1')
+  })
+
+  it('committed character id is a non-empty string', () => {
+    navigateToConfirmation()
+    const id = useGameStore.getState().character?.id
+    expect(typeof id).toBe('string')
+    expect((id ?? '').length).toBeGreaterThan(0)
+  })
+
+  it('committed character.data contains assetIds', () => {
+    navigateToConfirmation()
+    const data = useGameStore.getState().character?.data as Record<string, unknown>
+    expect(Array.isArray(data?.assetIds)).toBe(true)
+  })
+
+  it('committed character.data has health: 5 from defaults', () => {
+    navigateToConfirmation()
+    const data = useGameStore.getState().character?.data as Record<string, unknown>
+    expect(data?.health).toBe(5)
   })
 })

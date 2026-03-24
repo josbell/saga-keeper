@@ -1,12 +1,14 @@
 import { useState } from 'react'
-import { ironswornPlugin } from '@saga-keeper/ruleset-ironsworn'
-import type { CreationStep } from '@saga-keeper/domain'
+import { ironswornPlugin, type IronswornCharacterData } from '@saga-keeper/ruleset-ironsworn'
+import type { CharacterState, CreationStep } from '@saga-keeper/domain'
+import { useGameStore } from '@/store'
 import { INITIAL_DRAFT, type ForgeDraft, type StepProps } from './types'
 import { WorldSelectStep } from './steps/WorldSelectStep'
 import { NameBackgroundStep } from './steps/NameBackgroundStep'
 import { StatAssignmentStep } from './steps/StatAssignmentStep'
 import { AssetPickerStep } from './steps/AssetPickerStep'
 import { VowComposerStep } from './steps/VowComposerStep'
+import { ConfirmationStep } from './steps/ConfirmationStep'
 
 function renderStep(step: CreationStep, props: StepProps) {
   switch (step.component) {
@@ -21,7 +23,7 @@ function renderStep(step: CreationStep, props: StepProps) {
     case 'vow-composer':
       return <VowComposerStep {...props} />
     case 'confirmation':
-      return <div data-testid="step-confirmation" />
+      return <ConfirmationStep {...props} />
     default:
       return null
   }
@@ -39,8 +41,35 @@ export function ForgeScreen() {
     setDraft((prev) => ({ ...prev, ...patch }))
   }
 
+  function handleConfirm() {
+    const now = new Date().toISOString()
+    const defaults = ironswornPlugin.character.defaults() as unknown as IronswornCharacterData
+    const data: IronswornCharacterData = {
+      ...defaults,
+      edge: draft.edge || defaults.edge,
+      heart: draft.heart || defaults.heart,
+      iron: draft.iron || defaults.iron,
+      shadow: draft.shadow || defaults.shadow,
+      wits: draft.wits || defaults.wits,
+      assetIds: draft.assetIds,
+      vows: draft.vow ? [draft.vow] : [],
+    }
+    const character: CharacterState = {
+      id: globalThis.crypto.randomUUID(),
+      campaignId: 'default',
+      name: draft.name,
+      rulesetId: 'ironsworn-v1',
+      data: data as unknown as Record<string, unknown>,
+      createdAt: now,
+      updatedAt: now,
+    }
+    useGameStore.getState().setCharacter(character)
+  }
+
   function handleNext() {
-    if (stepIndex < totalSteps - 1) {
+    if (stepIndex === totalSteps - 1) {
+      handleConfirm()
+    } else {
       setStepIndex((i) => i + 1)
     }
   }
