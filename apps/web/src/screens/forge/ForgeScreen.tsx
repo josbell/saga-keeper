@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ironswornPlugin, type IronswornCharacterData } from '@saga-keeper/ruleset-ironsworn'
 import type { AIGateway, CharacterState, CreationStep } from '@saga-keeper/domain'
 import { useGameStore } from '@/store'
@@ -87,6 +88,7 @@ export function ForgeScreen({
   gateway = STUB_GATEWAY,
   initialDraft = INITIAL_DRAFT,
 }: { gateway?: AIGateway; initialDraft?: ForgeDraft } = {}) {
+  const navigate = useNavigate()
   const [stepIndex, setStepIndex] = useState(0)
   const [draft, setDraft] = useState<ForgeDraft>(initialDraft)
   const [validationErrors, setValidationErrors] = useState<string[]>([])
@@ -147,6 +149,7 @@ export function ForgeScreen({
       updatedAt: now,
     }
     useGameStore.getState().setCharacter(character)
+    navigate('/iron-sheet')
   }
 
   function handleNext() {

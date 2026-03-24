@@ -1,0 +1,52 @@
+.track {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  outline: none;
+  padding: 4px 0;
+}
+
+.track:focus-visible {
+  outline: 1px solid var(--color-gold);
+  border-radius: 2px;
+}
+
+.step {
+  width: 20px;
+  height: 20px;
+  border-radius: 2px;
+  border: 1px solid rgba(212, 148, 26, 0.25);
+  background: transparent;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.step:not(:disabled):hover {
+  border-color: rgba(212, 148, 26, 0.6);
+}
+
+/* Negative side filled: blood red */
+.step[data-negative][data-filled='true'] {
+  background: var(--color-blood);
+  border-color: var(--color-blood-bright);
+}
+
+/* Positive side filled: gold */
+.step:not([data-negative])[data-filled='true'] {
+  background: var(--color-gold);
+  border-color: var(--color-gold-bright);
+}
+
+/* Zero marker: slight gap via wider border */
+.step[data-zero='true'] {
+  border-left-width: 3px;
+  border-left-color: rgba(122, 179, 204, 0.5);
+  margin-left: 4px;
+}
+
+.step:disabled {
+  cursor: default;
+  opacity: 0.6;
+}

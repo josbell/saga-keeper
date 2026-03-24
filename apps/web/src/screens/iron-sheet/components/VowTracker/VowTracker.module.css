@@ -1,0 +1,72 @@
+.section {
+  margin-bottom: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.vowCard {
+  background: rgba(19, 16, 13, 0.8);
+  border: 1px solid rgba(212, 148, 26, 0.15);
+  border-radius: 4px;
+  padding: 16px;
+}
+
+.vowHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.vowTitle {
+  font-family: 'Cinzel', serif;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--color-parchment);
+  letter-spacing: 1px;
+  margin: 0;
+  flex: 1;
+  min-width: 0;
+}
+
+.fulfilled {
+  color: var(--color-gold-bright);
+  font-size: 16px;
+  margin-left: auto;
+}
+
+.progressTrack {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.progressBox {
+  width: 28px;
+  height: 28px;
+  border-radius: 2px;
+  border: 1px solid rgba(139, 26, 26, 0.4);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s, border-color 0.15s;
+  flex-shrink: 0;
+}
+
+.progressBox:hover {
+  border-color: rgba(192, 57, 43, 0.6);
+}
+
+.progressBox[aria-pressed='true'] {
+  background: var(--color-blood);
+  border-color: var(--color-blood-bright);
+}
+
+/* Final box glows gold when the whole track is complete */
+.progressBox[data-complete='true'] {
+  background: var(--color-gold);
+  border-color: var(--color-gold-bright);
+  box-shadow: 0 0 10px rgba(212, 148, 26, 0.6);
+}

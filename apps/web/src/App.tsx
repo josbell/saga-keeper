@@ -1,12 +1,15 @@
-import React from 'react'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import { ForgeScreen } from './screens/forge'
+import { IronSheetScreen } from './screens/iron-sheet'
 
-// TODO: wire up router (react-router-dom) and global providers
-// Screens: GreatHall → Forge → [IronSheet, Oracle, Skald, WorldForge]
 export function App() {
   return (
-    <div className="app">
-      <ForgeScreen />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/forge" element={<ForgeScreen />} />
+        <Route path="/iron-sheet" element={<IronSheetScreen />} />
+        <Route path="*" element={<Navigate to="/forge" replace />} />
+      </Routes>
+    </BrowserRouter>
   )
 }
