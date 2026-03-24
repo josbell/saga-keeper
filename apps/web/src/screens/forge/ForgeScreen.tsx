@@ -3,13 +3,14 @@ import { ironswornPlugin } from '@saga-keeper/ruleset-ironsworn'
 import type { CreationStep } from '@saga-keeper/domain'
 import { INITIAL_DRAFT, type ForgeDraft, type StepProps } from './types'
 import { WorldSelectStep } from './steps/WorldSelectStep'
+import { NameBackgroundStep } from './steps/NameBackgroundStep'
 
 function renderStep(step: CreationStep, props: StepProps) {
   switch (step.component) {
     case 'world-select':
       return <WorldSelectStep {...props} />
     case 'name-background':
-      return <div data-testid="step-name-background" />
+      return <NameBackgroundStep {...props} />
     case 'stat-assignment':
       return <div data-testid="step-stat-assignment" />
     case 'asset-picker':
