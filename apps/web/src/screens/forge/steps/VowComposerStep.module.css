@@ -1,0 +1,74 @@
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.vowWrap {
+  background: rgba(139, 26, 26, 0.07);
+  border: 1px solid rgba(139, 26, 26, 0.2);
+  border-radius: 4px;
+  padding: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.vowWrap::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: rgba(192, 57, 43, 0.5);
+}
+
+.vowLabel {
+  font-size: 8px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--color-blood);
+  margin-bottom: 8px;
+}
+
+.rankSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rankLabel {
+  font-size: 8px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: #5f5447;
+}
+
+.ranks {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.rankBtn {
+  background: var(--color-ash);
+  border: 1px solid var(--color-iron);
+  border-radius: 3px;
+  padding: 7px 14px;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--color-bone);
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+
+.rankBtn:hover {
+  border-color: rgba(139, 26, 26, 0.4);
+}
+
+.rankBtn[aria-pressed='true'] {
+  background: rgba(139, 26, 26, 0.15);
+  border-color: rgba(192, 57, 43, 0.5);
+  color: var(--color-blood-bright);
+}

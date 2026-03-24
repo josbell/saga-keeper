@@ -1,5 +1,6 @@
 import { ironswornPlugin } from '@saga-keeper/ruleset-ironsworn'
 import type { StepProps } from '../types'
+import styles from './AssetPickerStep.module.css'
 
 export function AssetPickerStep({ draft, onDraftChange }: StepProps) {
   const assets = ironswornPlugin.assets.getAll()
@@ -15,11 +16,14 @@ export function AssetPickerStep({ draft, onDraftChange }: StepProps) {
   }
 
   return (
-    <div className="asset-picker-step">
-      <div data-testid="asset-count" className="asset-picker-step__count">
-        {draft.assetIds.length} / {maxSelected}
+    <div className={styles.step}>
+      <div className={styles.countRow}>
+        <span className={styles.countLabel}>Selected</span>
+        <span data-testid="asset-count" className={styles.count}>
+          {draft.assetIds.length} / {maxSelected}
+        </span>
       </div>
-      <div className="asset-picker-step__list">
+      <div className={styles.list}>
         {assets.map((asset) => {
           const isSelected = draft.assetIds.includes(asset.id)
           const isDisabled = isMaxReached && !isSelected
@@ -31,10 +35,10 @@ export function AssetPickerStep({ draft, onDraftChange }: StepProps) {
               aria-pressed={isSelected}
               disabled={isDisabled}
               onClick={() => handleToggle(asset.id)}
-              className="asset-picker-step__asset"
+              className={styles.assetBtn}
             >
-              <span className="asset-picker-step__asset-name">{asset.name}</span>
-              <span className="asset-picker-step__asset-type">{asset.type}</span>
+              <span className={styles.assetName}>{asset.name}</span>
+              <span className={styles.assetType}>{asset.type}</span>
             </button>
           )
         })}

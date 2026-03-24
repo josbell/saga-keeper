@@ -1,0 +1,12 @@
+.step {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.prompt {
+  font-size: 13px;
+  color: var(--color-bone);
+  font-style: italic;
+  line-height: 1.7;
+}

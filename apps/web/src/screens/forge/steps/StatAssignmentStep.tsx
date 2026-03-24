@@ -1,8 +1,17 @@
 import { useState } from 'react'
 import { ironswornPlugin } from '@saga-keeper/ruleset-ironsworn'
 import type { StepProps, StatKey } from '../types'
+import styles from './StatAssignmentStep.module.css'
 
 const STAT_KEYS: StatKey[] = ['edge', 'heart', 'iron', 'shadow', 'wits']
+
+const STAT_META: Record<StatKey, { rune: string; desc: string }> = {
+  edge: { rune: 'ᛖ', desc: 'Speed & ranged' },
+  heart: { rune: 'ᚺ', desc: 'Courage & bonds' },
+  iron: { rune: 'ᛁ', desc: 'Strength & combat' },
+  shadow: { rune: 'ᛊ', desc: 'Deception & stealth' },
+  wits: { rune: 'ᚹ', desc: 'Cunning & survival' },
+}
 
 // Each stat starts at 0 (unassigned sentinel). Placing a budget token sets the stat
 // to the token's value. Pool = budget minus all token values already placed (> 0).
@@ -28,50 +37,67 @@ export function StatAssignmentStep({ draft, onDraftChange }: StepProps) {
 
   function handleStatClick(stat: StatKey) {
     if (selectedToken !== null) {
-      // If the stat already has a non-default value, return it to the pool first
-      // (handled implicitly: computePool re-derives pool from draft)
       onDraftChange({ [stat]: selectedToken })
       setSelectedToken(null)
     } else if (draft[stat] > 0) {
-      // Clear the stat back to unassigned (return token to pool)
       onDraftChange({ [stat]: 0 })
     }
   }
 
   return (
-    <div className="stat-assignment-step">
-      <div data-testid="budget-pool" className="stat-assignment-step__pool">
-        {pool.map((value, idx) => (
-          <button
-            key={idx}
-            type="button"
-            aria-pressed={selectedToken === value}
-            onClick={() => handleTokenClick(value)}
-          >
-            {value}
-          </button>
-        ))}
+    <div className={styles.step}>
+      {/* Value chip pool */}
+      <div>
+        <div className={styles.sectionHeading}>Available Values</div>
+        <div data-testid="budget-pool" className={styles.pool}>
+          <span className={styles.poolLabel}>Pool</span>
+          {pool.map((value, idx) => (
+            <button
+              key={idx}
+              type="button"
+              className={styles.chip}
+              aria-pressed={selectedToken === value}
+              onClick={() => handleTokenClick(value)}
+            >
+              {value}
+            </button>
+          ))}
+        </div>
       </div>
 
-      <div className="stat-assignment-step__stats">
-        {STAT_KEYS.map((stat) => (
-          <div
-            key={stat}
-            data-testid={`stat-${stat}`}
-            className="stat-assignment-step__stat-row"
-            onClick={() => handleStatClick(stat)}
-            role="button"
-            tabIndex={0}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter' || e.key === ' ') handleStatClick(stat)
-            }}
-          >
-            <span className="stat-assignment-step__stat-label">
-              {stat.charAt(0).toUpperCase() + stat.slice(1)}
-            </span>
-            <span className="stat-assignment-step__stat-value">{draft[stat]}</span>
-          </div>
-        ))}
+      {/* Stat grid */}
+      <div>
+        <div className={styles.sectionHeading}>Attributes</div>
+        <div className={styles.statGrid}>
+          {STAT_KEYS.map((stat) => {
+            const { rune, desc } = STAT_META[stat]
+            const isAssigned = draft[stat] > 0
+            return (
+              <div
+                key={stat}
+                data-testid={`stat-${stat}`}
+                className={`${styles.statSlot}${isAssigned ? ' ' + styles.assigned : ''}`}
+                onClick={() => handleStatClick(stat)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') handleStatClick(stat)
+                }}
+              >
+                <div className={styles.statRune}>{rune}</div>
+                <div className={styles.statName}>
+                  {stat.charAt(0).toUpperCase() + stat.slice(1)}
+                </div>
+                {isAssigned ? (
+                  <div className={styles.statValue}>{draft[stat]}</div>
+                ) : (
+                  <div className={styles.statEmpty}>—</div>
+                )}
+                <div className={styles.statDesc}>{desc}</div>
+              </div>
+            )
+          })}
+        </div>
       </div>
     </div>
   )

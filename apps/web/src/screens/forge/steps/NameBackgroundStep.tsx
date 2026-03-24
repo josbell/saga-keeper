@@ -1,11 +1,14 @@
 import { Input, Textarea } from '@saga-keeper/ui'
 import type { StepProps } from '../types'
+import styles from './NameBackgroundStep.module.css'
 
 export function NameBackgroundStep({ draft, onDraftChange }: StepProps) {
   return (
-    <div className="name-background-step">
-      <div className="name-background-step__field">
-        <label htmlFor="character-name">Name</label>
+    <div className={styles.step}>
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="character-name">
+          Name
+        </label>
         <Input
           id="character-name"
           value={draft.name}
@@ -13,8 +16,10 @@ export function NameBackgroundStep({ draft, onDraftChange }: StepProps) {
           placeholder="Your name"
         />
       </div>
-      <div className="name-background-step__field">
-        <label htmlFor="character-background">Background</label>
+      <div className={styles.field}>
+        <label className={styles.label} htmlFor="character-background">
+          Background
+        </label>
         <Textarea
           id="character-background"
           value={draft.background}

@@ -1,6 +1,7 @@
 import { Input } from '@saga-keeper/ui'
 import type { IronswornVow } from '@saga-keeper/ruleset-ironsworn'
 import type { StepProps } from '../types'
+import styles from './VowComposerStep.module.css'
 
 const VOW_RANKS: IronswornVow['rank'][] = [
   'troublesome',
@@ -34,26 +35,31 @@ export function VowComposerStep({ draft, onDraftChange }: StepProps) {
   }
 
   return (
-    <div className="vow-composer-step">
-      <div className="vow-composer-step__field">
+    <div className={styles.step}>
+      <div className={styles.vowWrap}>
+        <div className={styles.vowLabel}>Your Iron Oath</div>
         <Input
           value={draft.vow?.title ?? ''}
           onChange={(e) => handleTitleChange(e.target.value)}
           placeholder="Your vow"
         />
       </div>
-      <div className="vow-composer-step__ranks">
-        {VOW_RANKS.map((rank) => (
-          <button
-            key={rank}
-            type="button"
-            aria-pressed={draft.vow?.rank === rank}
-            onClick={() => handleRankSelect(rank)}
-            className="vow-composer-step__rank-btn"
-          >
-            {rank.charAt(0).toUpperCase() + rank.slice(1)}
-          </button>
-        ))}
+
+      <div className={styles.rankSection}>
+        <div className={styles.rankLabel}>Rank</div>
+        <div className={styles.ranks}>
+          {VOW_RANKS.map((rank) => (
+            <button
+              key={rank}
+              type="button"
+              aria-pressed={draft.vow?.rank === rank}
+              onClick={() => handleRankSelect(rank)}
+              className={styles.rankBtn}
+            >
+              {rank.charAt(0).toUpperCase() + rank.slice(1)}
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   )
