@@ -2,6 +2,20 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { StatAssignmentStep } from './StatAssignmentStep'
 import { INITIAL_DRAFT, type ForgeDraft } from '../types'
 
+const DRAG_TYPE = 'application/x-forge-stat'
+
+function makeDT(data: object) {
+  const store = new Map<string, string>([[DRAG_TYPE, JSON.stringify(data)]])
+  return {
+    effectAllowed: 'move' as const,
+    dataTransfer: {
+      effectAllowed: 'move',
+      setData: (type: string, value: string) => store.set(type, value),
+      getData: (type: string) => store.get(type) ?? '',
+    },
+  }
+}
+
 // All stats at 1 by default — budget not yet distributed
 function makeDraft(overrides?: Partial<ForgeDraft>) {
   return { ...INITIAL_DRAFT, ...overrides }
@@ -128,7 +142,7 @@ describe('StatAssignmentStep — assignment', () => {
     expect(tokenThree.getAttribute('aria-pressed')).toBe('true')
   })
 
-  it('clicking an assigned stat row returns its current value to the pool', () => {
+  it('clicking an assigned stat row clears it to 0 (unassigned)', () => {
     const onDraftChange = vi.fn()
     render(
       <StatAssignmentStep
@@ -142,6 +156,69 @@ describe('StatAssignmentStep — assignment', () => {
     )
     // Click edge stat (assigned to 3) — should clear it to 0 (unassigned)
     fireEvent.click(screen.getByTestId('stat-edge'))
+    expect(onDraftChange).toHaveBeenCalledWith({ edge: 0 })
+  })
+})
+
+describe('StatAssignmentStep — drag and drop', () => {
+  const defaultProps = {
+    onNext: vi.fn(),
+    onBack: vi.fn(),
+    stepIndex: 2,
+    totalSteps: 6,
+  }
+
+  it('dragging a pool chip onto a stat slot assigns the value', () => {
+    const onDraftChange = vi.fn()
+    render(
+      <StatAssignmentStep draft={makeDraft()} onDraftChange={onDraftChange} {...defaultProps} />
+    )
+    const statSlot = screen.getByTestId('stat-edge')
+    fireEvent.dragStart(
+      screen.getByTestId('budget-pool').querySelector('button')!,
+      makeDT({ kind: 'pool', value: 3 })
+    )
+    fireEvent.dragOver(statSlot)
+    fireEvent.drop(statSlot, makeDT({ kind: 'pool', value: 3 }))
+    expect(onDraftChange).toHaveBeenCalledWith({ edge: 3 })
+  })
+
+  it('dragging an assigned stat onto another stat swaps the values', () => {
+    const onDraftChange = vi.fn()
+    render(
+      <StatAssignmentStep
+        draft={makeAssignedDraft()}
+        onDraftChange={onDraftChange}
+        {...defaultProps}
+      />
+    )
+    const heartSlot = screen.getByTestId('stat-heart')
+    fireEvent.dragStart(
+      screen.getByTestId('stat-edge'),
+      makeDT({ kind: 'stat', key: 'edge', value: 3 })
+    )
+    fireEvent.dragOver(heartSlot)
+    fireEvent.drop(heartSlot, makeDT({ kind: 'stat', key: 'edge', value: 3 }))
+    // edge gets heart's old value (2), heart gets edge's dragged value (3)
+    expect(onDraftChange).toHaveBeenCalledWith({ edge: 2, heart: 3 })
+  })
+
+  it('dragging an assigned stat onto the pool clears the stat to 0', () => {
+    const onDraftChange = vi.fn()
+    render(
+      <StatAssignmentStep
+        draft={makeAssignedDraft()}
+        onDraftChange={onDraftChange}
+        {...defaultProps}
+      />
+    )
+    const pool = screen.getByTestId('budget-pool')
+    fireEvent.dragStart(
+      screen.getByTestId('stat-edge'),
+      makeDT({ kind: 'stat', key: 'edge', value: 3 })
+    )
+    fireEvent.dragOver(pool)
+    fireEvent.drop(pool, makeDT({ kind: 'stat', key: 'edge', value: 3 }))
     expect(onDraftChange).toHaveBeenCalledWith({ edge: 0 })
   })
 })

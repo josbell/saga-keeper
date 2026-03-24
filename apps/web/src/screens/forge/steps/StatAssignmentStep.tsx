@@ -13,8 +13,10 @@ const STAT_META: Record<StatKey, { rune: string; desc: string }> = {
   wits: { rune: 'ᚹ', desc: 'Cunning & survival' },
 }
 
-// Each stat starts at 0 (unassigned sentinel). Placing a budget token sets the stat
-// to the token's value. Pool = budget minus all token values already placed (> 0).
+type DragSource = { kind: 'pool'; value: number } | { kind: 'stat'; key: StatKey; value: number }
+
+const DRAG_TYPE = 'application/x-forge-stat'
+
 function computePool(draft: StepProps['draft']): number[] {
   const budget = [...ironswornPlugin.creation.statBudget]
   const assignedValues = STAT_KEYS.map((k) => draft[k]).filter((v) => v > 0)
@@ -28,9 +30,11 @@ function computePool(draft: StepProps['draft']): number[] {
 
 export function StatAssignmentStep({ draft, onDraftChange }: StepProps) {
   const [selectedToken, setSelectedToken] = useState<number | null>(null)
+  const [dragOverTarget, setDragOverTarget] = useState<StatKey | 'pool' | null>(null)
 
   const pool = computePool(draft)
 
+  // ── Click-to-assign ──────────────────────────────────────────────────────
   function handleTokenClick(value: number) {
     setSelectedToken((prev) => (prev === value ? null : value))
   }
@@ -44,12 +48,54 @@ export function StatAssignmentStep({ draft, onDraftChange }: StepProps) {
     }
   }
 
+  // ── Drag and drop ────────────────────────────────────────────────────────
+  function startDrag(e: React.DragEvent, source: DragSource) {
+    e.dataTransfer.effectAllowed = 'move'
+    e.dataTransfer.setData(DRAG_TYPE, JSON.stringify(source))
+    setSelectedToken(null)
+  }
+
+  function handleStatDrop(e: React.DragEvent, targetStat: StatKey) {
+    e.preventDefault()
+    setDragOverTarget(null)
+    const raw = e.dataTransfer.getData(DRAG_TYPE)
+    if (!raw) return
+    const source = JSON.parse(raw) as DragSource
+
+    if (source.kind === 'pool') {
+      onDraftChange({ [targetStat]: source.value })
+    } else {
+      // swap: move source value to target, move target value (or 0) back to source
+      onDraftChange({ [source.key]: draft[targetStat], [targetStat]: source.value })
+    }
+  }
+
+  function handlePoolDrop(e: React.DragEvent) {
+    e.preventDefault()
+    setDragOverTarget(null)
+    const raw = e.dataTransfer.getData(DRAG_TYPE)
+    if (!raw) return
+    const source = JSON.parse(raw) as DragSource
+    if (source.kind === 'stat') {
+      onDraftChange({ [source.key]: 0 })
+    }
+  }
+
   return (
     <div className={styles.step}>
       {/* Value chip pool */}
       <div>
         <div className={styles.sectionHeading}>Available Values</div>
-        <div data-testid="budget-pool" className={styles.pool}>
+        <div
+          data-testid="budget-pool"
+          className={`${styles.pool}${dragOverTarget === 'pool' ? ' ' + styles.dragOver : ''}`}
+          onDragOver={(e) => {
+            e.preventDefault()
+            setDragOverTarget('pool')
+          }}
+          onDragLeave={() => setDragOverTarget(null)}
+          onDrop={handlePoolDrop}
+        >
           <span className={styles.poolLabel}>Pool</span>
           {pool.map((value, idx) => (
             <button
@@ -57,7 +103,9 @@ export function StatAssignmentStep({ draft, onDraftChange }: StepProps) {
               type="button"
               className={styles.chip}
               aria-pressed={selectedToken === value}
+              draggable
               onClick={() => handleTokenClick(value)}
+              onDragStart={(e) => startDrag(e, { kind: 'pool', value })}
             >
               {value}
             </button>
@@ -72,17 +120,32 @@ export function StatAssignmentStep({ draft, onDraftChange }: StepProps) {
           {STAT_KEYS.map((stat) => {
             const { rune, desc } = STAT_META[stat]
             const isAssigned = draft[stat] > 0
+            const isDragOver = dragOverTarget === stat
             return (
               <div
                 key={stat}
                 data-testid={`stat-${stat}`}
-                className={`${styles.statSlot}${isAssigned ? ' ' + styles.assigned : ''}`}
+                className={[
+                  styles.statSlot,
+                  isAssigned ? styles.assigned : '',
+                  isDragOver ? styles.dragOver : '',
+                ]
+                  .filter(Boolean)
+                  .join(' ')}
                 onClick={() => handleStatClick(stat)}
                 role="button"
                 tabIndex={0}
+                draggable={isAssigned}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') handleStatClick(stat)
                 }}
+                onDragStart={(e) => startDrag(e, { kind: 'stat', key: stat, value: draft[stat] })}
+                onDragOver={(e) => {
+                  e.preventDefault()
+                  setDragOverTarget(stat)
+                }}
+                onDragLeave={() => setDragOverTarget(null)}
+                onDrop={(e) => handleStatDrop(e, stat)}
               >
                 <div className={styles.statRune}>{rune}</div>
                 <div className={styles.statName}>
