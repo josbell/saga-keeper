@@ -15,15 +15,17 @@ export interface ForgeDraft {
   vow: IronswornVow | null
 }
 
+// Stats use 0 as the "unassigned" sentinel — budget tokens from [3,2,2,1,1]
+// are placed on stats to set their final value. 0 means no token placed yet.
 export const INITIAL_DRAFT: ForgeDraft = {
   worldDescription: '',
   name: '',
   background: '',
-  edge: 1,
-  heart: 1,
-  iron: 1,
-  shadow: 1,
-  wits: 1,
+  edge: 0,
+  heart: 0,
+  iron: 0,
+  shadow: 0,
+  wits: 0,
   assetIds: [],
   vow: null,
 }

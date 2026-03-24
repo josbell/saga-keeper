@@ -4,6 +4,7 @@ import type { CreationStep } from '@saga-keeper/domain'
 import { INITIAL_DRAFT, type ForgeDraft, type StepProps } from './types'
 import { WorldSelectStep } from './steps/WorldSelectStep'
 import { NameBackgroundStep } from './steps/NameBackgroundStep'
+import { StatAssignmentStep } from './steps/StatAssignmentStep'
 
 function renderStep(step: CreationStep, props: StepProps) {
   switch (step.component) {
@@ -12,7 +13,7 @@ function renderStep(step: CreationStep, props: StepProps) {
     case 'name-background':
       return <NameBackgroundStep {...props} />
     case 'stat-assignment':
-      return <div data-testid="step-stat-assignment" />
+      return <StatAssignmentStep {...props} />
     case 'asset-picker':
       return <div data-testid="step-asset-picker" />
     case 'vow-composer':
