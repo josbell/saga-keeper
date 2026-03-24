@@ -1,8 +1,23 @@
 import { useState } from 'react'
 import { ironswornPlugin, type IronswornCharacterData } from '@saga-keeper/ruleset-ironsworn'
-import type { CharacterState, CreationStep } from '@saga-keeper/domain'
+import type { AIGateway, CharacterState, CreationStep } from '@saga-keeper/domain'
 import { useGameStore } from '@/store'
 import { INITIAL_DRAFT, type ForgeDraft, type StepProps } from './types'
+import { useForgeCounsel } from './hooks/useForgeCounsel'
+
+// Stub gateway used when no real AI provider is configured.
+// Returns an empty string so no message is appended to the feed.
+const STUB_GATEWAY: AIGateway = {
+  complete: () => Promise.resolve({ text: '', intent: 'forge.counsel', tokensUsed: 0 }),
+  stream: async function* () {},
+  getCapabilities: () => ({
+    streaming: false,
+    maxContextTokens: 0,
+    supportsSystemPrompt: false,
+    localOnly: true,
+  }),
+  getTier: () => 'offline',
+}
 import { WorldSelectStep } from './steps/WorldSelectStep'
 import { NameBackgroundStep } from './steps/NameBackgroundStep'
 import { StatAssignmentStep } from './steps/StatAssignmentStep'
@@ -29,13 +44,15 @@ function renderStep(step: CreationStep, props: StepProps) {
   }
 }
 
-export function ForgeScreen() {
+export function ForgeScreen({ gateway = STUB_GATEWAY }: { gateway?: AIGateway } = {}) {
   const [stepIndex, setStepIndex] = useState(0)
   const [draft, setDraft] = useState<ForgeDraft>(INITIAL_DRAFT)
 
   const steps = ironswornPlugin.creation.steps
   const totalSteps = steps.length
   const step = steps[Math.min(stepIndex, totalSteps - 1)]!
+
+  useForgeCounsel(gateway, step, draft)
 
   function handleDraftChange(patch: Partial<ForgeDraft>) {
     setDraft((prev) => ({ ...prev, ...patch }))
