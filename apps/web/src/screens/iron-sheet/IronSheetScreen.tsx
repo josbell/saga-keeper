@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { ironswornPlugin, type IronswornCharacterData } from '@saga-keeper/ruleset-ironsworn'
 import { useGameStore } from '@/store'
 import { CharacterHeader } from './components/CharacterHeader/CharacterHeader'
@@ -12,13 +13,14 @@ import { DiceRollerSection } from './components/DiceRollerSection/DiceRollerSect
 import styles from './IronSheetScreen.module.css'
 
 const NAV_ITEMS = [
-  { label: 'Iron Sheet', active: true },
-  { label: 'Oracle', active: false },
-  { label: 'Skald', active: false },
-  { label: 'World Forge', active: false },
+  { label: 'Iron Sheet', path: null },
+  { label: 'Oracle', path: '/oracle' },
+  { label: 'Skald', path: null },
+  { label: 'World Forge', path: null },
 ]
 
 export function IronSheetScreen() {
+  const navigate = useNavigate()
   const character = useGameStore((state) => state.character)
   const patchCharacterData = useGameStore((state) => state.patchCharacterData)
   const [selectedStat, setSelectedStat] = useState<StatKey | null>(null)
@@ -30,7 +32,7 @@ export function IronSheetScreen() {
   if (!character) {
     return (
       <div className={styles.screen}>
-        {renderHeader()}
+        {renderHeader(navigate)}
         <main className={styles.empty} role="main" tabIndex={-1}>
           <p>No character loaded</p>
         </main>
@@ -42,7 +44,11 @@ export function IronSheetScreen() {
   const loadedCharacter = character
 
   function handleDebilityToggle(key: DebilityKey) {
-    const { next } = ironswornPlugin.character.applyCondition(loadedCharacter, key, !data.debilities[key])
+    const { next } = ironswornPlugin.character.applyCondition(
+      loadedCharacter,
+      key,
+      !data.debilities[key]
+    )
     patchCharacterData(next.data as Record<string, unknown>)
   }
 
@@ -56,11 +62,9 @@ export function IronSheetScreen() {
 
   return (
     <div className={styles.screen}>
-      {renderHeader()}
+      {renderHeader(navigate)}
       <div className={styles.body}>
-        <aside className={styles.sidebar}>
-          {/* Session nav placeholder */}
-        </aside>
+        <aside className={styles.sidebar}>{/* Session nav placeholder */}</aside>
         <main className={styles.main} role="main" tabIndex={-1}>
           <h1 className={styles.pageTitle}>Iron Sheet</h1>
           <CharacterHeader
@@ -90,10 +94,7 @@ export function IronSheetScreen() {
             onSupplyChange={(v) => patchCharacterData({ supply: v })}
             onMomentumChange={(v) => patchCharacterData({ momentum: v })}
           />
-          <DebilityChips
-            debilities={data.debilities}
-            onToggle={handleDebilityToggle}
-          />
+          <DebilityChips debilities={data.debilities} onToggle={handleDebilityToggle} />
           <VowTracker vows={data.vows} onProgressChange={handleVowProgressChange} />
           <DiceRollerSection
             selectedStat={selectedStat}
@@ -105,19 +106,20 @@ export function IronSheetScreen() {
   )
 }
 
-function renderHeader() {
+function renderHeader(navigate: ReturnType<typeof useNavigate>) {
   return (
     <header className={styles.header}>
       <div className={styles.headerLogo}>
         <span className={styles.logoTitle}>Saga Keeper</span>
       </div>
       <nav className={styles.headerNav} aria-label="Application">
-        {NAV_ITEMS.map(({ label, active }) => (
+        {NAV_ITEMS.map(({ label, path }) => (
           <button
             key={label}
             type="button"
             className={styles.navBtn}
-            aria-current={active ? 'page' : undefined}
+            aria-current={path === null ? 'page' : undefined}
+            onClick={path ? () => navigate(path) : undefined}
           >
             {label}
           </button>

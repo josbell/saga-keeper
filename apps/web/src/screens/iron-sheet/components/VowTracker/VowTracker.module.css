@@ -51,7 +51,9 @@
   background: transparent;
   cursor: pointer;
   padding: 0;
-  transition: background 0.15s, border-color 0.15s;
+  transition:
+    background 0.15s,
+    border-color 0.15s;
   flex-shrink: 0;
 }
 

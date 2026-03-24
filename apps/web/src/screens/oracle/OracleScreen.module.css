@@ -1,0 +1,108 @@
+.screen {
+  display: grid;
+  grid-template-rows: 47px 1fr;
+  min-height: 100vh;
+  background: var(--color-void, #0d0b08);
+  color: var(--color-parchment, #c4a96e);
+  font-family: 'Cinzel', Georgia, serif;
+}
+
+/* ── HEADER ── */
+.header {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  border-bottom: 1px solid rgba(212, 148, 26, 0.2);
+  background: rgba(30, 23, 16, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+.headerLogo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logoTitle {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--color-gold-bright, #f0b429);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.headerNav {
+  display: flex;
+  gap: 2px;
+}
+
+.navBtn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--color-bone, #7a6a52);
+  padding: 6px 14px;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 2px;
+  height: 47px;
+}
+
+.navBtn:hover,
+.navBtn[aria-current='page'] {
+  border-color: rgba(212, 148, 26, 0.4);
+  color: var(--color-gold, #d4941a);
+  background: rgba(212, 148, 26, 0.08);
+}
+
+/* ── BODY ── */
+.body {
+  display: grid;
+  grid-template-columns: 240px 1fr 260px;
+  overflow: hidden;
+}
+
+.sidebar {
+  border-right: 1px solid rgba(212, 148, 26, 0.12);
+  background: rgba(19, 16, 13, 0.7);
+  padding: 20px 12px;
+  overflow-y: auto;
+}
+
+.main {
+  padding: 32px;
+  overflow-y: auto;
+  outline: none;
+}
+
+.pageTitle {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 11px;
+  letter-spacing: 6px;
+  color: var(--color-bone, #7a6a52);
+  text-transform: uppercase;
+  margin: 0 0 28px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pageTitle::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(212, 148, 26, 0.3), transparent);
+}
+
+.rightPanel {
+  border-left: 1px solid rgba(212, 148, 26, 0.12);
+  background: rgba(19, 16, 13, 0.7);
+  padding: 20px 12px;
+  overflow-y: auto;
+}

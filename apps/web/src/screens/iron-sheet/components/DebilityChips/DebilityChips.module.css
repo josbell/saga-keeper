@@ -31,5 +31,7 @@
   background: rgba(139, 26, 26, 0.25);
   border-color: var(--color-blood);
   color: var(--color-blood-bright);
-  box-shadow: 0 0 8px rgba(139, 26, 26, 0.4), inset 0 0 8px rgba(139, 26, 26, 0.15);
+  box-shadow:
+    0 0 8px rgba(139, 26, 26, 0.4),
+    inset 0 0 8px rgba(139, 26, 26, 0.15);
 }
