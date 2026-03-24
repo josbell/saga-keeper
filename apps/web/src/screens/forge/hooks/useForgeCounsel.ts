@@ -30,6 +30,8 @@ export function useForgeCounsel(
   useEffect(() => {
     if (!step.aiCounsel) return
 
+    let cancelled = false
+
     const context: GameContext = {
       rulesetId: 'ironsworn-v1',
       characters: [],
@@ -41,6 +43,7 @@ export function useForgeCounsel(
     gateway
       .complete({ intent: 'forge.counsel', context, userMessage: buildUserMessage(step, draft) })
       .then((res) => {
+        if (cancelled || !res.text.trim()) return
         appendMessage({
           id: globalThis.crypto.randomUUID(),
           role: 'skald',
@@ -49,8 +52,13 @@ export function useForgeCounsel(
         })
       })
       .catch((err: unknown) => {
+        if (cancelled) return
         setError(err instanceof Error ? err : new Error(String(err)))
       })
+
+    return () => {
+      cancelled = true
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [step.id])
 

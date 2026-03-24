@@ -29,7 +29,7 @@ function computePool(draft: StepProps['draft']): number[] {
 }
 
 export function StatAssignmentStep({ draft, onDraftChange }: StepProps) {
-  const [selectedToken, setSelectedToken] = useState<number | null>(null)
+  const [selectedTokenIdx, setSelectedTokenIdx] = useState<number | null>(null)
   const [dragOverTarget, setDragOverTarget] = useState<StatKey | 'pool' | null>(null)
   const poolRef = useRef<HTMLDivElement>(null)
 
@@ -47,14 +47,15 @@ export function StatAssignmentStep({ draft, onDraftChange }: StepProps) {
   }
 
   // ── Click-to-assign ──────────────────────────────────────────────────────
-  function handleTokenClick(value: number) {
-    setSelectedToken((prev) => (prev === value ? null : value))
+  function handleTokenClick(idx: number) {
+    setSelectedTokenIdx((prev) => (prev === idx ? null : idx))
   }
 
   function handleStatClick(stat: StatKey) {
-    if (selectedToken !== null) {
-      onDraftChange({ [stat]: selectedToken })
-      setSelectedToken(null)
+    if (selectedTokenIdx !== null) {
+      const value = pool[selectedTokenIdx]!
+      onDraftChange({ [stat]: value })
+      setSelectedTokenIdx(null)
     } else if (draft[stat] > 0) {
       onDraftChange({ [stat]: 0 })
     }
@@ -64,7 +65,7 @@ export function StatAssignmentStep({ draft, onDraftChange }: StepProps) {
   function startDrag(e: React.DragEvent, source: DragSource) {
     e.dataTransfer.effectAllowed = 'move'
     e.dataTransfer.setData(DRAG_TYPE, JSON.stringify(source))
-    setSelectedToken(null)
+    setSelectedTokenIdx(null)
   }
 
   function handleStatDrop(e: React.DragEvent, targetStat: StatKey) {
@@ -115,10 +116,10 @@ export function StatAssignmentStep({ draft, onDraftChange }: StepProps) {
               key={idx}
               type="button"
               className={styles.chip}
-              aria-pressed={selectedToken === value}
+              aria-pressed={selectedTokenIdx === idx}
               tabIndex={idx === 0 ? 0 : -1}
               draggable
-              onClick={() => handleTokenClick(value)}
+              onClick={() => handleTokenClick(idx)}
               onKeyDown={(e) => handlePoolKeyDown(e, idx)}
               onDragStart={(e) => startDrag(e, { kind: 'pool', value })}
             >

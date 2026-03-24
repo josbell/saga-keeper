@@ -28,16 +28,17 @@ export function AssetPickerStep({ draft, onDraftChange }: StepProps) {
     }
   }
 
-  function handleGroupKeyDown(e: React.KeyboardEvent, type: AssetType, idx: number) {
+  function handleGroupKeyDown(e: React.KeyboardEvent, type: AssetType) {
     const container = groupRefs.current.get(type)
     if (!container) return
     const buttons = Array.from(container.querySelectorAll<HTMLElement>('button:not(:disabled)'))
-    if (e.key === 'ArrowDown' && idx < buttons.length - 1) {
+    const currentIdx = buttons.indexOf(e.currentTarget as HTMLElement)
+    if (e.key === 'ArrowDown' && currentIdx < buttons.length - 1) {
       e.preventDefault()
-      buttons[idx + 1]?.focus()
-    } else if (e.key === 'ArrowUp' && idx > 0) {
+      buttons[currentIdx + 1]?.focus()
+    } else if (e.key === 'ArrowUp' && currentIdx > 0) {
       e.preventDefault()
-      buttons[idx - 1]?.focus()
+      buttons[currentIdx - 1]?.focus()
     }
   }
 
@@ -77,7 +78,7 @@ export function AssetPickerStep({ draft, onDraftChange }: StepProps) {
                   disabled={isDisabled}
                   tabIndex={idx === 0 ? 0 : -1}
                   onClick={() => handleToggle(asset.id)}
-                  onKeyDown={(e) => handleGroupKeyDown(e, type, idx)}
+                  onKeyDown={(e) => handleGroupKeyDown(e, type)}
                   className={styles.assetBtn}
                 >
                   <span className={styles.assetName}>{asset.name}</span>

@@ -8,7 +8,11 @@ export function WorldSelectStep({ draft, onDraftChange }: StepProps) {
       <p className={styles.prompt}>
         Describe the Ironlands you inhabit — its people, its perils, and its truths.
       </p>
+      <label htmlFor="world-description" className={styles.label}>
+        World Description
+      </label>
       <Textarea
+        id="world-description"
         value={draft.worldDescription}
         onChange={(e) => onDraftChange({ worldDescription: e.target.value })}
         placeholder="The Ironlands are a harsh and unforgiving land..."

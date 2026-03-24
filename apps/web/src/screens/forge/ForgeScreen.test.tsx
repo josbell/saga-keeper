@@ -1,6 +1,31 @@
 import { render, screen, fireEvent } from '@testing-library/react'
 import { ForgeScreen } from './ForgeScreen'
 import { useGameStore } from '@/store'
+import type { ForgeDraft } from './types'
+import { ironswornPlugin } from '@saga-keeper/ruleset-ironsworn'
+
+// A draft that satisfies ironswornPlugin.creation.validate
+const VALID_DRAFT: ForgeDraft = {
+  worldDescription: 'A harsh land of iron and stone.',
+  name: 'Björn',
+  background: 'A wandering warrior seeking purpose.',
+  edge: 3,
+  heart: 2,
+  iron: 2,
+  shadow: 1,
+  wits: 1,
+  assetIds: ironswornPlugin.assets
+    .getAll()
+    .slice(0, 3)
+    .map((a) => a.id),
+  vow: {
+    id: 'vow-test',
+    title: 'Become a legend',
+    rank: 'epic',
+    progress: 0,
+    fulfilled: false,
+  },
+}
 
 beforeEach(() => {
   useGameStore.setState(useGameStore.getInitialState())
@@ -88,7 +113,7 @@ describe('ForgeScreen — navigation', () => {
 
 describe('ForgeScreen — store commit', () => {
   function navigateToConfirmation() {
-    render(<ForgeScreen />)
+    render(<ForgeScreen initialDraft={VALID_DRAFT} />)
     // Navigate through steps 1-5 using the shell Next button
     for (let i = 0; i < 5; i++) {
       fireEvent.click(screen.getByRole('button', { name: /next/i }))

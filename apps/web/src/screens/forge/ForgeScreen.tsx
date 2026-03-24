@@ -83,9 +83,13 @@ function renderStep(step: CreationStep, props: StepProps) {
   }
 }
 
-export function ForgeScreen({ gateway = STUB_GATEWAY }: { gateway?: AIGateway } = {}) {
+export function ForgeScreen({
+  gateway = STUB_GATEWAY,
+  initialDraft = INITIAL_DRAFT,
+}: { gateway?: AIGateway; initialDraft?: ForgeDraft } = {}) {
   const [stepIndex, setStepIndex] = useState(0)
-  const [draft, setDraft] = useState<ForgeDraft>(INITIAL_DRAFT)
+  const [draft, setDraft] = useState<ForgeDraft>(initialDraft)
+  const [validationErrors, setValidationErrors] = useState<string[]>([])
   const mainRef = useRef<HTMLElement>(null)
 
   const steps = ironswornPlugin.creation.steps
@@ -105,6 +109,22 @@ export function ForgeScreen({ gateway = STUB_GATEWAY }: { gateway?: AIGateway } 
   }
 
   function handleConfirm() {
+    const result = ironswornPlugin.creation.validate({
+      edge: draft.edge,
+      heart: draft.heart,
+      iron: draft.iron,
+      shadow: draft.shadow,
+      wits: draft.wits,
+      assetIds: draft.assetIds,
+      vows: draft.vow ? [draft.vow] : [],
+    } as Parameters<typeof ironswornPlugin.creation.validate>[0])
+
+    if (!result.valid) {
+      setValidationErrors(result.errors)
+      return
+    }
+
+    setValidationErrors([])
     const now = new Date().toISOString()
     const defaults = ironswornPlugin.character.defaults() as unknown as IronswornCharacterData
     const data: IronswornCharacterData = {
@@ -208,6 +228,14 @@ export function ForgeScreen({ gateway = STUB_GATEWAY }: { gateway?: AIGateway } 
           <p className={styles.subtitle}>{STEP_SUBTITLES[step.id] ?? ''}</p>
 
           <div className={styles.content}>{renderStep(step, stepProps)}</div>
+
+          {validationErrors.length > 0 && (
+            <ul className={styles.validationErrors} role="alert">
+              {validationErrors.map((msg) => (
+                <li key={msg}>{msg}</li>
+              ))}
+            </ul>
+          )}
 
           <footer className={styles.footer}>
             {stepIndex > 0 ? (
