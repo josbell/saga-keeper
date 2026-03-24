@@ -1,0 +1,82 @@
+import { render, screen, fireEvent } from '@testing-library/react'
+import { ForgeScreen } from './ForgeScreen'
+
+const STEP_TITLES = [
+  'Your World',
+  'Who Are You?',
+  'Your Stats',
+  'Your Assets',
+  'Your Starting Vow',
+  'Enter the Ironlands',
+]
+
+describe('ForgeScreen — rendering', () => {
+  it('renders the first step title "Your World"', () => {
+    render(<ForgeScreen />)
+    expect(screen.getByText('Your World')).toBeTruthy()
+  })
+
+  it('renders a progress indicator showing step 1 of 6', () => {
+    render(<ForgeScreen />)
+    expect(screen.getByText('1 / 6')).toBeTruthy()
+  })
+
+  it('renders a Next button', () => {
+    render(<ForgeScreen />)
+    expect(screen.getByRole('button', { name: /next/i })).toBeTruthy()
+  })
+
+  it('does not render a Back button on step 1', () => {
+    render(<ForgeScreen />)
+    expect(screen.queryByRole('button', { name: /back/i })).toBeNull()
+  })
+})
+
+describe('ForgeScreen — navigation', () => {
+  it('advances to step 2 when Next is clicked on step 1', () => {
+    render(<ForgeScreen />)
+    fireEvent.click(screen.getByRole('button', { name: /next/i }))
+    expect(screen.getByText('Who Are You?')).toBeTruthy()
+  })
+
+  it('renders a Back button on step 2', () => {
+    render(<ForgeScreen />)
+    fireEvent.click(screen.getByRole('button', { name: /next/i }))
+    expect(screen.getByRole('button', { name: /back/i })).toBeTruthy()
+  })
+
+  it('returns to step 1 when Back is clicked on step 2', () => {
+    render(<ForgeScreen />)
+    fireEvent.click(screen.getByRole('button', { name: /next/i }))
+    fireEvent.click(screen.getByRole('button', { name: /back/i }))
+    expect(screen.getByText('Your World')).toBeTruthy()
+  })
+
+  it('advances through all 6 steps sequentially', () => {
+    render(<ForgeScreen />)
+    for (let i = 0; i < 5; i++) {
+      fireEvent.click(screen.getByRole('button', { name: /next/i }))
+    }
+    expect(screen.getByText('Enter the Ironlands')).toBeTruthy()
+  })
+
+  it('does not advance past step 6', () => {
+    render(<ForgeScreen />)
+    for (let i = 0; i < 10; i++) {
+      const next = screen.queryByRole('button', { name: /next/i })
+      if (next) fireEvent.click(next)
+    }
+    expect(screen.getByText('Enter the Ironlands')).toBeTruthy()
+    expect(screen.getByText('6 / 6')).toBeTruthy()
+  })
+
+  it('renders the correct step title at each index', () => {
+    render(<ForgeScreen />)
+    for (let i = 0; i < STEP_TITLES.length; i++) {
+      expect(screen.getByText(STEP_TITLES[i]!)).toBeTruthy()
+      if (i < STEP_TITLES.length - 1) {
+        fireEvent.click(screen.getByRole('button', { name: /next/i }))
+      }
+    }
+  })
+})
