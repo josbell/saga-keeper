@@ -1,0 +1,133 @@
+.charCard {
+  margin: 0 0 12px;
+  background: var(--color-ash, #13100d);
+  border: 1px solid var(--color-iron, #2a241c);
+  border-radius: 3px;
+  padding: 10px;
+}
+
+.charName {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 12px;
+  color: var(--color-gold-bright, #f0b429);
+  margin: 0 0 2px;
+}
+
+.charEpithet {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--color-stone, #5f5447);
+  text-transform: uppercase;
+  margin: 0 0 8px;
+}
+
+.noChar {
+  font-size: 9px;
+  color: var(--color-stone, #5f5447);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ── STAT BARS ── */
+.statBars {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statBarRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.statBarLabel {
+  font-size: 8px;
+  letter-spacing: 1px;
+  color: var(--color-stone, #5f5447);
+  text-transform: uppercase;
+  width: 26px;
+  flex-shrink: 0;
+}
+
+.statBarTrack {
+  flex: 1;
+  height: 6px;
+  background: rgba(30, 23, 16, 0.8);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.statBarFill {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.statBarFill.health {
+  background: #8b1a1a;
+}
+
+.statBarFill.spirit {
+  background: #4a7a8a;
+}
+
+.statBarFill.momentum {
+  background: #5a8fa0;
+}
+
+.statBarNum {
+  font-size: 8px;
+  color: var(--color-stone, #5f5447);
+  width: 14px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+/* ── SESSION SECTION ── */
+.sessionSection {
+  flex: 1;
+}
+
+.sectionLabel {
+  font-size: 8px;
+  letter-spacing: 4px;
+  color: var(--color-iron, #3d3428);
+  text-transform: uppercase;
+  padding: 0 8px;
+  margin: 12px 0 5px;
+}
+
+.sessionList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.sessionItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border-radius: 3px;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-bone, #7a6a52);
+  border: 1px solid transparent;
+  margin-bottom: 2px;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.sessionItem[aria-current='true'] {
+  color: var(--color-gold, #d4941a);
+  border-color: rgba(212, 148, 26, 0.25);
+  background: rgba(212, 148, 26, 0.08);
+}
+
+.sessionIcon {
+  font-size: 13px;
+  width: 18px;
+  text-align: center;
+}

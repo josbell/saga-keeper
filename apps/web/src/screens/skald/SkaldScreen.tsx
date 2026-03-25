@@ -4,6 +4,7 @@ import { ironswornPlugin } from '@saga-keeper/ruleset-ironsworn'
 import { useGameStore } from '@/store'
 import { SkaldFeed } from './components/SkaldFeed/SkaldFeed'
 import { SkaldInputBar } from './components/SkaldInputBar/SkaldInputBar'
+import { SkaldLeftSidebar } from './components/SkaldLeftSidebar/SkaldLeftSidebar'
 import styles from './SkaldScreen.module.css'
 
 const NAV_ITEMS = [
@@ -81,7 +82,7 @@ export function SkaldScreen() {
 
       <div className={styles.body}>
         <aside className={styles.leftSidebar} aria-label="Character & Sessions">
-          {/* SkaldLeftSidebar — chunk 4 */}
+          <SkaldLeftSidebar character={character} />
         </aside>
 
         <main className={styles.main} role="main" tabIndex={-1}>
