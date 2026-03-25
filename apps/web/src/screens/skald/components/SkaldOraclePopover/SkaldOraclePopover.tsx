@@ -24,6 +24,7 @@ export function SkaldOraclePopover({ isOpen, onClose }: SkaldOraclePopoverProps)
   const [activeTab, setActiveTab] = useState<Tab>('ask-fates')
   const dialogRef = useRef<HTMLDivElement>(null)
   const firstTabRef = useRef<HTMLButtonElement>(null)
+  const prevFocusRef = useRef<HTMLElement | null>(null)
 
   // oracle store
   const tables = ironswornPlugin.oracle.getTables()
@@ -37,10 +38,14 @@ export function SkaldOraclePopover({ isOpen, onClose }: SkaldOraclePopoverProps)
   const recordOracleRoll = useGameStore((s) => s.recordOracleRoll)
   const clearHistory = useGameStore((s) => s.clearHistory)
 
-  // Focus first tab when popover opens
+  // Save previous focus, move focus in, and return it on close
   useEffect(() => {
     if (isOpen) {
+      prevFocusRef.current = document.activeElement as HTMLElement
       firstTabRef.current?.focus()
+    } else {
+      prevFocusRef.current?.focus()
+      prevFocusRef.current = null
     }
   }, [isOpen])
 
@@ -61,6 +66,26 @@ export function SkaldOraclePopover({ isOpen, onClose }: SkaldOraclePopoverProps)
   function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
     if (e.key === 'Escape') {
       onClose()
+      return
+    }
+    if (e.key === 'Tab') {
+      const focusable = dialogRef.current?.querySelectorAll<HTMLElement>(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      )
+      if (!focusable || focusable.length === 0) return
+      const first = focusable[0]!
+      const last = focusable[focusable.length - 1]!
+      if (e.shiftKey) {
+        if (document.activeElement === first) {
+          e.preventDefault()
+          last.focus()
+        }
+      } else {
+        if (document.activeElement === last) {
+          e.preventDefault()
+          first.focus()
+        }
+      }
     }
   }
 
@@ -168,12 +193,12 @@ function RecentTab({ history, fatesHistory, tables, onClear }: RecentTabProps) {
 
   return (
     <div className={styles.recent}>
-      <button type="button" className={styles.clearBtn} onClick={onClear}>
+      <button type="button" className={styles.clearBtn} aria-label="Clear Oracle History" onClick={onClear}>
         Clear
       </button>
       <ul className={styles.recentList}>
-        {combined.map((entry, idx) => (
-          <li key={idx} className={styles.recentItem}>
+        {combined.map((entry) => (
+          <li key={`${entry.kind}-${entry.data.timestamp}`} className={styles.recentItem}>
             {entry.kind === 'fates' ? (
               <span className={entry.data.result ? styles.yes : styles.no}>
                 {entry.data.result ? 'Yes' : 'No'}

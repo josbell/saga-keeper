@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, within } from '@testing-library/react'
 import { SkaldScreen } from './SkaldScreen'
 import { useGameStore } from '@/store'
 
@@ -81,11 +81,7 @@ describe('SkaldScreen — layout landmarks', () => {
   it('clicking Oracle nav button calls navigate("/oracle")', () => {
     render(<SkaldScreen />)
     const nav = screen.getByRole('navigation', { name: /application/i })
-    const oracleNavBtn = nav.querySelector('button[aria-current], button') as HTMLButtonElement
-    // Find the Oracle button specifically within nav (accessible name is exactly "Oracle")
-    const buttons = Array.from(nav.querySelectorAll('button'))
-    const oracleBtn = buttons.find((b) => b.textContent?.trim() === 'Oracle')!
-    fireEvent.click(oracleBtn)
+    fireEvent.click(within(nav).getByRole('button', { name: /^oracle$/i }))
     expect(mockNavigate).toHaveBeenCalledWith('/oracle')
   })
 

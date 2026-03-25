@@ -78,6 +78,11 @@ describe('SkaldFeed — typing indicator', () => {
     expect(screen.getByRole('status')).toBeTruthy()
   })
 
+  it('shows typing indicator when phase is "move-pending"', () => {
+    renderFeed([], 'move-pending')
+    expect(screen.getByRole('status')).toBeTruthy()
+  })
+
   it('hides typing indicator when phase is "idle"', () => {
     renderFeed([], 'idle')
     expect(screen.queryByRole('status')).toBeNull()

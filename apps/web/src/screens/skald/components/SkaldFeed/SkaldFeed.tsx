@@ -8,7 +8,7 @@ interface SkaldFeedProps {
 }
 
 export function SkaldFeed({ messages, phase, streamBuffer }: SkaldFeedProps) {
-  const isComposing = phase === 'waiting-for-ai' || phase === 'streaming'
+  const isComposing = phase === 'waiting-for-ai' || phase === 'streaming' || phase === 'move-pending'
   const hasError = phase === 'error'
 
   return (

@@ -102,6 +102,17 @@ describe('SkaldOraclePopover — tab navigation', () => {
     render(<SkaldOraclePopover isOpen onClose={vi.fn()} />)
     expect(screen.getByRole('tabpanel')).toBeTruthy()
   })
+
+  it('active tabpanel aria-labelledby matches active tab id', () => {
+    render(<SkaldOraclePopover isOpen onClose={vi.fn()} />)
+    expect(screen.getByRole('tabpanel').getAttribute('aria-labelledby')).toBe('oracle-tab-ask-fates')
+  })
+
+  it('tabpanel aria-labelledby updates when switching to Browse Tables', () => {
+    render(<SkaldOraclePopover isOpen onClose={vi.fn()} />)
+    fireEvent.click(screen.getByRole('tab', { name: /browse tables/i }))
+    expect(screen.getByRole('tabpanel').getAttribute('aria-labelledby')).toBe('oracle-tab-browse-tables')
+  })
 })
 
 describe('SkaldOraclePopover — Ask Fates tab', () => {

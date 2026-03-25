@@ -102,33 +102,25 @@ describe('SkaldRightPanel — Vow Tracker', () => {
     expect(screen.getByText(/dangerous/i)).toBeTruthy()
   })
 
-  it('renders 10 progress boxes per vow', () => {
+  it('vow progress uses role="progressbar" with aria-valuenow', () => {
     const char = makeCharacter({
       vows: [{ id: 'v1', title: 'Test Vow', rank: 'troublesome', progress: 3, fulfilled: false }],
     })
     renderPanel(char)
-    const boxes = screen.getAllByRole('checkbox')
-    expect(boxes.length).toBe(10)
+    const bar = screen.getByRole('progressbar', { name: /test vow progress/i })
+    expect(bar.getAttribute('aria-valuenow')).toBe('3')
+    expect(bar.getAttribute('aria-valuemin')).toBe('0')
+    expect(bar.getAttribute('aria-valuemax')).toBe('10')
   })
 
-  it('filled boxes up to progress value have aria-checked="true"', () => {
+  it('progress boxes are presentational (aria-hidden)', () => {
     const char = makeCharacter({
       vows: [{ id: 'v1', title: 'Test Vow', rank: 'troublesome', progress: 4, fulfilled: false }],
     })
     renderPanel(char)
-    const boxes = screen.getAllByRole('checkbox')
-    const checkedBoxes = boxes.filter((b) => b.getAttribute('aria-checked') === 'true')
-    expect(checkedBoxes.length).toBe(4)
-  })
-
-  it('unfilled boxes have aria-checked="false"', () => {
-    const char = makeCharacter({
-      vows: [{ id: 'v1', title: 'Test Vow', rank: 'troublesome', progress: 3, fulfilled: false }],
-    })
-    renderPanel(char)
-    const boxes = screen.getAllByRole('checkbox')
-    const unchecked = boxes.filter((b) => b.getAttribute('aria-checked') === 'false')
-    expect(unchecked.length).toBe(7)
+    const bar = screen.getByRole('progressbar', { name: /test vow progress/i })
+    const boxes = bar.querySelectorAll('[aria-hidden="true"]')
+    expect(boxes.length).toBe(10)
   })
 })
 

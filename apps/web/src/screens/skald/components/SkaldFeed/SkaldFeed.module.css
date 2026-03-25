@@ -9,7 +9,7 @@
 
 /* ── FEED ITEM WRAPPER ── */
 .item {
-  display: contents;
+  display: block;
 }
 
 /* ── SKALD MESSAGE ── */

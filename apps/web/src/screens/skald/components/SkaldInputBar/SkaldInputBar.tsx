@@ -22,7 +22,7 @@ export function SkaldInputBar({
 }: SkaldInputBarProps) {
   const [text, setText] = useState('')
 
-  const isBusy = phase === 'waiting-for-ai' || phase === 'streaming'
+  const isBusy = phase === 'waiting-for-ai' || phase === 'streaming' || phase === 'move-pending'
   const canSend = text.trim().length > 0 && !isBusy
 
   function handleSend() {
@@ -47,6 +47,7 @@ export function SkaldInputBar({
               type="button"
               className={styles.pill}
               data-category={move.category}
+              disabled={isBusy}
               onClick={() => onMoveSelect(move.id)}
             >
               {move.trigger}
@@ -80,7 +81,6 @@ export function SkaldInputBar({
         <button
           type="button"
           className={styles.sendBtn}
-          aria-label="Send"
           disabled={!canSend}
           onClick={handleSend}
         >

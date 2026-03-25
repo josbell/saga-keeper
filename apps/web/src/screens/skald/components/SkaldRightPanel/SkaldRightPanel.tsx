@@ -14,9 +14,10 @@ export function SkaldRightPanel({ character, pendingAction, phase }: SkaldRightP
   const data = character ? (character.data as unknown as IronswornCharacterData) : null
   const vows: IronswornVow[] = data?.vows ?? []
 
-  const activeMove = pendingAction?.moveId
-    ? ironswornPlugin.moves.getAll().find((m) => m.id === pendingAction.moveId) ?? null
-    : null
+  const activeMove =
+    pendingAction?.type === 'move' && pendingAction.moveId
+      ? ironswornPlugin.moves.getAll().find((m) => m.id === pendingAction.moveId) ?? null
+      : null
 
   return (
     <>
@@ -86,16 +87,17 @@ function VowCard({ vow }: VowCardProps) {
       <p className={styles.vowRank}>{vow.rank}</p>
       <div
         className={styles.vowProgress}
-        role="group"
+        role="progressbar"
         aria-label={`${vow.title} progress`}
+        aria-valuenow={vow.progress}
+        aria-valuemin={0}
+        aria-valuemax={10}
       >
         {Array.from({ length: 10 }, (_, i) => (
           <span
             key={i}
             className={`${styles.progressBox} ${i < vow.progress ? styles.filled : ''}`}
-            role="checkbox"
-            aria-checked={i < vow.progress}
-            aria-label={`Progress box ${i + 1}`}
+            aria-hidden="true"
           />
         ))}
       </div>

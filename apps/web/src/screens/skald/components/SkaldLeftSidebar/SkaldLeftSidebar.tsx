@@ -36,7 +36,7 @@ export function SkaldLeftSidebar({ character }: SkaldLeftSidebarProps) {
       <section className={styles.sessionSection} aria-label="Sessions">
         <h3 className={styles.sectionLabel}>Sessions</h3>
         <ul className={styles.sessionList}>
-          <li className={styles.sessionItem} aria-current="true">
+          <li className={`${styles.sessionItem} ${styles.sessionItemActive}`}>
             <span className={styles.sessionIcon} aria-hidden="true">🔥</span>
             Current Session
           </li>
@@ -53,9 +53,16 @@ interface StatBarProps {
   max: number
 }
 
+const STAT_FILL_CLASS: Record<string, string | undefined> = {
+  health: styles.health,
+  spirit: styles.spirit,
+  momentum: styles.momentum,
+}
+
 function StatBar({ label, value, min, max }: StatBarProps) {
   const pct = Math.round(((value - min) / (max - min)) * 100)
   const clampedPct = Math.max(0, Math.min(100, pct))
+  const fillClass = STAT_FILL_CLASS[label.toLowerCase()] ?? ''
 
   return (
     <div className={styles.statBarRow} data-testid={`stat-bar-${label.toLowerCase()}`}>
@@ -68,7 +75,7 @@ function StatBar({ label, value, min, max }: StatBarProps) {
         aria-valuemin={min}
         aria-valuemax={max}
       >
-        <div className={`${styles.statBarFill} ${styles[label.toLowerCase() as 'health' | 'spirit' | 'momentum']}`} style={{ width: `${clampedPct}%` }} />
+        <div className={`${styles.statBarFill} ${fillClass}`} style={{ width: `${clampedPct}%` }} />
       </div>
       <span className={styles.statBarNum}>{value}</span>
     </div>

@@ -39,9 +39,9 @@ describe('SkaldInputBar — structure', () => {
     expect(screen.getByRole('textbox', { name: /tell the skald what you do/i })).toBeTruthy()
   })
 
-  it('renders Send button type="button" with aria-label "Send"', () => {
+  it('renders Speak button type="button"', () => {
     renderBar()
-    const sendBtn = screen.getByRole('button', { name: /^send$/i })
+    const sendBtn = screen.getByRole('button', { name: /^speak$/i })
     expect(sendBtn.getAttribute('type')).toBe('button')
   })
 
@@ -89,6 +89,24 @@ describe('SkaldInputBar — quick move pills', () => {
     const pill = screen.getByRole('button', { name: /face a threat/i })
     expect(pill.getAttribute('type')).toBe('button')
   })
+
+  it('pill buttons are disabled when phase is "waiting-for-ai"', () => {
+    renderBar({ phase: 'waiting-for-ai', moves: [makeMove()] })
+    const pill = screen.getByRole('button', { name: /face a threat/i }) as HTMLButtonElement
+    expect(pill.disabled).toBe(true)
+  })
+
+  it('pill buttons are disabled when phase is "move-pending"', () => {
+    renderBar({ phase: 'move-pending', moves: [makeMove()] })
+    const pill = screen.getByRole('button', { name: /face a threat/i }) as HTMLButtonElement
+    expect(pill.disabled).toBe(true)
+  })
+
+  it('pill buttons are enabled when phase is "idle"', () => {
+    renderBar({ phase: 'idle', moves: [makeMove()] })
+    const pill = screen.getByRole('button', { name: /face a threat/i }) as HTMLButtonElement
+    expect(pill.disabled).toBe(false)
+  })
 })
 
 describe('SkaldInputBar — input interaction', () => {
@@ -130,13 +148,13 @@ describe('SkaldInputBar — input interaction', () => {
     renderBar({ onSend })
     const input = screen.getByRole('textbox', { name: /tell the skald/i })
     fireEvent.change(input, { target: { value: 'Hello Skald' } })
-    fireEvent.click(screen.getByRole('button', { name: /^send$/i }))
+    fireEvent.click(screen.getByRole('button', { name: /^speak$/i }))
     expect(onSend).toHaveBeenCalledWith('Hello Skald')
   })
 
   it('Send button is disabled when input is empty', () => {
     renderBar()
-    const sendBtn = screen.getByRole('button', { name: /^send$/i }) as HTMLButtonElement
+    const sendBtn = screen.getByRole('button', { name: /^speak$/i }) as HTMLButtonElement
     expect(sendBtn.disabled).toBe(true)
   })
 
@@ -144,7 +162,7 @@ describe('SkaldInputBar — input interaction', () => {
     renderBar()
     const input = screen.getByRole('textbox', { name: /tell the skald/i })
     fireEvent.change(input, { target: { value: 'Hello' } })
-    const sendBtn = screen.getByRole('button', { name: /^send$/i }) as HTMLButtonElement
+    const sendBtn = screen.getByRole('button', { name: /^speak$/i }) as HTMLButtonElement
     expect(sendBtn.disabled).toBe(false)
   })
 
@@ -152,7 +170,7 @@ describe('SkaldInputBar — input interaction', () => {
     renderBar({ phase: 'waiting-for-ai' })
     const input = screen.getByRole('textbox', { name: /tell the skald/i })
     fireEvent.change(input, { target: { value: 'Hello' } })
-    const sendBtn = screen.getByRole('button', { name: /^send$/i }) as HTMLButtonElement
+    const sendBtn = screen.getByRole('button', { name: /^speak$/i }) as HTMLButtonElement
     expect(sendBtn.disabled).toBe(true)
   })
 
@@ -160,12 +178,26 @@ describe('SkaldInputBar — input interaction', () => {
     renderBar({ phase: 'streaming' })
     const input = screen.getByRole('textbox', { name: /tell the skald/i })
     fireEvent.change(input, { target: { value: 'Hello' } })
-    const sendBtn = screen.getByRole('button', { name: /^send$/i }) as HTMLButtonElement
+    const sendBtn = screen.getByRole('button', { name: /^speak$/i }) as HTMLButtonElement
     expect(sendBtn.disabled).toBe(true)
   })
 
   it('input is disabled when phase is "waiting-for-ai"', () => {
     renderBar({ phase: 'waiting-for-ai' })
+    const input = screen.getByRole('textbox', { name: /tell the skald/i }) as HTMLInputElement
+    expect(input.disabled).toBe(true)
+  })
+
+  it('Send button is disabled when phase is "move-pending"', () => {
+    renderBar({ phase: 'move-pending' })
+    const input = screen.getByRole('textbox', { name: /tell the skald/i })
+    fireEvent.change(input, { target: { value: 'Hello' } })
+    const sendBtn = screen.getByRole('button', { name: /^speak$/i }) as HTMLButtonElement
+    expect(sendBtn.disabled).toBe(true)
+  })
+
+  it('input is disabled when phase is "move-pending"', () => {
+    renderBar({ phase: 'move-pending' })
     const input = screen.getByRole('textbox', { name: /tell the skald/i }) as HTMLInputElement
     expect(input.disabled).toBe(true)
   })

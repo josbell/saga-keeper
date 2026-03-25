@@ -65,7 +65,7 @@ export function SkaldScreen() {
 
   return (
     <div className={styles.screen}>
-      <header className={styles.header} role="banner">
+      <header className={styles.header}>
         <div className={styles.headerLogo}>
           <span className={styles.logoTitle}>Saga Keeper</span>
         </div>

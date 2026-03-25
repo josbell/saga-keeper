@@ -76,9 +76,9 @@ describe('SkaldLeftSidebar — session list', () => {
     expect(screen.getByText(/current session/i)).toBeTruthy()
   })
 
-  it('current session item has aria-current="true"', () => {
+  it('current session item does not carry aria-current (visual-only active state)', () => {
     render(<SkaldLeftSidebar character={null} />)
     const currentItem = screen.getByText(/current session/i).closest('li')
-    expect(currentItem?.getAttribute('aria-current')).toBe('true')
+    expect(currentItem?.getAttribute('aria-current')).toBeNull()
   })
 })
