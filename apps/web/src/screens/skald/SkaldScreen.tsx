@@ -93,15 +93,17 @@ export function SkaldScreen() {
         <main className={styles.main} role="main" tabIndex={-1}>
           <h1 className={styles.pageTitle}>The Skald</h1>
           <SkaldFeed messages={messages} phase={phase} streamBuffer={streamBuffer} />
-          <SkaldInputBar
-            phase={phase}
-            moves={suggestedMoves}
-            onSend={handleSend}
-            onMoveSelect={handleMoveSelect}
-            onOracleOpen={() => setIsOracleOpen((prev) => !prev)}
-            isOracleOpen={isOracleOpen}
-          />
-          <SkaldOraclePopover isOpen={isOracleOpen} onClose={() => setIsOracleOpen(false)} />
+          <div className={styles.inputArea}>
+            <SkaldInputBar
+              phase={phase}
+              moves={suggestedMoves}
+              onSend={handleSend}
+              onMoveSelect={handleMoveSelect}
+              onOracleOpen={() => setIsOracleOpen((prev) => !prev)}
+              isOracleOpen={isOracleOpen}
+            />
+            <SkaldOraclePopover isOpen={isOracleOpen} onClose={() => setIsOracleOpen(false)} />
+          </div>
         </main>
 
         <aside className={styles.rightPanel} aria-label="Scene & Moves">
