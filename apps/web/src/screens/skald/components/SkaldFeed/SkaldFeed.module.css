@@ -1,0 +1,169 @@
+.feed {
+  flex: 1;
+  padding: 16px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  overflow-y: auto;
+}
+
+/* ── FEED ITEM WRAPPER ── */
+.item {
+  display: contents;
+}
+
+/* ── SKALD MESSAGE ── */
+.skaldRow {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.skaldAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 3px;
+  background: var(--color-ember, #1e1710);
+  border: 1px solid rgba(212, 148, 26, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+  margin-top: 2px;
+  line-height: 1;
+}
+
+.skaldBubble {
+  flex: 1;
+  background: var(--color-ash, #13100d);
+  border: 1px solid var(--color-iron, #2a241c);
+  border-radius: 0 4px 4px 4px;
+  padding: 12px 14px;
+  font-size: 11px;
+  color: var(--color-parchment, #c4a96e);
+  line-height: 1.8;
+  font-style: italic;
+  position: relative;
+}
+
+.skaldBubble::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, rgba(212, 148, 26, 0.4), transparent);
+}
+
+.skaldBubble.partial {
+  opacity: 0.8;
+}
+
+/* ── PLAYER MESSAGE ── */
+.playerRow {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  align-items: flex-start;
+}
+
+.playerBubble {
+  max-width: 72%;
+  background: #1a130a;
+  border: 1px solid var(--color-iron, #2a241c);
+  border-radius: 4px 0 4px 4px;
+  padding: 10px 14px;
+  font-size: 11px;
+  color: var(--color-parchment, #c4a96e);
+  line-height: 1.7;
+}
+
+/* ── SYSTEM MESSAGE ── */
+.systemBubble {
+  background: rgba(212, 148, 26, 0.04);
+  border: 1px solid rgba(212, 148, 26, 0.12);
+  border-left: 3px solid rgba(212, 148, 26, 0.4);
+  border-radius: 0 4px 4px 0;
+  padding: 12px 14px;
+  font-size: 11px;
+  color: var(--color-parchment, #c4a96e);
+  line-height: 1.8;
+  font-style: italic;
+}
+
+/* ── TYPING INDICATOR ── */
+.typingIndicator {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.typingAvatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 3px;
+  background: var(--color-ember, #1e1710);
+  border: 1px solid rgba(212, 148, 26, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.typingDots {
+  display: flex;
+  gap: 4px;
+  padding: 8px 14px;
+  background: var(--color-ash, #13100d);
+  border: 1px solid var(--color-iron, #2a241c);
+  border-radius: 0 4px 4px 4px;
+}
+
+.dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--color-gold, #d4941a);
+  animation: pulse 1.4s infinite ease-in-out;
+}
+
+.dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes pulse {
+  0%, 80%, 100% {
+    opacity: 0.3;
+    transform: scale(0.8);
+  }
+  40% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* ── ERROR BANNER ── */
+.errorBanner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: rgba(139, 26, 26, 0.1);
+  border: 1px solid rgba(139, 26, 26, 0.3);
+  border-radius: 3px;
+  font-size: 10px;
+  color: #c0392b;
+  letter-spacing: 1px;
+}
+
+.errorIcon {
+  font-size: 13px;
+}

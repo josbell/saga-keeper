@@ -1,4 +1,6 @@
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useGameStore } from '@/store'
+import { SkaldFeed } from './components/SkaldFeed/SkaldFeed'
 import styles from './SkaldScreen.module.css'
 
 const NAV_ITEMS = [
@@ -11,6 +13,9 @@ const NAV_ITEMS = [
 export function SkaldScreen() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
+  const messages = useGameStore((s) => s.messages)
+  const phase = useGameStore((s) => s.phase)
+  const streamBuffer = useGameStore((s) => s.streamBuffer)
 
   return (
     <div className={styles.screen}>
@@ -41,7 +46,7 @@ export function SkaldScreen() {
 
         <main className={styles.main} role="main" tabIndex={-1}>
           <h1 className={styles.pageTitle}>The Skald</h1>
-          {/* SkaldFeed — chunk 2 */}
+          <SkaldFeed messages={messages} phase={phase} streamBuffer={streamBuffer} />
           {/* SkaldInputBar — chunk 3 */}
         </main>
 
