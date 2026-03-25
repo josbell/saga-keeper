@@ -6,6 +6,7 @@ import { SkaldFeed } from './components/SkaldFeed/SkaldFeed'
 import { SkaldInputBar } from './components/SkaldInputBar/SkaldInputBar'
 import { SkaldLeftSidebar } from './components/SkaldLeftSidebar/SkaldLeftSidebar'
 import { SkaldRightPanel } from './components/SkaldRightPanel/SkaldRightPanel'
+import { SkaldOraclePopover } from './components/SkaldOraclePopover/SkaldOraclePopover'
 import styles from './SkaldScreen.module.css'
 
 const NAV_ITEMS = [
@@ -100,7 +101,7 @@ export function SkaldScreen() {
             onOracleOpen={() => setIsOracleOpen((prev) => !prev)}
             isOracleOpen={isOracleOpen}
           />
-          {/* SkaldOraclePopover — chunk 6 */}
+          <SkaldOraclePopover isOpen={isOracleOpen} onClose={() => setIsOracleOpen(false)} />
         </main>
 
         <aside className={styles.rightPanel} aria-label="Scene & Moves">
