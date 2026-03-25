@@ -15,7 +15,7 @@ import styles from './IronSheetScreen.module.css'
 const NAV_ITEMS = [
   { label: 'Iron Sheet', path: '/iron-sheet' },
   { label: 'Oracle', path: '/oracle' },
-  { label: 'Skald', path: null },
+  { label: 'Skald', path: '/skald' },
   { label: 'World Forge', path: null },
 ]
 

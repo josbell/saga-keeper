@@ -187,4 +187,12 @@ describe('IronSheetScreen — accessibility', () => {
     fireEvent.click(screen.getByRole('button', { name: /oracle/i }))
     expect(mockNavigate).toHaveBeenCalledWith('/oracle')
   })
+
+  it('Skald nav button is enabled and navigates to /skald', () => {
+    render(<IronSheetScreen />)
+    const skaldBtn = screen.getByRole('button', { name: /skald/i })
+    expect((skaldBtn as HTMLButtonElement).disabled).toBe(false)
+    fireEvent.click(skaldBtn)
+    expect(mockNavigate).toHaveBeenCalledWith('/skald')
+  })
 })
