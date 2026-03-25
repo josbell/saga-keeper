@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ironswornPlugin, type IronswornCharacterData } from '@saga-keeper/ruleset-ironsworn'
-import type { AIGateway, CharacterState, CreationStep } from '@saga-keeper/domain'
+import type { AIGateway, Campaign, CharacterState, CreationStep } from '@saga-keeper/domain'
 import { useGameStore } from '@/store'
 import { INITIAL_DRAFT, type ForgeDraft, type StepProps } from './types'
 import { useForgeCounsel } from './hooks/useForgeCounsel'
@@ -148,6 +148,17 @@ export function ForgeScreen({
       createdAt: now,
       updatedAt: now,
     }
+    const campaign: Campaign = {
+      id: 'default',
+      name: draft.name,
+      rulesetId: 'ironsworn-v1',
+      status: 'active',
+      mode: 'solo',
+      characterIds: [character.id],
+      createdAt: now,
+      updatedAt: now,
+    }
+    useGameStore.getState().setCampaign(campaign)
     useGameStore.getState().setCharacter(character)
     navigate('/iron-sheet')
   }
