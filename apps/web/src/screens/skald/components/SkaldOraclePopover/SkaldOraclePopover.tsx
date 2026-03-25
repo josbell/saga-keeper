@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, type KeyboardEvent } from 'react'
+import { createPortal } from 'react-dom'
 import { ironswornPlugin } from '@saga-keeper/ruleset-ironsworn'
 import { useGameStore } from '@/store'
 import { AskFatesPanel } from '../../../oracle/components/AskFatesPanel/AskFatesPanel'
@@ -89,7 +90,7 @@ export function SkaldOraclePopover({ isOpen, onClose }: SkaldOraclePopoverProps)
     }
   }
 
-  return (
+  return createPortal(
     <div
       ref={dialogRef}
       id="skald-oracle-popover"
@@ -166,7 +167,8 @@ export function SkaldOraclePopover({ isOpen, onClose }: SkaldOraclePopoverProps)
           />
         )}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 

@@ -1,4 +1,5 @@
 import { useEffect, useRef, type KeyboardEvent } from 'react'
+import { createPortal } from 'react-dom'
 import { ironswornPlugin } from '@saga-keeper/ruleset-ironsworn'
 import type { Move } from '@saga-keeper/domain'
 import styles from './SkaldMovesPopover.module.css'
@@ -92,7 +93,7 @@ export function SkaldMovesPopover({
     }
   }
 
-  return (
+  return createPortal(
     <div
       ref={dialogRef}
       id="skald-moves-popover"
@@ -139,6 +140,7 @@ export function SkaldMovesPopover({
           </section>
         ))}
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
