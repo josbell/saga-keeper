@@ -80,6 +80,26 @@
   cursor: not-allowed;
 }
 
+/* ── MOVES BUTTON ── */
+.movesBtn {
+  background: rgba(212, 148, 26, 0.06);
+  border: 1px solid rgba(212, 148, 26, 0.25);
+  border-radius: 3px;
+  padding: 8px 12px;
+  font-size: 14px;
+  color: var(--color-gold, #d4941a);
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.movesBtn:hover,
+.movesBtn[aria-expanded='true'] {
+  background: rgba(212, 148, 26, 0.12);
+  border-color: rgba(212, 148, 26, 0.45);
+  color: var(--color-gold-bright, #f0b429);
+}
+
 /* ── ORACLE BUTTON ── */
 .oracleBtn {
   background: rgba(122, 179, 204, 0.06);

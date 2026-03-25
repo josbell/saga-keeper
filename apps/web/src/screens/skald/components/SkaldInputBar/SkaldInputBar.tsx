@@ -10,6 +10,8 @@ interface SkaldInputBarProps {
   onMoveSelect: (moveId: string) => void
   onOracleOpen: () => void
   isOracleOpen: boolean
+  onMovesOpen: () => void
+  isMovesOpen: boolean
 }
 
 export function SkaldInputBar({
@@ -19,6 +21,8 @@ export function SkaldInputBar({
   onMoveSelect,
   onOracleOpen,
   isOracleOpen,
+  onMovesOpen,
+  isMovesOpen,
 }: SkaldInputBarProps) {
   const [text, setText] = useState('')
 
@@ -67,6 +71,17 @@ export function SkaldInputBar({
           onChange={(e) => setText(e.target.value)}
           onKeyDown={handleKeyDown}
         />
+        <button
+          type="button"
+          className={styles.movesBtn}
+          aria-label="Open move browser"
+          aria-haspopup="dialog"
+          aria-expanded={isMovesOpen}
+          aria-controls="skald-moves-popover"
+          onClick={onMovesOpen}
+        >
+          ⚔
+        </button>
         <button
           type="button"
           className={styles.oracleBtn}

@@ -8,6 +8,7 @@ import { SkaldInputBar } from './components/SkaldInputBar/SkaldInputBar'
 import { SkaldLeftSidebar } from './components/SkaldLeftSidebar/SkaldLeftSidebar'
 import { SkaldRightPanel } from './components/SkaldRightPanel/SkaldRightPanel'
 import { SkaldOraclePopover } from './components/SkaldOraclePopover/SkaldOraclePopover'
+import { SkaldMovesPopover } from './components/SkaldMovesPopover/SkaldMovesPopover'
 import styles from './SkaldScreen.module.css'
 
 const NAV_ITEMS = [
@@ -21,6 +22,7 @@ export function SkaldScreen() {
   const navigate = useNavigate()
   const { pathname } = useLocation()
   const [isOracleOpen, setIsOracleOpen] = useState(false)
+  const [isMovesOpen, setIsMovesOpen] = useState(false)
 
   // skaldFeedSlice
   const messages = useGameStore((s) => s.messages)
@@ -103,6 +105,14 @@ export function SkaldScreen() {
               onMoveSelect={handleMoveSelect}
               onOracleOpen={() => setIsOracleOpen((prev) => !prev)}
               isOracleOpen={isOracleOpen}
+              onMovesOpen={() => setIsMovesOpen((prev) => !prev)}
+              isMovesOpen={isMovesOpen}
+            />
+            <SkaldMovesPopover
+              isOpen={isMovesOpen}
+              isBusy={phase === 'resolving' || phase === 'waiting-for-ai' || phase === 'streaming'}
+              onClose={() => setIsMovesOpen(false)}
+              onMoveSelect={handleMoveSelect}
             />
             <SkaldOraclePopover isOpen={isOracleOpen} onClose={() => setIsOracleOpen(false)} />
           </div>

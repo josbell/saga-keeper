@@ -23,6 +23,8 @@ const defaultProps = {
   onMoveSelect: vi.fn(),
   onOracleOpen: vi.fn(),
   isOracleOpen: false,
+  onMovesOpen: vi.fn(),
+  isMovesOpen: false,
 }
 
 function renderBar(overrides: Partial<typeof defaultProps> = {}) {
