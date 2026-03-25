@@ -84,4 +84,23 @@ describe('SkaldMovesPopover — interaction', () => {
     )
     expect(moveBtns.every((b) => b.disabled)).toBe(true)
   })
+
+  it('restores focus to the previously focused element on close', () => {
+    const trigger = document.createElement('button')
+    trigger.textContent = 'Trigger'
+    document.body.appendChild(trigger)
+    trigger.focus()
+    expect(document.activeElement).toBe(trigger)
+
+    const onClose = vi.fn()
+    const { rerender } = render(
+      <SkaldMovesPopover isOpen isBusy={false} onClose={onClose} onMoveSelect={vi.fn()} />,
+    )
+    rerender(
+      <SkaldMovesPopover isOpen={false} isBusy={false} onClose={onClose} onMoveSelect={vi.fn()} />,
+    )
+
+    expect(document.activeElement).toBe(trigger)
+    document.body.removeChild(trigger)
+  })
 })

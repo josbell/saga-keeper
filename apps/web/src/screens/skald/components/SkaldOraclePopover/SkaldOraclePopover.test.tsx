@@ -175,3 +175,21 @@ describe('SkaldOraclePopover — Recent tab', () => {
     expect(screen.getByText('No')).toBeTruthy()
   })
 })
+
+describe('SkaldOraclePopover — focus management', () => {
+  it('restores focus to the previously focused element on close', () => {
+    const trigger = document.createElement('button')
+    trigger.textContent = 'Trigger'
+    document.body.appendChild(trigger)
+    trigger.focus()
+    expect(document.activeElement).toBe(trigger)
+
+    const onClose = vi.fn()
+    const { rerender } = render(<SkaldOraclePopover isOpen onClose={onClose} />)
+    // Close the popover
+    rerender(<SkaldOraclePopover isOpen={false} onClose={onClose} />)
+
+    expect(document.activeElement).toBe(trigger)
+    document.body.removeChild(trigger)
+  })
+})
