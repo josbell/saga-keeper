@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ironswornPlugin, type IronswornCharacterData } from '@saga-keeper/ruleset-ironsworn'
 import type { AIGateway, Campaign, CharacterState, CreationStep } from '@saga-keeper/domain'
 import { useGameStore } from '@/store'
+import { usePersistSetup } from '@/providers/NarrativeDomainProvider'
 import { INITIAL_DRAFT, type ForgeDraft, type StepProps } from './types'
 import { useForgeCounsel } from './hooks/useForgeCounsel'
 import { WorldSelectStep } from './steps/WorldSelectStep'
@@ -98,6 +99,8 @@ export function ForgeScreen({
   const totalSteps = steps.length
   const step = steps[Math.min(stepIndex, totalSteps - 1)]!
 
+  const persistSetup = usePersistSetup()
+
   useForgeCounsel(gateway, step, draft)
 
   // Move keyboard focus into the main content area whenever the step changes
@@ -161,6 +164,8 @@ export function ForgeScreen({
     useGameStore.getState().setCampaign(campaign)
     useGameStore.getState().setCharacter(character)
     navigate('/iron-sheet')
+    // Persist to IndexedDB in the background — completes before user can reach /skald
+    void persistSetup(campaign, character)
   }
 
   function handleNext() {

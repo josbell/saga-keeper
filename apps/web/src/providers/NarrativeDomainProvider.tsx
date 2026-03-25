@@ -2,12 +2,14 @@ import { createContext, useContext, useMemo, type ReactNode } from 'react'
 import { NarrativeDomain, OracleService, DiceService, type INarrativeDomain } from '@saga-keeper/services'
 import { LocalAdapter } from '@saga-keeper/storage'
 import { ironswornPlugin } from '@saga-keeper/ruleset-ironsworn'
+import type { Campaign, CharacterState } from '@saga-keeper/domain'
 import { OfflineAIGateway } from './OfflineAIGateway'
 
 // ── Context ───────────────────────────────────────────────────────────────────
 
 interface NarrativeDomainContextValue {
   narrativeDomain: INarrativeDomain
+  persistSetup: (campaign: Campaign, character: CharacterState) => Promise<void>
 }
 
 const NarrativeDomainContext = createContext<NarrativeDomainContextValue | null>(null)
@@ -28,16 +30,30 @@ interface NarrativeDomainProviderProps {
  * - OfflineAIGateway.getTier() returns 'offline'; NarrativeDomain skips AI calls entirely
  */
 export function NarrativeDomainProvider({ children }: NarrativeDomainProviderProps) {
-  const narrativeDomain = useMemo(() => {
+  const ctx = useMemo(() => {
     const storage = new LocalAdapter()
     const oracle = new OracleService()
     const ai = new OfflineAIGateway()
     // DiceService is a plain object (not a class) — pass the singleton directly
-    return new NarrativeDomain(storage, ironswornPlugin, ai, oracle, DiceService)
+    const narrativeDomain = new NarrativeDomain(storage, ironswornPlugin, ai, oracle, DiceService)
+
+    async function persistSetup(campaign: Campaign, character: CharacterState): Promise<void> {
+      await storage.import({
+        version: '1',
+        exportedAt: new Date().toISOString(),
+        rulesetId: campaign.rulesetId,
+        campaign,
+        characters: [character],
+        world: [],
+        sessionLog: [],
+      })
+    }
+
+    return { narrativeDomain, persistSetup }
   }, [])
 
   return (
-    <NarrativeDomainContext.Provider value={{ narrativeDomain }}>
+    <NarrativeDomainContext.Provider value={ctx}>
       {children}
     </NarrativeDomainContext.Provider>
   )
@@ -55,4 +71,12 @@ export function useNarrativeDomain(): INarrativeDomain {
     throw new Error('useNarrativeDomain must be called inside a <NarrativeDomainProvider>')
   }
   return ctx.narrativeDomain
+}
+
+export function usePersistSetup(): (campaign: Campaign, character: CharacterState) => Promise<void> {
+  const ctx = useContext(NarrativeDomainContext)
+  if (!ctx) {
+    throw new Error('usePersistSetup must be called inside a <NarrativeDomainProvider>')
+  }
+  return ctx.persistSetup
 }
