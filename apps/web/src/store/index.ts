@@ -39,6 +39,17 @@ export const useGameStore = create<GameStore>()((set, get, store) => ({
     const ts = new Date().toISOString()
     const newMessages: SkaldMessage[] = []
 
+    // Player bubble — always show what the player submitted
+    if (result.input.userText) {
+      newMessages.push({
+        id: globalThis.crypto.randomUUID(),
+        role: 'player',
+        content: result.input.userText,
+        turnId: result.turnId,
+        timestamp: ts,
+      })
+    }
+
     // Outcome card — only when a move was resolved
     if (result.outcome && result.move) {
       const moveName =

@@ -146,9 +146,12 @@ describe('useGameStore — applyTurnResult', () => {
     expect(useGameStore.getState().activeTurnId).toBe('turn-42')
   })
 
-  it('does not append any feed messages for a free turn with no narration', () => {
+  it('appends only the player message for a free turn with no narration (offline tier)', () => {
     useGameStore.getState().applyTurnResult(makeTurnResult({ narration: '' }))
-    expect(useGameStore.getState().messages).toHaveLength(0)
+    const msgs = useGameStore.getState().messages
+    expect(msgs).toHaveLength(1)
+    expect(msgs[0]?.role).toBe('player')
+    expect(msgs[0]?.content).toBe('I rest by the fire.')
   })
 
   it('appends a skald message when narration is present', () => {
