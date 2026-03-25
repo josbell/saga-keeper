@@ -1,0 +1,125 @@
+.inputBar {
+  padding: 12px 20px;
+  border-top: 1px solid rgba(30, 23, 16, 1);
+  flex-shrink: 0;
+}
+
+/* ── QUICK MOVE PILLS ── */
+.pillList {
+  display: flex;
+  gap: 5px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+  list-style: none;
+  padding: 0;
+  margin: 0 0 8px;
+}
+
+.pillItem {
+  display: contents;
+}
+
+.pill {
+  background: var(--color-ember, #1e1710);
+  border: 1px solid var(--color-iron, #2a241c);
+  border-radius: 20px;
+  padding: 3px 10px;
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--color-bone, #7a6a52);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+
+.pill:hover {
+  border-color: rgba(212, 148, 26, 0.4);
+  color: var(--color-gold, #d4941a);
+  background: rgba(212, 148, 26, 0.08);
+}
+
+.pill[data-category='combat'] {
+  border-color: rgba(139, 26, 26, 0.35);
+  color: #c0392b;
+  background: rgba(139, 26, 26, 0.07);
+}
+
+.pill[data-category='combat']:hover {
+  border-color: rgba(192, 57, 43, 0.55);
+  background: rgba(139, 26, 26, 0.14);
+}
+
+/* ── INPUT ROW ── */
+.inputRow {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.input {
+  flex: 1;
+  background: var(--color-ash, #13100d);
+  border: 1px solid var(--color-iron, #2a241c);
+  border-radius: 3px;
+  padding: 9px 14px;
+  font-family: 'Cinzel', serif;
+  font-size: 11px;
+  color: var(--color-parchment, #c4a96e);
+  letter-spacing: 1px;
+  transition: border-color 0.2s;
+}
+
+.input:focus {
+  outline: none;
+  border-color: rgba(212, 148, 26, 0.5);
+}
+
+.input:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── ORACLE BUTTON ── */
+.oracleBtn {
+  background: rgba(122, 179, 204, 0.06);
+  border: 1px solid rgba(122, 179, 204, 0.25);
+  border-radius: 3px;
+  padding: 8px 12px;
+  font-size: 15px;
+  color: #7ab3cc;
+  cursor: pointer;
+  transition: all 0.2s;
+  line-height: 1;
+}
+
+.oracleBtn:hover,
+.oracleBtn[aria-expanded='true'] {
+  background: rgba(122, 179, 204, 0.12);
+  border-color: rgba(122, 179, 204, 0.45);
+  color: #a8d4e8;
+}
+
+/* ── SEND BUTTON ── */
+.sendBtn {
+  background: linear-gradient(135deg, rgba(139, 26, 26, 0.75), rgba(192, 57, 43, 0.55));
+  border: 1px solid rgba(192, 57, 43, 0.45);
+  border-radius: 3px;
+  padding: 8px 16px;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--color-parchment, #c4a96e);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.sendBtn:hover:not(:disabled) {
+  background: linear-gradient(135deg, rgba(192, 57, 43, 0.85), rgba(220, 80, 60, 0.7));
+  border-color: rgba(220, 80, 60, 0.6);
+}
+
+.sendBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

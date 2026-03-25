@@ -78,9 +78,14 @@ describe('SkaldScreen — layout landmarks', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/iron-sheet')
   })
 
-  it('clicking Oracle calls navigate("/oracle")', () => {
+  it('clicking Oracle nav button calls navigate("/oracle")', () => {
     render(<SkaldScreen />)
-    fireEvent.click(screen.getByRole('button', { name: /oracle/i }))
+    const nav = screen.getByRole('navigation', { name: /application/i })
+    const oracleNavBtn = nav.querySelector('button[aria-current], button') as HTMLButtonElement
+    // Find the Oracle button specifically within nav (accessible name is exactly "Oracle")
+    const buttons = Array.from(nav.querySelectorAll('button'))
+    const oracleBtn = buttons.find((b) => b.textContent?.trim() === 'Oracle')!
+    fireEvent.click(oracleBtn)
     expect(mockNavigate).toHaveBeenCalledWith('/oracle')
   })
 
