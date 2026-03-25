@@ -5,6 +5,7 @@ import { useGameStore } from '@/store'
 import { SkaldFeed } from './components/SkaldFeed/SkaldFeed'
 import { SkaldInputBar } from './components/SkaldInputBar/SkaldInputBar'
 import { SkaldLeftSidebar } from './components/SkaldLeftSidebar/SkaldLeftSidebar'
+import { SkaldRightPanel } from './components/SkaldRightPanel/SkaldRightPanel'
 import styles from './SkaldScreen.module.css'
 
 const NAV_ITEMS = [
@@ -27,6 +28,9 @@ export function SkaldScreen() {
 
   // characterSlice
   const character = useGameStore((s) => s.character)
+
+  // sessionSlice
+  const pendingAction = useGameStore((s) => s.pendingAction)
 
   const suggestedMoves = character
     ? ironswornPlugin.moves.suggest({
@@ -100,7 +104,11 @@ export function SkaldScreen() {
         </main>
 
         <aside className={styles.rightPanel} aria-label="Scene & Moves">
-          {/* SkaldRightPanel — chunk 5 */}
+          <SkaldRightPanel
+            character={character}
+            pendingAction={pendingAction}
+            phase={phase}
+          />
         </aside>
       </div>
     </div>
