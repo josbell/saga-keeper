@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { ironswornPlugin } from '@saga-keeper/ruleset-ironsworn'
 import { useGameStore } from '@/store'
+import { useSkaldTurn } from './hooks/useSkaldTurn'
 import { SkaldFeed } from './components/SkaldFeed/SkaldFeed'
 import { SkaldInputBar } from './components/SkaldInputBar/SkaldInputBar'
 import { SkaldLeftSidebar } from './components/SkaldLeftSidebar/SkaldLeftSidebar'
@@ -25,13 +26,18 @@ export function SkaldScreen() {
   const messages = useGameStore((s) => s.messages)
   const phase = useGameStore((s) => s.phase)
   const streamBuffer = useGameStore((s) => s.streamBuffer)
-  const appendMessage = useGameStore((s) => s.appendMessage)
 
   // characterSlice
   const character = useGameStore((s) => s.character)
 
   // sessionSlice
   const pendingAction = useGameStore((s) => s.pendingAction)
+  const campaignId = useGameStore((s) => s.campaign?.id ?? '')
+
+  const { submitAction } = useSkaldTurn({
+    campaignId,
+    ...(character?.id ? { characterId: character.id } : {}),
+  })
 
   const suggestedMoves = character
     ? ironswornPlugin.moves.suggest({
@@ -43,24 +49,20 @@ export function SkaldScreen() {
     : ironswornPlugin.moves.getByCategory('adventure').slice(0, 5)
 
   function handleSend(text: string) {
-    appendMessage({
-      id: globalThis.crypto.randomUUID(),
-      role: 'player',
-      content: text,
-      timestamp: new Date().toISOString(),
-    })
+    if (!campaignId) return
+    void submitAction({ type: 'free', ...(character?.id ? { characterId: character.id } : {}), userText: text })
   }
 
   function handleMoveSelect(moveId: string) {
+    if (!campaignId) return
     const move = ironswornPlugin.moves.getAll().find((m) => m.id === moveId)
-    if (move) {
-      appendMessage({
-        id: globalThis.crypto.randomUUID(),
-        role: 'player',
-        content: `[${move.name}] ${move.trigger}`,
-        timestamp: new Date().toISOString(),
-      })
-    }
+    if (!move) return
+    void submitAction({
+      type: 'move',
+      moveId,
+      ...(character?.id ? { characterId: character.id } : {}),
+      statKey: move.stats[0] ?? 'edge',
+    })
   }
 
   return (

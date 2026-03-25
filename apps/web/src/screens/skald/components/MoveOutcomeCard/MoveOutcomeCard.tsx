@@ -25,7 +25,7 @@ function badgeClass(result: MoveOutcomeData['result']): string {
   if (result === 'strong-hit') return `${styles.badge} ${styles.badgeStrongHit}`
   if (result === 'weak-hit') return `${styles.badge} ${styles.badgeWeakHit}`
   if (result === 'miss') return `${styles.badge} ${styles.badgeMiss}`
-  return styles.badge
+  return styles.badge ?? ''
 }
 
 function deltaSign(d: StatDelta): number {

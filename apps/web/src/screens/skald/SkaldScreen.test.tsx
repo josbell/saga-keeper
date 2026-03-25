@@ -14,6 +14,10 @@ vi.mock('@/store', () => ({
   useGameStore: vi.fn(),
 }))
 
+vi.mock('@/providers/NarrativeDomainProvider', () => ({
+  useNarrativeDomain: vi.fn(() => ({ processTurn: vi.fn() })),
+}))
+
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 function setupStore(overrides: Record<string, unknown> = {}) {
   vi.mocked(useGameStore).mockImplementation((selector: (s: any) => unknown) => {
@@ -35,6 +39,8 @@ function setupStore(overrides: Record<string, unknown> = {}) {
       recordOracleRoll: vi.fn(),
       appendMessage: vi.fn(),
       setPhase: vi.fn(),
+      setPendingAction: vi.fn(),
+      applyTurnResult: vi.fn(),
       ...overrides,
     }
     return selector(state)

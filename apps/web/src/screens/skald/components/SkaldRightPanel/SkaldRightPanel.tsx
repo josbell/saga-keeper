@@ -38,6 +38,7 @@ export function SkaldRightPanel({ character, pendingAction, phase }: SkaldRightP
               <span className={styles.moveRefName}>{activeMove.name}</span>
               <span className={styles.moveRefStat}>{activeMove.stats.join(' / ')}</span>
             </div>
+            <p className={styles.moveRefDescription}>{activeMove.description}</p>
             <div className={styles.moveRefBody}>
               <div className={styles.moveOutcome}>
                 <div className={`${styles.outcomeLabel} ${styles.strongHit}`}>Strong Hit</div>
