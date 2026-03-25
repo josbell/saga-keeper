@@ -1,0 +1,49 @@
+.strip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 12px;
+  background: rgba(30, 23, 16, 0.6);
+  border: 1px solid rgba(212, 148, 26, 0.18);
+  border-left: 3px solid rgba(212, 148, 26, 0.45);
+  border-radius: 0 3px 3px 0;
+  align-self: flex-start;
+  max-width: 80%;
+}
+
+.icon {
+  font-size: 12px;
+  line-height: 1;
+  margin-top: 2px;
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.tableName {
+  font-family: 'Cinzel', serif;
+  font-size: 7px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-bone, #7a6a52);
+}
+
+.raw {
+  font-size: 11px;
+  color: var(--color-parchment, #c4a96e);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.roll {
+  font-size: 8px;
+  color: var(--color-stone, #3d3428);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 1px;
+}

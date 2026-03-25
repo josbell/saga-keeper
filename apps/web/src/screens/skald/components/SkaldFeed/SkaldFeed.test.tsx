@@ -109,6 +109,41 @@ describe('SkaldFeed — streaming', () => {
   })
 })
 
+describe('SkaldFeed — outcome messages', () => {
+  it('renders a MoveOutcomeCard for an outcome role message', () => {
+    const content = JSON.stringify({
+      moveId: 'face-danger',
+      moveName: 'Face Danger',
+      result: 'strong-hit',
+      match: false,
+      roll: null,
+      consequences: [],
+    })
+    renderFeed([makeMessage({ role: 'outcome', content })])
+    expect(screen.getByTestId('move-outcome-card')).toBeTruthy()
+    expect(screen.getByText('Face Danger')).toBeTruthy()
+  })
+
+  it('renders nothing when outcome content is invalid JSON', () => {
+    renderFeed([makeMessage({ role: 'outcome', content: 'not-json' })])
+    expect(screen.queryByTestId('move-outcome-card')).toBeNull()
+  })
+})
+
+describe('SkaldFeed — oracle messages', () => {
+  it('renders an OracleStrip for an oracle role message', () => {
+    const content = JSON.stringify({ tableId: 'theme', roll: 42, raw: 'Darkness' })
+    renderFeed([makeMessage({ role: 'oracle', content })])
+    expect(screen.getByTestId('oracle-strip')).toBeTruthy()
+    expect(screen.getByText('Darkness')).toBeTruthy()
+  })
+
+  it('renders nothing when oracle content is invalid JSON', () => {
+    renderFeed([makeMessage({ role: 'oracle', content: 'bad' })])
+    expect(screen.queryByTestId('oracle-strip')).toBeNull()
+  })
+})
+
 describe('SkaldFeed — error state', () => {
   it('shows error indicator when phase is "error"', () => {
     renderFeed([], 'error')

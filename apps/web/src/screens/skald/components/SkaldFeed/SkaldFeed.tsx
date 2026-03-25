@@ -1,4 +1,6 @@
 import type { SkaldMessage, TurnPhase } from '@/store/types'
+import { MoveOutcomeCard, type MoveOutcomeData } from '../MoveOutcomeCard/MoveOutcomeCard'
+import { OracleStrip } from '../OracleStrip/OracleStrip'
 import styles from './SkaldFeed.module.css'
 
 interface SkaldFeedProps {
@@ -18,6 +20,8 @@ export function SkaldFeed({ messages, phase, streamBuffer }: SkaldFeedProps) {
           {msg.role === 'skald' && <SkaldBubble content={msg.content} />}
           {msg.role === 'player' && <PlayerBubble content={msg.content} />}
           {msg.role === 'system' && <SystemBubble content={msg.content} />}
+          {msg.role === 'outcome' && <OutcomeItem content={msg.content} />}
+          {msg.role === 'oracle' && <OracleItem content={msg.content} />}
         </div>
       ))}
 
@@ -85,4 +89,28 @@ function SystemBubble({ content }: BubbleProps) {
       {content}
     </div>
   )
+}
+
+interface ContentProps {
+  content: string
+}
+
+function OutcomeItem({ content }: ContentProps) {
+  let data: MoveOutcomeData | null = null
+  try {
+    data = JSON.parse(content) as MoveOutcomeData
+  } catch {
+    return null
+  }
+  return <MoveOutcomeCard {...data} />
+}
+
+function OracleItem({ content }: ContentProps) {
+  let data: { tableId: string; roll: number; raw: string } | null = null
+  try {
+    data = JSON.parse(content) as { tableId: string; roll: number; raw: string }
+  } catch {
+    return null
+  }
+  return <OracleStrip tableId={data.tableId} roll={data.roll} raw={data.raw} />
 }
