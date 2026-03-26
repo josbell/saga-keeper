@@ -1,0 +1,194 @@
+.card {
+  background: var(--color-ash, #13100d);
+  border: 1px solid rgba(212, 148, 26, 0.15);
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+.card[data-status='active']::before {
+  background: linear-gradient(90deg, transparent, var(--color-gold, #d4941a) 40%, transparent);
+}
+
+.card[data-status='complete']::before {
+  background: linear-gradient(90deg, transparent, rgba(122, 179, 204, 0.5) 40%, transparent);
+}
+
+.card[data-status='abandoned']::before {
+  background: linear-gradient(90deg, transparent, rgba(60, 50, 40, 0.5) 40%, transparent);
+}
+
+.inner {
+  padding: 14px 16px;
+  flex: 1;
+}
+
+.statusRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.statusBadge {
+  font-size: 7px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 2px;
+}
+
+.statusBadge[data-status='active'] {
+  background: rgba(212, 148, 26, 0.1);
+  border: 1px solid rgba(212, 148, 26, 0.3);
+  color: var(--color-gold, #d4941a);
+}
+
+.statusBadge[data-status='complete'] {
+  background: rgba(122, 179, 204, 0.08);
+  border: 1px solid rgba(122, 179, 204, 0.25);
+  color: var(--color-ice, #7ab3cc);
+}
+
+.statusBadge[data-status='abandoned'] {
+  background: rgba(60, 50, 40, 0.3);
+  border: 1px solid rgba(80, 65, 50, 0.4);
+  color: var(--color-bone, #7a6a52);
+}
+
+.lastPlayed {
+  font-size: 8px;
+  color: var(--color-stone, #3d3428);
+  letter-spacing: 1px;
+}
+
+.name {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 15px;
+  color: var(--color-gold-bright, #f0b429);
+  margin: 0 0 4px;
+  line-height: 1.2;
+}
+
+.tagline {
+  font-size: 10px;
+  color: var(--color-bone, #7a6a52);
+  font-style: italic;
+  margin: 0 0 12px;
+  line-height: 1.5;
+}
+
+.character {
+  margin-bottom: 10px;
+}
+
+.charName {
+  font-size: 9px;
+  color: var(--color-parchment, #c4a96e);
+  letter-spacing: 1px;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.meters {
+  display: flex;
+  gap: 4px;
+}
+
+.meter {
+  flex: 1;
+  height: 3px;
+}
+
+.vow {
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(139, 26, 26, 0.15);
+  border-radius: 2px;
+  padding: 6px 8px;
+  margin-bottom: 4px;
+}
+
+.vowTitle {
+  font-size: 9px;
+  color: var(--color-bone, #7a6a52);
+  font-style: italic;
+  margin: 0 0 4px;
+  line-height: 1.4;
+}
+
+.pips {
+  display: flex;
+  gap: 2px;
+}
+
+.pip {
+  flex: 1;
+  height: 5px;
+  border-radius: 1px;
+  border: 1px solid rgba(139, 26, 26, 0.15);
+  background: rgba(0, 0, 0, 0.3);
+}
+
+.pip[data-pip='filled'] {
+  background: rgba(139, 26, 26, 0.5);
+  border-color: rgba(192, 57, 43, 0.3);
+}
+
+.footer {
+  padding: 10px 16px;
+  border-top: 1px solid rgba(212, 148, 26, 0.1);
+  display: flex;
+  gap: 6px;
+}
+
+.continueBtn {
+  flex: 1;
+  padding: 7px;
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-radius: 3px;
+  cursor: pointer;
+  background: linear-gradient(135deg, rgba(139, 26, 26, 0.7), rgba(192, 57, 43, 0.5));
+  border: 1px solid rgba(192, 57, 43, 0.4);
+  color: var(--color-parchment, #c4a96e);
+}
+
+.viewBtn {
+  flex: 1;
+  padding: 7px;
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-radius: 3px;
+  cursor: pointer;
+  background: rgba(30, 23, 16, 0.8);
+  border: 1px solid rgba(212, 148, 26, 0.2);
+  color: var(--color-bone, #7a6a52);
+}
+
+.detailsBtn {
+  padding: 7px 12px;
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-radius: 3px;
+  cursor: pointer;
+  background: rgba(30, 23, 16, 0.5);
+  border: 1px solid rgba(42, 36, 28, 0.8);
+  color: var(--color-stone, #3d3428);
+}
