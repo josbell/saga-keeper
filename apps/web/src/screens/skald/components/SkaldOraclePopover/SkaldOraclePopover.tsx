@@ -24,7 +24,7 @@ interface SkaldOraclePopoverProps {
 export function SkaldOraclePopover({ isOpen, onClose }: SkaldOraclePopoverProps) {
   const [activeTab, setActiveTab] = useState<Tab>('ask-fates')
   const dialogRef = useRef<HTMLDivElement>(null)
-  const firstTabRef = useRef<HTMLButtonElement>(null)
+  const tabRefs = useRef<Partial<Record<Tab, HTMLButtonElement>>>({})
   const prevFocusRef = useRef<HTMLElement | null>(null)
 
   // oracle store
@@ -39,15 +39,28 @@ export function SkaldOraclePopover({ isOpen, onClose }: SkaldOraclePopoverProps)
   const recordOracleRoll = useGameStore((s) => s.recordOracleRoll)
   const clearHistory = useGameStore((s) => s.clearHistory)
 
-  // Save previous focus, move focus in, and return it on close
+  // Save previous focus on open; restore it on close
   useEffect(() => {
     if (isOpen) {
       prevFocusRef.current = document.activeElement as HTMLElement
-      firstTabRef.current?.focus()
     } else {
       prevFocusRef.current?.focus()
       prevFocusRef.current = null
     }
+  }, [isOpen])
+
+  // Focus active tab when popover opens or active tab changes (roving tabIndex)
+  useEffect(() => {
+    if (!isOpen) return
+    tabRefs.current[activeTab]?.focus()
+  }, [activeTab, isOpen])
+
+  // Inert the app root so screen readers cannot escape the dialog
+  useEffect(() => {
+    if (!isOpen) return
+    const root = document.getElementById('root')
+    root?.setAttribute('inert', '')
+    return () => root?.removeAttribute('inert')
   }, [isOpen])
 
   if (!isOpen) return null
@@ -62,6 +75,18 @@ export function SkaldOraclePopover({ isOpen, onClose }: SkaldOraclePopoverProps)
   function handleTableRoll() {
     if (!draft.tableId) return
     recordOracleRoll(ironswornPlugin.oracle.roll(draft.tableId))
+  }
+
+  function handleTablistKeyDown(e: KeyboardEvent<HTMLDivElement>) {
+    const tabs: Tab[] = ['ask-fates', 'browse-tables', 'recent']
+    const idx = tabs.indexOf(activeTab)
+    if (e.key === 'ArrowRight') {
+      e.preventDefault()
+      setActiveTab(tabs[(idx + 1) % tabs.length]!)
+    } else if (e.key === 'ArrowLeft') {
+      e.preventDefault()
+      setActiveTab(tabs[(idx - 1 + tabs.length) % tabs.length]!)
+    }
   }
 
   function handleKeyDown(e: KeyboardEvent<HTMLDivElement>) {
@@ -102,16 +127,17 @@ export function SkaldOraclePopover({ isOpen, onClose }: SkaldOraclePopoverProps)
       onKeyDown={handleKeyDown}
     >
       {/* Tab strip */}
-      <div className={styles.tabList} role="tablist" aria-label="Oracle sections">
-        {TABS.map((tab, idx) => (
+      <div className={styles.tabList} role="tablist" aria-label="Oracle sections" onKeyDown={handleTablistKeyDown}>
+        {TABS.map((tab) => (
           <button
             key={tab.id}
-            ref={idx === 0 ? firstTabRef : undefined}
+            ref={(el) => { if (el) tabRefs.current[tab.id] = el }}
             type="button"
             role="tab"
             id={`oracle-tab-${tab.id}`}
             aria-selected={activeTab === tab.id}
             aria-controls={`oracle-panel-${tab.id}`}
+            tabIndex={activeTab === tab.id ? 0 : -1}
             className={styles.tab}
             onClick={() => setActiveTab(tab.id)}
           >

@@ -58,6 +58,14 @@ export function SkaldMovesPopover({
     }
   }, [isOpen])
 
+  // Inert the app root so screen readers cannot escape the dialog
+  useEffect(() => {
+    if (!isOpen) return
+    const root = document.getElementById('root')
+    root?.setAttribute('inert', '')
+    return () => root?.removeAttribute('inert')
+  }, [isOpen])
+
   if (!isOpen) return null
 
   const groups = groupByCategory(ironswornPlugin.moves.getAll())

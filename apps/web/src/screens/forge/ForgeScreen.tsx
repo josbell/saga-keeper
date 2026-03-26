@@ -142,9 +142,10 @@ export function ForgeScreen({
       assetIds: draft.assetIds,
       vows: draft.vow ? [draft.vow] : [],
     }
+    const campaignId = globalThis.crypto.randomUUID()
     const character: CharacterState = {
       id: globalThis.crypto.randomUUID(),
-      campaignId: 'default',
+      campaignId,
       name: draft.name,
       rulesetId: 'ironsworn-v1',
       data: data as unknown as Record<string, unknown>,
@@ -152,7 +153,7 @@ export function ForgeScreen({
       updatedAt: now,
     }
     const campaign: Campaign = {
-      id: 'default',
+      id: campaignId,
       name: draft.name,
       rulesetId: 'ironsworn-v1',
       status: 'active',

@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { SkaldOraclePopover } from './SkaldOraclePopover'
 import { useGameStore } from '@/store'
@@ -26,9 +26,18 @@ function setupStore(overrides: Record<string, unknown> = {}) {
   })
 }
 
+let rootEl: HTMLDivElement
+
 beforeEach(() => {
   vi.clearAllMocks()
   setupStore()
+  rootEl = document.createElement('div')
+  rootEl.id = 'root'
+  document.body.appendChild(rootEl)
+})
+
+afterEach(() => {
+  document.body.removeChild(rootEl)
 })
 
 describe('SkaldOraclePopover — visibility', () => {
@@ -191,5 +200,54 @@ describe('SkaldOraclePopover — focus management', () => {
 
     expect(document.activeElement).toBe(trigger)
     document.body.removeChild(trigger)
+  })
+})
+
+describe('SkaldOraclePopover — inert background', () => {
+  it('sets inert on #root when open', () => {
+    render(<SkaldOraclePopover isOpen onClose={vi.fn()} />)
+    expect(document.getElementById('root')?.hasAttribute('inert')).toBe(true)
+  })
+
+  it('removes inert from #root when closed', () => {
+    const { rerender } = render(<SkaldOraclePopover isOpen onClose={vi.fn()} />)
+    rerender(<SkaldOraclePopover isOpen={false} onClose={vi.fn()} />)
+    expect(document.getElementById('root')?.hasAttribute('inert')).toBe(false)
+  })
+})
+
+describe('SkaldOraclePopover — tablist arrow-key navigation', () => {
+  it('active tab has tabIndex=0, inactive tabs have tabIndex=-1', () => {
+    render(<SkaldOraclePopover isOpen onClose={vi.fn()} />)
+    const askFatesTab = screen.getByRole('tab', { name: /ask fates/i }) as HTMLButtonElement
+    const browseTab = screen.getByRole('tab', { name: /browse tables/i }) as HTMLButtonElement
+    const recentTab = screen.getByRole('tab', { name: /recent/i }) as HTMLButtonElement
+    expect(askFatesTab.tabIndex).toBe(0)
+    expect(browseTab.tabIndex).toBe(-1)
+    expect(recentTab.tabIndex).toBe(-1)
+  })
+
+  it('ArrowRight moves to the next tab', () => {
+    render(<SkaldOraclePopover isOpen onClose={vi.fn()} />)
+    const tablist = screen.getByRole('tablist')
+    fireEvent.keyDown(tablist, { key: 'ArrowRight' })
+    expect(screen.getByRole('tab', { name: /browse tables/i }).getAttribute('aria-selected')).toBe('true')
+    expect(screen.getByRole('tab', { name: /ask fates/i }).getAttribute('aria-selected')).toBe('false')
+  })
+
+  it('ArrowLeft from the first tab wraps to the last tab', () => {
+    render(<SkaldOraclePopover isOpen onClose={vi.fn()} />)
+    const tablist = screen.getByRole('tablist')
+    fireEvent.keyDown(tablist, { key: 'ArrowLeft' })
+    expect(screen.getByRole('tab', { name: /recent/i }).getAttribute('aria-selected')).toBe('true')
+  })
+
+  it('ArrowRight from the last tab wraps to the first tab', () => {
+    render(<SkaldOraclePopover isOpen onClose={vi.fn()} />)
+    const tablist = screen.getByRole('tablist')
+    // Move to Recent (last tab)
+    fireEvent.click(screen.getByRole('tab', { name: /recent/i }))
+    fireEvent.keyDown(tablist, { key: 'ArrowRight' })
+    expect(screen.getByRole('tab', { name: /ask fates/i }).getAttribute('aria-selected')).toBe('true')
   })
 })

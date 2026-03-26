@@ -1,6 +1,18 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import { SkaldMovesPopover } from './SkaldMovesPopover'
+
+let rootEl: HTMLDivElement
+
+beforeEach(() => {
+  rootEl = document.createElement('div')
+  rootEl.id = 'root'
+  document.body.appendChild(rootEl)
+})
+
+afterEach(() => {
+  document.body.removeChild(rootEl)
+})
 
 function renderPopover(overrides: Partial<Parameters<typeof SkaldMovesPopover>[0]> = {}) {
   const props = {
@@ -102,5 +114,22 @@ describe('SkaldMovesPopover — interaction', () => {
 
     expect(document.activeElement).toBe(trigger)
     document.body.removeChild(trigger)
+  })
+})
+
+describe('SkaldMovesPopover — inert background', () => {
+  it('sets inert on #root when open', () => {
+    renderPopover({ isOpen: true })
+    expect(document.getElementById('root')?.hasAttribute('inert')).toBe(true)
+  })
+
+  it('removes inert from #root when closed', () => {
+    const { rerender } = render(
+      <SkaldMovesPopover isOpen isBusy={false} onClose={vi.fn()} onMoveSelect={vi.fn()} />,
+    )
+    rerender(
+      <SkaldMovesPopover isOpen={false} isBusy={false} onClose={vi.fn()} onMoveSelect={vi.fn()} />,
+    )
+    expect(document.getElementById('root')?.hasAttribute('inert')).toBe(false)
   })
 })
