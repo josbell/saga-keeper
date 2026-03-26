@@ -1,0 +1,22 @@
+.card {
+  background: var(--color-ash, #13100d);
+  border: 1px solid rgba(212, 148, 26, 0.12);
+  border-radius: 3px;
+  padding: 10px 12px;
+}
+
+.label {
+  font-size: 7px;
+  letter-spacing: 3px;
+  color: var(--color-stone, #3d3428);
+  text-transform: uppercase;
+  margin: 0 0 6px;
+}
+
+.text {
+  font-size: 9px;
+  color: var(--color-bone, #7a6a52);
+  font-style: italic;
+  line-height: 1.6;
+  margin: 0;
+}
