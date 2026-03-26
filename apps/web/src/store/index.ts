@@ -39,12 +39,17 @@ export const useGameStore = create<GameStore>()((set, get, store) => ({
     const ts = new Date().toISOString()
     const newMessages: SkaldMessage[] = []
 
-    // Player bubble — always show what the player submitted
-    if (result.input.userText) {
+    // Player bubble — show userText for free/oracle turns; fall back to move name for move-type turns
+    const playerText =
+      result.input.userText ??
+      (result.move
+        ? ironswornPlugin.moves.getAll().find((m) => m.id === result.move)?.name ?? result.move
+        : undefined)
+    if (playerText) {
       newMessages.push({
         id: globalThis.crypto.randomUUID(),
         role: 'player',
-        content: result.input.userText,
+        content: playerText,
         turnId: result.turnId,
         timestamp: ts,
       })

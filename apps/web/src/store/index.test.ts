@@ -146,6 +146,24 @@ describe('useGameStore — applyTurnResult', () => {
     expect(useGameStore.getState().activeTurnId).toBe('turn-42')
   })
 
+  it('appends a player bubble with the move name when input.userText is absent (move-pill action)', () => {
+    useGameStore.getState().applyTurnResult(
+      makeTurnResult({
+        input: { type: 'move', moveId: 'face-danger' },
+        move: 'face-danger',
+        outcome: {
+          result: 'strong-hit',
+          match: false,
+          consequences: [],
+          narrativeHints: [],
+        },
+      }),
+    )
+    const msgs = useGameStore.getState().messages
+    expect(msgs[0]?.role).toBe('player')
+    expect(msgs[0]?.content).toBeTruthy()
+  })
+
   it('appends only the player message for a free turn with no narration (offline tier)', () => {
     useGameStore.getState().applyTurnResult(makeTurnResult({ narration: '' }))
     const msgs = useGameStore.getState().messages

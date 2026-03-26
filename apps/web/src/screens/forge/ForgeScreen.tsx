@@ -165,7 +165,7 @@ export function ForgeScreen({
     useGameStore.getState().setCharacter(character)
     navigate('/iron-sheet')
     // Persist to IndexedDB in the background — completes before user can reach /skald
-    void persistSetup(campaign, character)
+    void persistSetup(campaign, character).catch(console.error)
   }
 
   function handleNext() {

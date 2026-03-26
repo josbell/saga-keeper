@@ -203,6 +203,26 @@ describe('SkaldInputBar — input interaction', () => {
     const input = screen.getByRole('textbox', { name: /tell the skald/i }) as HTMLInputElement
     expect(input.disabled).toBe(true)
   })
+
+  it('input is disabled when phase is "resolving"', () => {
+    renderBar({ phase: 'resolving' })
+    const input = screen.getByRole('textbox', { name: /tell the skald/i }) as HTMLInputElement
+    expect(input.disabled).toBe(true)
+  })
+
+  it('Send button is disabled when phase is "resolving"', () => {
+    renderBar({ phase: 'resolving' })
+    const input = screen.getByRole('textbox', { name: /tell the skald/i })
+    fireEvent.change(input, { target: { value: 'Hello' } })
+    const sendBtn = screen.getByRole('button', { name: /^speak$/i }) as HTMLButtonElement
+    expect(sendBtn.disabled).toBe(true)
+  })
+
+  it('pill buttons are disabled when phase is "resolving"', () => {
+    renderBar({ phase: 'resolving', moves: [makeMove()] })
+    const pill = screen.getByRole('button', { name: /face a threat/i }) as HTMLButtonElement
+    expect(pill.disabled).toBe(true)
+  })
 })
 
 describe('SkaldInputBar — oracle button', () => {

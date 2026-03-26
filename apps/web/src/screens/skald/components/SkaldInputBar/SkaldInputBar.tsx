@@ -26,7 +26,7 @@ export function SkaldInputBar({
 }: SkaldInputBarProps) {
   const [text, setText] = useState('')
 
-  const isBusy = phase === 'waiting-for-ai' || phase === 'streaming' || phase === 'move-pending'
+  const isBusy = phase === 'resolving' || phase === 'waiting-for-ai' || phase === 'streaming' || phase === 'move-pending'
   const canSend = text.trim().length > 0 && !isBusy
 
   function handleSend() {
