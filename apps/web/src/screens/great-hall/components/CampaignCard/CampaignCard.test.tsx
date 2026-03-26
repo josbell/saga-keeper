@@ -32,7 +32,8 @@ describe('CampaignCard — basic info', () => {
   })
 
   it('does not render tagline when absent', () => {
-    const { container } = render(<CampaignCard campaign={makeCampaign({ tagline: undefined })} character={null} leadingVow={null} onContinue={vi.fn()} onDetails={vi.fn()} />)
+    const { tagline: _tag, ...campaignNoTagline } = makeCampaign()
+    const { container } = render(<CampaignCard campaign={campaignNoTagline as CampaignSummary} character={null} leadingVow={null} onContinue={vi.fn()} onDetails={vi.fn()} />)
     expect(container.querySelector('[data-tagline]')).toBeNull()
   })
 

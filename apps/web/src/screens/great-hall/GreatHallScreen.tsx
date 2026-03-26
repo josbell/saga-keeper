@@ -58,8 +58,9 @@ export function GreatHallScreen() {
     campaigns[0]?.name ?? '',
   )
 
+  const firstCampaign = campaigns[0]
   const reminderText = deriveReminderText(
-    campaigns.length > 0 ? { id: campaigns[0].id, name: campaigns[0].name, rulesetId: campaigns[0].rulesetId, status: campaigns[0].status, mode: campaigns[0].mode, characterIds: campaigns[0].characterIds, createdAt: '', updatedAt: '' } : null,
+    firstCampaign ? { id: firstCampaign.id, name: firstCampaign.name, rulesetId: firstCampaign.rulesetId, status: firstCampaign.status, mode: firstCampaign.mode, characterIds: firstCampaign.characterIds, createdAt: '', updatedAt: '' } : null,
     character,
   )
 

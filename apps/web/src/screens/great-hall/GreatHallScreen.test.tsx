@@ -6,9 +6,10 @@ import { GreatHallScreen } from './GreatHallScreen'
 // ── Mocks ─────────────────────────────────────────────────────────────────────
 
 const mockNavigate = vi.fn()
-const mockListCampaigns = vi.fn<() => Promise<CampaignSummary[]>>()
+const mockListCampaigns = vi.fn<[], Promise<CampaignSummary[]>>()
 const mockLoadCampaign = vi.fn<
-  (id: string) => Promise<{ campaign: Campaign; character: CharacterState; events: SessionEvent[] }>
+  [id: string],
+  Promise<{ campaign: Campaign; character: CharacterState; events: SessionEvent[] }>
 >()
 const mockSetCampaign = vi.fn()
 const mockSetCharacter = vi.fn()

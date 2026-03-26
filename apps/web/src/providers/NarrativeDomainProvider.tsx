@@ -61,7 +61,7 @@ export function NarrativeDomainProvider({ children }: NarrativeDomainProviderPro
       campaignId: string,
     ): Promise<{ campaign: Campaign; character: CharacterState; events: SessionEvent[] }> {
       const campaign = await storage.campaigns.get(campaignId)
-      const character = await storage.characters.get(campaign.characterIds[0])
+      const character = await storage.characters.get(campaign.characterIds[0]!)
       const events = await storage.session.getRecent(campaignId, 20)
       return { campaign, character, events }
     }
