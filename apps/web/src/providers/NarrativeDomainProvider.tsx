@@ -2,7 +2,7 @@ import { createContext, useContext, useMemo, type ReactNode } from 'react'
 import { NarrativeDomain, OracleService, DiceService, type INarrativeDomain } from '@saga-keeper/services'
 import { LocalAdapter } from '@saga-keeper/storage'
 import { ironswornPlugin } from '@saga-keeper/ruleset-ironsworn'
-import type { Campaign, CharacterState } from '@saga-keeper/domain'
+import type { Campaign, CampaignSummary, CharacterState, SessionEvent } from '@saga-keeper/domain'
 import { OfflineAIGateway } from './OfflineAIGateway'
 
 // ── Context ───────────────────────────────────────────────────────────────────
@@ -10,6 +10,10 @@ import { OfflineAIGateway } from './OfflineAIGateway'
 interface NarrativeDomainContextValue {
   narrativeDomain: INarrativeDomain
   persistSetup: (campaign: Campaign, character: CharacterState) => Promise<void>
+  listCampaigns: () => Promise<CampaignSummary[]>
+  loadCampaign: (
+    campaignId: string,
+  ) => Promise<{ campaign: Campaign; character: CharacterState; events: SessionEvent[] }>
 }
 
 const NarrativeDomainContext = createContext<NarrativeDomainContextValue | null>(null)
@@ -49,7 +53,20 @@ export function NarrativeDomainProvider({ children }: NarrativeDomainProviderPro
       })
     }
 
-    return { narrativeDomain, persistSetup }
+    async function listCampaigns(): Promise<CampaignSummary[]> {
+      return storage.campaigns.list()
+    }
+
+    async function loadCampaign(
+      campaignId: string,
+    ): Promise<{ campaign: Campaign; character: CharacterState; events: SessionEvent[] }> {
+      const campaign = await storage.campaigns.get(campaignId)
+      const character = await storage.characters.get(campaign.characterIds[0])
+      const events = await storage.session.getRecent(campaignId, 20)
+      return { campaign, character, events }
+    }
+
+    return { narrativeDomain, persistSetup, listCampaigns, loadCampaign }
   }, [])
 
   return (
@@ -71,6 +88,14 @@ export function useNarrativeDomain(): INarrativeDomain {
     throw new Error('useNarrativeDomain must be called inside a <NarrativeDomainProvider>')
   }
   return ctx.narrativeDomain
+}
+
+export function useCampaignOps(): Pick<NarrativeDomainContextValue, 'listCampaigns' | 'loadCampaign'> {
+  const ctx = useContext(NarrativeDomainContext)
+  if (!ctx) {
+    throw new Error('useCampaignOps must be called inside a <NarrativeDomainProvider>')
+  }
+  return { listCampaigns: ctx.listCampaigns, loadCampaign: ctx.loadCampaign }
 }
 
 export function usePersistSetup(): (campaign: Campaign, character: CharacterState) => Promise<void> {
