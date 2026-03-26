@@ -1,0 +1,33 @@
+.statsBar {
+  display: flex;
+  border-bottom: 1px solid rgba(212, 148, 26, 0.12);
+}
+
+.stat {
+  flex: 1;
+  padding: 14px 20px;
+  border-right: 1px solid rgba(212, 148, 26, 0.12);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.stat:last-child {
+  border-right: none;
+}
+
+.statVal {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 22px;
+  color: var(--color-gold, #d4941a);
+  line-height: 1;
+}
+
+.statLabel {
+  font-size: 8px;
+  letter-spacing: 3px;
+  color: var(--color-stone, #3d3428);
+  text-transform: uppercase;
+}
