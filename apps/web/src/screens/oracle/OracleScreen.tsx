@@ -45,9 +45,14 @@ export function OracleScreen() {
   return (
     <div className={styles.screen}>
       <header className={styles.header} role="banner">
-        <div className={styles.headerLogo}>
+        <button
+          type="button"
+          className={styles.logoBtn}
+          aria-label="Go to Great Hall"
+          onClick={() => navigate('/great-hall')}
+        >
           <span className={styles.logoTitle}>Saga Keeper</span>
-        </div>
+        </button>
         <nav className={styles.headerNav} aria-label="Application">
           {NAV_ITEMS.map(({ label, path }) => (
             <button

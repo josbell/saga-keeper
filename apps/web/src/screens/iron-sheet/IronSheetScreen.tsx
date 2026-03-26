@@ -110,9 +110,14 @@ export function IronSheetScreen() {
 function renderHeader(navigate: ReturnType<typeof useNavigate>, currentPath: string) {
   return (
     <header className={styles.header}>
-      <div className={styles.headerLogo}>
+      <button
+        type="button"
+        className={styles.logoBtn}
+        aria-label="Go to Great Hall"
+        onClick={() => navigate('/great-hall')}
+      >
         <span className={styles.logoTitle}>Saga Keeper</span>
-      </div>
+      </button>
       <nav className={styles.headerNav} aria-label="Application">
         {NAV_ITEMS.map(({ label, path }) => (
           <button

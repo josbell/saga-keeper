@@ -122,6 +122,12 @@ describe('SkaldScreen — layout landmarks', () => {
 })
 
 describe('SkaldScreen — accessibility', () => {
+  it('clicking the logo navigates to /great-hall', () => {
+    render(<SkaldScreen />)
+    fireEvent.click(screen.getByRole('button', { name: /go to great hall/i }))
+    expect(mockNavigate).toHaveBeenCalledWith('/great-hall')
+  })
+
   it('World Forge nav button is disabled', () => {
     render(<SkaldScreen />)
     const worldForgeBtn = screen.getByRole('button', { name: /world forge/i })

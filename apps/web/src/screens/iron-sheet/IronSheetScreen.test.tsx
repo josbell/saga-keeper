@@ -159,6 +159,12 @@ describe('IronSheetScreen — store mutations', () => {
 })
 
 describe('IronSheetScreen — accessibility', () => {
+  it('clicking the logo navigates to /great-hall', () => {
+    render(<IronSheetScreen />)
+    fireEvent.click(screen.getByRole('button', { name: /go to great hall/i }))
+    expect(mockNavigate).toHaveBeenCalledWith('/great-hall')
+  })
+
   it('has a <main> landmark', () => {
     render(<IronSheetScreen />)
     expect(screen.getByRole('main')).toBeTruthy()

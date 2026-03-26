@@ -75,6 +75,12 @@ describe('OracleScreen — accessibility', () => {
     expect(screen.getByText(/saga keeper/i)).toBeTruthy()
   })
 
+  it('clicking the logo navigates to /great-hall', () => {
+    render(<OracleScreen />)
+    fireEvent.click(screen.getByRole('button', { name: /go to great hall/i }))
+    expect(mockNavigate).toHaveBeenCalledWith('/great-hall')
+  })
+
   it('Skald nav button is enabled and navigates to /skald', () => {
     render(<OracleScreen />)
     const skaldBtn = screen.getByRole('button', { name: /skald/i })
