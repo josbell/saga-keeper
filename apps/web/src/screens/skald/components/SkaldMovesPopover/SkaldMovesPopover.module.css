@@ -1,7 +1,7 @@
 .popover {
   position: fixed;
   bottom: 80px;
-  right: 280px;
+  right: var(--right-panel-width, 280px);
   margin-bottom: 0;
   width: 380px;
   background: var(--color-ash, #13100d);

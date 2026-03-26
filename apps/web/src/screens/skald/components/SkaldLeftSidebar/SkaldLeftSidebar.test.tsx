@@ -76,7 +76,7 @@ describe('SkaldLeftSidebar — session list', () => {
     expect(screen.getByText(/current session/i)).toBeTruthy()
   })
 
-  it('active session item uses CSS class for visual state, not aria-current (aria-current is for navigation landmarks)', () => {
+  it('active session item uses CSS class for visual state, not aria-current', () => {
     render(<SkaldLeftSidebar character={null} />)
     const currentItem = screen.getByText(/current session/i).closest('li')
     expect(currentItem?.getAttribute('aria-current')).toBeNull()

@@ -99,7 +99,7 @@ export function SkaldScreen() {
           <SkaldLeftSidebar character={character} />
         </aside>
 
-        <main className={styles.main} role="main" tabIndex={-1}>
+        <main className={styles.main} tabIndex={-1}>
           <h1 className={styles.pageTitle}>The Skald</h1>
           <SkaldFeed messages={messages} phase={phase} streamBuffer={streamBuffer} />
           <div className={styles.inputArea}>

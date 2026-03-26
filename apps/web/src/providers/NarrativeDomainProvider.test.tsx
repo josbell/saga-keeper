@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { NarrativeDomainProvider, useNarrativeDomain } from './NarrativeDomainProvider'
+import { NarrativeDomainProvider, useNarrativeDomain, usePersistSetup } from './NarrativeDomainProvider'
 
 // ── Helper component that calls the hook ──────────────────────────────────────
 
@@ -34,6 +34,21 @@ describe('NarrativeDomainProvider', () => {
     render(<ThrowerOutsideProvider />)
     expect(screen.getByTestId('error').textContent).toMatch(
       /useNarrativeDomain must be called inside/i,
+    )
+  })
+
+  it('throws when usePersistSetup is called outside provider', () => {
+    function PersistSetupOutside() {
+      try {
+        usePersistSetup()
+        return <div>no error</div>
+      } catch (e) {
+        return <div data-testid="persist-error">{(e as Error).message}</div>
+      }
+    }
+    render(<PersistSetupOutside />)
+    expect(screen.getByTestId('persist-error').textContent).toMatch(
+      /usePersistSetup must be called inside/i,
     )
   })
 })

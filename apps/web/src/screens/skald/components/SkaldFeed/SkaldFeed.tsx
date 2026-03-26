@@ -102,6 +102,7 @@ function OutcomeItem({ content }: ContentProps) {
   } catch {
     return null
   }
+  if (!data || typeof data.moveId !== 'string') return null
   return <MoveOutcomeCard {...data} />
 }
 
@@ -112,5 +113,6 @@ function OracleItem({ content }: ContentProps) {
   } catch {
     return null
   }
+  if (!data || typeof data.tableId !== 'string') return null
   return <OracleStrip tableId={data.tableId} roll={data.roll} raw={data.raw} />
 }
