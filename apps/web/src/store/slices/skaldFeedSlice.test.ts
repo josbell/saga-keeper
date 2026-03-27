@@ -66,7 +66,7 @@ describe('createSkaldFeedSlice — appendMessage', () => {
 // ── setPhase ──────────────────────────────────────────────────────────────────
 
 describe('createSkaldFeedSlice — setPhase', () => {
-  const phases: TurnPhase[] = ['idle', 'waiting-for-ai', 'streaming', 'move-pending', 'error']
+  const phases: TurnPhase[] = ['idle', 'resolving', 'waiting-for-ai', 'streaming', 'move-pending', 'error']
 
   it.each(phases)('accepts phase "%s"', (phase) => {
     const store = makeStore()

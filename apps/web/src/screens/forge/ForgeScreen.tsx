@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ironswornPlugin, type IronswornCharacterData } from '@saga-keeper/ruleset-ironsworn'
-import type { AIGateway, CharacterState, CreationStep } from '@saga-keeper/domain'
+import type { AIGateway, Campaign, CharacterState, CreationStep } from '@saga-keeper/domain'
 import { useGameStore } from '@/store'
+import { usePersistSetup } from '@/providers/NarrativeDomainProvider'
 import { INITIAL_DRAFT, type ForgeDraft, type StepProps } from './types'
 import { useForgeCounsel } from './hooks/useForgeCounsel'
 import { WorldSelectStep } from './steps/WorldSelectStep'
@@ -98,6 +99,8 @@ export function ForgeScreen({
   const totalSteps = steps.length
   const step = steps[Math.min(stepIndex, totalSteps - 1)]!
 
+  const persistSetup = usePersistSetup()
+
   useForgeCounsel(gateway, step, draft)
 
   // Move keyboard focus into the main content area whenever the step changes
@@ -139,17 +142,31 @@ export function ForgeScreen({
       assetIds: draft.assetIds,
       vows: draft.vow ? [draft.vow] : [],
     }
+    const campaignId = globalThis.crypto.randomUUID()
     const character: CharacterState = {
       id: globalThis.crypto.randomUUID(),
-      campaignId: 'default',
+      campaignId,
       name: draft.name,
       rulesetId: 'ironsworn-v1',
       data: data as unknown as Record<string, unknown>,
       createdAt: now,
       updatedAt: now,
     }
+    const campaign: Campaign = {
+      id: campaignId,
+      name: draft.name,
+      rulesetId: 'ironsworn-v1',
+      status: 'active',
+      mode: 'solo',
+      characterIds: [character.id],
+      createdAt: now,
+      updatedAt: now,
+    }
+    useGameStore.getState().setCampaign(campaign)
     useGameStore.getState().setCharacter(character)
     navigate('/iron-sheet')
+    // Persist to IndexedDB in the background — completes before user can reach /skald
+    void persistSetup(campaign, character).catch(console.error)
   }
 
   function handleNext() {

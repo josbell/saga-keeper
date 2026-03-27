@@ -1,0 +1,59 @@
+.hero {
+  padding: 36px 28px 28px;
+  border-bottom: 1px solid rgba(212, 148, 26, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--color-gold, #d4941a) 30%, var(--color-blood, #8b1a1a) 60%, var(--color-gold, #d4941a) 80%, transparent);
+}
+
+.rune {
+  position: absolute;
+  right: 28px;
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0.06;
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 120px;
+  color: var(--color-gold, #d4941a);
+  pointer-events: none;
+  line-height: 1;
+  user-select: none;
+}
+
+.inner {
+  max-width: 520px;
+}
+
+.greeting {
+  font-size: 9px;
+  letter-spacing: 5px;
+  color: var(--color-stone, #3d3428);
+  text-transform: uppercase;
+  margin: 0 0 8px;
+}
+
+.headline {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 28px;
+  color: var(--color-gold-bright, #f0b429);
+  letter-spacing: 1px;
+  line-height: 1.2;
+  margin: 0 0 10px;
+}
+
+.tagline {
+  font-size: 12px;
+  color: var(--color-bone, #7a6a52);
+  font-style: italic;
+  line-height: 1.7;
+  margin: 0;
+}

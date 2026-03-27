@@ -15,7 +15,7 @@ import styles from './IronSheetScreen.module.css'
 const NAV_ITEMS = [
   { label: 'Iron Sheet', path: '/iron-sheet' },
   { label: 'Oracle', path: '/oracle' },
-  { label: 'Skald', path: null },
+  { label: 'Skald', path: '/skald' },
   { label: 'World Forge', path: null },
 ]
 
@@ -110,9 +110,14 @@ export function IronSheetScreen() {
 function renderHeader(navigate: ReturnType<typeof useNavigate>, currentPath: string) {
   return (
     <header className={styles.header}>
-      <div className={styles.headerLogo}>
+      <button
+        type="button"
+        className={styles.logoBtn}
+        aria-label="Go to Great Hall"
+        onClick={() => navigate('/great-hall')}
+      >
         <span className={styles.logoTitle}>Saga Keeper</span>
-      </div>
+      </button>
       <nav className={styles.headerNav} aria-label="Application">
         {NAV_ITEMS.map(({ label, path }) => (
           <button

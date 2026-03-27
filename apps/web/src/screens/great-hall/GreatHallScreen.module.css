@@ -1,0 +1,169 @@
+.screen {
+  display: grid;
+  grid-template-rows: 47px auto auto 1fr;
+  min-height: 100vh;
+  background: var(--color-void, #0d0b08);
+  color: var(--color-parchment, #c4a96e);
+  font-family: 'Cinzel', Georgia, serif;
+}
+
+/* ── HEADER ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 32px;
+  border-bottom: 1px solid rgba(212, 148, 26, 0.2);
+  background: rgba(30, 23, 16, 0.95);
+  backdrop-filter: blur(8px);
+}
+
+.logoBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.logoTitle {
+  font-family: 'Cinzel Decorative', serif;
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--color-gold-bright, #f0b429);
+  letter-spacing: 3px;
+  text-transform: uppercase;
+}
+
+.headerNav {
+  display: flex;
+  gap: 2px;
+}
+
+.navBtn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--color-bone, #7a6a52);
+  padding: 6px 14px;
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s;
+  border-radius: 2px;
+  height: 47px;
+}
+
+.navBtn:hover,
+.navBtn[aria-current='page'] {
+  border-color: rgba(212, 148, 26, 0.4);
+  color: var(--color-gold, #d4941a);
+  background: rgba(212, 148, 26, 0.08);
+}
+
+.navBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+/* ── MAIN BODY ── */
+.main {
+  outline: none;
+}
+
+.body {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 24px;
+  padding: 24px 28px;
+}
+
+@media (max-width: 768px) {
+  .body {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── CAMPAIGN COLUMN ── */
+.campCol {
+  /* section with aria-label="Campaigns" */
+}
+
+.campGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+@media (max-width: 960px) {
+  .campGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ── RIGHT COLUMN ── */
+.rightCol {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── NEW CAMPAIGN CARD ── */
+.newCampCard {
+  border: 1px dashed rgba(42, 36, 28, 0.8);
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 16px;
+  min-height: 180px;
+  text-align: center;
+}
+
+.newCampIcon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid rgba(212, 148, 26, 0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  color: var(--color-stone, #3d3428);
+  line-height: 40px;
+}
+
+.newCampLabel {
+  font-size: 9px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--color-stone, #3d3428);
+  margin: 0;
+}
+
+.newCampSub {
+  font-size: 9px;
+  color: rgba(42, 36, 28, 0.8);
+  font-style: italic;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.newCampBtn {
+  margin-top: 8px;
+  background: linear-gradient(135deg, rgba(139, 26, 26, 0.6), rgba(192, 57, 43, 0.4));
+  border: 1px solid rgba(192, 57, 43, 0.35);
+  border-radius: 3px;
+  padding: 7px 20px;
+  font-family: 'Cinzel', serif;
+  font-size: 9px;
+  letter-spacing: 2px;
+  color: var(--color-parchment, #c4a96e);
+  cursor: pointer;
+  text-transform: uppercase;
+}

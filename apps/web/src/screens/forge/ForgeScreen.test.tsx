@@ -11,6 +11,10 @@ vi.mock('react-router-dom', () => ({
   useNavigate: () => mockNavigate,
 }))
 
+vi.mock('@/providers/NarrativeDomainProvider', () => ({
+  usePersistSetup: () => vi.fn().mockResolvedValue(undefined),
+}))
+
 // A draft that satisfies ironswornPlugin.creation.validate
 const VALID_DRAFT: ForgeDraft = {
   worldDescription: 'A harsh land of iron and stone.',

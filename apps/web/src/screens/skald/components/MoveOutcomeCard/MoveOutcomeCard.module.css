@@ -1,0 +1,139 @@
+.card {
+  border: 1px solid rgba(212, 148, 26, 0.3);
+  border-radius: 4px;
+  background: var(--color-ash, #13100d);
+  overflow: hidden;
+}
+
+/* ── Header row ── */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 8px;
+  border-bottom: 1px solid rgba(212, 148, 26, 0.12);
+}
+
+.moveName {
+  font-family: 'Cinzel', serif;
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-parchment, #c4a96e);
+  font-weight: 600;
+}
+
+.badges {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge {
+  font-family: 'Cinzel', serif;
+  font-size: 8px;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 3px 8px;
+  border-radius: 2px;
+  border: 1px solid;
+}
+
+.badgeStrongHit {
+  color: #5cb85c;
+  border-color: rgba(92, 184, 92, 0.4);
+  background: rgba(92, 184, 92, 0.08);
+}
+
+.badgeWeakHit {
+  color: var(--color-gold-bright, #f0b429);
+  border-color: rgba(240, 180, 41, 0.4);
+  background: rgba(240, 180, 41, 0.08);
+}
+
+.badgeMiss {
+  color: var(--color-blood-bright, #c0392b);
+  border-color: rgba(192, 57, 43, 0.4);
+  background: rgba(192, 57, 43, 0.08);
+}
+
+.matchPill {
+  font-size: 7px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-weight: 600;
+  padding: 3px 7px;
+  border-radius: 2px;
+  color: var(--color-gold-bright, #f0b429);
+  border: 1px solid rgba(240, 180, 41, 0.5);
+  background: rgba(240, 180, 41, 0.12);
+}
+
+/* ── Body ── */
+.body {
+  padding: 10px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* ── Dice row ── */
+.diceRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  color: var(--color-bone, #7a6a52);
+  font-variant-numeric: tabular-nums;
+}
+
+.diceTotal {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-parchment, #c4a96e);
+}
+
+.diceSep {
+  color: var(--color-stone, #3d3428);
+  font-size: 10px;
+}
+
+.diceChallenge {
+  font-size: 10px;
+  color: var(--color-bone, #7a6a52);
+}
+
+/* ── Consequences ── */
+.consequences {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.delta {
+  font-size: 9px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 2px;
+  font-weight: 600;
+}
+
+.deltaPositive {
+  color: #5cb85c;
+  background: rgba(92, 184, 92, 0.1);
+  border: 1px solid rgba(92, 184, 92, 0.25);
+}
+
+.deltaNegative {
+  color: var(--color-blood-bright, #c0392b);
+  background: rgba(192, 57, 43, 0.1);
+  border: 1px solid rgba(192, 57, 43, 0.25);
+}
+
+.deltaNeutral {
+  color: var(--color-bone, #7a6a52);
+  background: rgba(122, 106, 82, 0.1);
+  border: 1px solid rgba(122, 106, 82, 0.25);
+}

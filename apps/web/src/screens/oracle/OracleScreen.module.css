@@ -19,10 +19,14 @@
   backdrop-filter: blur(8px);
 }
 
-.headerLogo {
+.logoBtn {
   display: flex;
   align-items: center;
   gap: 10px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
 }
 
 .logoTitle {

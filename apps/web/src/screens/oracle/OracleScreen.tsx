@@ -10,7 +10,7 @@ import styles from './OracleScreen.module.css'
 const NAV_ITEMS = [
   { label: 'Iron Sheet', path: '/iron-sheet' },
   { label: 'Oracle', path: '/oracle' },
-  { label: 'Skald', path: null },
+  { label: 'Skald', path: '/skald' },
   { label: 'World Forge', path: null },
 ]
 
@@ -45,9 +45,14 @@ export function OracleScreen() {
   return (
     <div className={styles.screen}>
       <header className={styles.header} role="banner">
-        <div className={styles.headerLogo}>
+        <button
+          type="button"
+          className={styles.logoBtn}
+          aria-label="Go to Great Hall"
+          onClick={() => navigate('/great-hall')}
+        >
           <span className={styles.logoTitle}>Saga Keeper</span>
-        </div>
+        </button>
         <nav className={styles.headerNav} aria-label="Application">
           {NAV_ITEMS.map(({ label, path }) => (
             <button

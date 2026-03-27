@@ -1,0 +1,174 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sectionTitle {
+  font-size: 8px;
+  letter-spacing: 4px;
+  color: var(--color-iron, #3d3428);
+  text-transform: uppercase;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(30, 23, 16, 1);
+  margin: 0;
+}
+
+.emptyState {
+  font-size: 9px;
+  color: var(--color-stone, #5f5447);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ── SCENE BLOCK ── */
+.sceneBlock {
+  background: var(--color-ash, #13100d);
+  border: 1px solid var(--color-iron, #2a241c);
+  border-radius: 3px;
+  padding: 10px;
+}
+
+.scenePlaceholder {
+  font-size: 9px;
+  color: var(--color-stone, #5f5447);
+  font-style: italic;
+  margin: 0;
+}
+
+/* ── MOVE REFERENCE ── */
+.moveRef {
+  background: var(--color-ash, #13100d);
+  border: 1px solid rgba(30, 23, 16, 1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.moveRefHead {
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(30, 23, 16, 1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.moveRefName {
+  font-size: 10px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--color-gold, #d4941a);
+}
+
+.moveRefStat {
+  font-size: 8px;
+  letter-spacing: 2px;
+  color: var(--color-stone, #5f5447);
+  text-transform: uppercase;
+}
+
+.moveRefDescription {
+  padding: 6px 10px;
+  font-size: 9px;
+  line-height: 1.5;
+  color: var(--color-bone, #7a6a52);
+  font-style: italic;
+  margin: 0;
+}
+
+.moveRefBody {
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.moveOutcome {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.outcomeLabel {
+  font-size: 8px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.outcomeLabel.strongHit {
+  color: var(--color-gold-bright, #f0b429);
+}
+
+.outcomeLabel.weakHit {
+  color: #7ab3cc;
+}
+
+.outcomeLabel.miss {
+  color: #c0392b;
+}
+
+/* ── VOW CARD ── */
+.vowCard {
+  background: var(--color-ash, #13100d);
+  border: 1px solid rgba(139, 26, 26, 0.2);
+  border-radius: 3px;
+  padding: 10px;
+}
+
+.vowTitle {
+  font-size: 10px;
+  color: var(--color-parchment, #c4a96e);
+  font-style: italic;
+  margin: 0 0 4px;
+  line-height: 1.4;
+}
+
+.vowRank {
+  font-size: 7px;
+  letter-spacing: 2px;
+  color: #8b1a1a;
+  text-transform: uppercase;
+  margin: 0 0 6px;
+}
+
+.vowProgress {
+  display: flex;
+  gap: 3px;
+}
+
+.progressBox {
+  flex: 1;
+  height: 8px;
+  border: 1px solid rgba(139, 26, 26, 0.25);
+  border-radius: 1px;
+  background: rgba(0, 0, 0, 0.3);
+  cursor: default;
+}
+
+.progressBox.filled {
+  background: rgba(139, 26, 26, 0.55);
+  border-color: rgba(192, 57, 43, 0.45);
+}
+
+/* ── WARNING BLOCK ── */
+.warningBlock {
+  background: rgba(139, 26, 26, 0.07);
+  border: 1px solid rgba(139, 26, 26, 0.2);
+  border-radius: 3px;
+  padding: 10px;
+}
+
+.warningTitle {
+  font-size: 7px;
+  letter-spacing: 3px;
+  color: var(--color-bone, #7a6a52);
+  text-transform: uppercase;
+  margin-bottom: 5px;
+}
+
+.warningText {
+  font-size: 9px;
+  color: var(--color-bone, #7a6a52);
+  line-height: 1.6;
+  font-style: italic;
+  margin: 0;
+}
