@@ -23,7 +23,16 @@ export function AppHeader() {
         aria-current={pathname === '/great-hall' ? 'page' : undefined}
         onClick={() => navigate('/great-hall')}
       >
-        <span className={styles.logoTitle}>Saga Keeper</span>
+        <svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true">
+          <polygon points="17,2 32,32 2,32" stroke="#d4941a" strokeWidth="1.2" fill="none" opacity="0.6" />
+          <line x1="17" y1="2" x2="17" y2="32" stroke="#d4941a" strokeWidth="0.8" />
+          <line x1="10" y1="16" x2="24" y2="16" stroke="#d4941a" strokeWidth="0.8" opacity="0.7" />
+          <circle cx="17" cy="17" r="2.5" fill="#f0b429" opacity="0.7" />
+        </svg>
+        <div className={styles.logoText}>
+          <span className={styles.logoTitle}>Saga Keeper</span>
+          <span className={styles.logoSub}>Ironsworn Companion</span>
+        </div>
       </button>
       <nav className={styles.nav} aria-label="Application">
         {NAV_ITEMS.map(({ label, path }) => {
