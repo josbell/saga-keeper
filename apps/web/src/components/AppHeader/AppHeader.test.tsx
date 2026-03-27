@@ -58,12 +58,9 @@ describe('AppHeader — navigation', () => {
     expect(activeBtn!.textContent).toMatch(/oracle/i)
   })
 
-  it('Skald button is enabled and navigates to /skald', () => {
+  it('Skald button is disabled when no campaign is loaded', () => {
     render(<AppHeader />)
-    const skaldBtn = screen.getByRole('button', { name: /skald/i })
-    expect((skaldBtn as HTMLButtonElement).disabled).toBe(false)
-    fireEvent.click(skaldBtn)
-    expect(mockNavigate).toHaveBeenCalledWith('/skald')
+    expect(screen.getByRole('button', { name: /skald/i })).toHaveProperty('disabled', true)
   })
 
   it('World Forge button is disabled', () => {
@@ -72,13 +69,18 @@ describe('AppHeader — navigation', () => {
   })
 })
 
-describe('AppHeader — Iron Sheet gating', () => {
+describe('AppHeader — session-gated tabs', () => {
   it('Iron Sheet button is disabled when no campaign is loaded', () => {
     render(<AppHeader />)
     expect(screen.getByRole('button', { name: /iron sheet/i })).toHaveProperty('disabled', true)
   })
 
-  it('Iron Sheet button is enabled when a campaign is loaded', () => {
+  it('Skald button is disabled when no campaign is loaded', () => {
+    render(<AppHeader />)
+    expect(screen.getByRole('button', { name: /skald/i })).toHaveProperty('disabled', true)
+  })
+
+  it('Iron Sheet and Skald buttons are enabled when a campaign is loaded', () => {
     useGameStore.setState({
       campaign: {
         id: 'c1',
@@ -92,9 +94,9 @@ describe('AppHeader — Iron Sheet gating', () => {
       },
     })
     render(<AppHeader />)
-    const ironSheetBtn = screen.getByRole('button', { name: /iron sheet/i })
-    expect(ironSheetBtn).toHaveProperty('disabled', false)
-    fireEvent.click(ironSheetBtn)
+    expect(screen.getByRole('button', { name: /iron sheet/i })).toHaveProperty('disabled', false)
+    expect(screen.getByRole('button', { name: /skald/i })).toHaveProperty('disabled', false)
+    fireEvent.click(screen.getByRole('button', { name: /iron sheet/i }))
     expect(mockNavigate).toHaveBeenCalledWith('/iron-sheet')
   })
 })

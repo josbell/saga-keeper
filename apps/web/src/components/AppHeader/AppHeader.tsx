@@ -36,7 +36,8 @@ export function AppHeader() {
       </button>
       <nav className={styles.nav} aria-label="Application">
         {NAV_ITEMS.map(({ label, path }) => {
-          const enabled = path === '/iron-sheet' ? campaign != null : path !== null
+          const sessionRequired = path === '/iron-sheet' || path === '/skald'
+          const enabled = sessionRequired ? campaign != null : path !== null
           return (
             <button
               key={label}

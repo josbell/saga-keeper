@@ -98,11 +98,8 @@ describe('OracleScreen — accessibility', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/great-hall')
   })
 
-  it('Skald nav button is enabled and navigates to /skald', () => {
+  it('Skald nav button is disabled when no campaign is loaded', () => {
     render(<OracleScreen />)
-    const skaldBtn = screen.getByRole('button', { name: /skald/i })
-    expect((skaldBtn as HTMLButtonElement).disabled).toBe(false)
-    fireEvent.click(skaldBtn)
-    expect(mockNavigate).toHaveBeenCalledWith('/skald')
+    expect(screen.getByRole('button', { name: /skald/i })).toHaveProperty('disabled', true)
   })
 })
