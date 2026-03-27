@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import type { CampaignSummary } from '@saga-keeper/domain'
 import type { IronswornCharacterData, IronswornVow } from '@saga-keeper/ruleset-ironsworn'
 import { useGameStore } from '@/store'
 import { useCampaignOps } from '@/providers/NarrativeDomainProvider'
+import { AppHeader } from '@/components/AppHeader/AppHeader'
 import { HeroSection } from './components/HeroSection/HeroSection'
 import { StatsBar } from './components/StatsBar/StatsBar'
 import { CampaignCard } from './components/CampaignCard/CampaignCard'
@@ -13,16 +14,8 @@ import { sessionEventsToActivityItems } from './utils/sessionEventsToActivityIte
 import { deriveReminderText } from './utils/deriveReminderText'
 import styles from './GreatHallScreen.module.css'
 
-const NAV_ITEMS = [
-  { label: 'Iron Sheet', path: '/iron-sheet' },
-  { label: 'Oracle', path: '/oracle' },
-  { label: 'Skald', path: '/skald' },
-  { label: 'World Forge', path: null },
-]
-
 export function GreatHallScreen() {
   const navigate = useNavigate()
-  const { pathname } = useLocation()
   const { listCampaigns, loadCampaign } = useCampaignOps()
 
   const [campaigns, setCampaigns] = useState<CampaignSummary[]>([])
@@ -68,31 +61,7 @@ export function GreatHallScreen() {
 
   return (
     <div className={styles.screen}>
-      <header className={styles.header} role="banner">
-        <button
-          type="button"
-          className={styles.logoBtn}
-          aria-label="Go to Great Hall"
-          aria-current={pathname === '/great-hall' ? 'page' : undefined}
-          onClick={() => navigate('/great-hall')}
-        >
-          <span className={styles.logoTitle}>Saga Keeper</span>
-        </button>
-        <nav className={styles.headerNav} aria-label="Application">
-          {NAV_ITEMS.map(({ label, path }) => (
-            <button
-              key={label}
-              type="button"
-              className={styles.navBtn}
-              aria-current={path === pathname ? 'page' : undefined}
-              disabled={path === null}
-              onClick={path ? () => navigate(path) : undefined}
-            >
-              {label}
-            </button>
-          ))}
-        </nav>
-      </header>
+      <AppHeader />
 
       <HeroSection />
 

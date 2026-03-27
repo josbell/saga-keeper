@@ -182,11 +182,10 @@ describe('GreatHallScreen — navigation', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/great-hall')
   })
 
-  it('Iron Sheet nav button calls navigate("/iron-sheet")', async () => {
+  it('Iron Sheet nav button is disabled when no campaign is loaded', async () => {
     render(<GreatHallScreen />)
     await waitFor(() => screen.getByRole('button', { name: /iron sheet/i }))
-    fireEvent.click(screen.getByRole('button', { name: /iron sheet/i }))
-    expect(mockNavigate).toHaveBeenCalledWith('/iron-sheet')
+    expect((screen.getByRole('button', { name: /iron sheet/i }) as HTMLButtonElement).disabled).toBe(true)
   })
 
   it('Oracle nav button calls navigate("/oracle")', async () => {

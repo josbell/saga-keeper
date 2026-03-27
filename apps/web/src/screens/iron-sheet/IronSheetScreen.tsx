@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
 import { ironswornPlugin, type IronswornCharacterData } from '@saga-keeper/ruleset-ironsworn'
 import { useGameStore } from '@/store'
+import { AppHeader } from '@/components/AppHeader/AppHeader'
 import { CharacterHeader } from './components/CharacterHeader/CharacterHeader'
 import { StatsGrid } from './components/StatsGrid/StatsGrid'
 import type { StatKey } from './components/StatsGrid/StatsGrid'
@@ -12,16 +12,7 @@ import { VowTracker } from './components/VowTracker/VowTracker'
 import { DiceRollerSection } from './components/DiceRollerSection/DiceRollerSection'
 import styles from './IronSheetScreen.module.css'
 
-const NAV_ITEMS = [
-  { label: 'Iron Sheet', path: '/iron-sheet' },
-  { label: 'Oracle', path: '/oracle' },
-  { label: 'Skald', path: '/skald' },
-  { label: 'World Forge', path: null },
-]
-
 export function IronSheetScreen() {
-  const navigate = useNavigate()
-  const { pathname } = useLocation()
   const character = useGameStore((state) => state.character)
   const patchCharacterData = useGameStore((state) => state.patchCharacterData)
   const [selectedStat, setSelectedStat] = useState<StatKey | null>(null)
@@ -33,7 +24,7 @@ export function IronSheetScreen() {
   if (!character) {
     return (
       <div className={styles.screen}>
-        {renderHeader(navigate, pathname)}
+        <AppHeader />
         <main className={styles.empty} role="main" tabIndex={-1}>
           <p>No character loaded</p>
         </main>
@@ -63,7 +54,7 @@ export function IronSheetScreen() {
 
   return (
     <div className={styles.screen}>
-      {renderHeader(navigate, pathname)}
+      <AppHeader />
       <div className={styles.body}>
         <aside className={styles.sidebar}>{/* Session nav placeholder */}</aside>
         <main className={styles.main} role="main" tabIndex={-1}>
@@ -104,34 +95,5 @@ export function IronSheetScreen() {
         </main>
       </div>
     </div>
-  )
-}
-
-function renderHeader(navigate: ReturnType<typeof useNavigate>, currentPath: string) {
-  return (
-    <header className={styles.header}>
-      <button
-        type="button"
-        className={styles.logoBtn}
-        aria-label="Go to Great Hall"
-        onClick={() => navigate('/great-hall')}
-      >
-        <span className={styles.logoTitle}>Saga Keeper</span>
-      </button>
-      <nav className={styles.headerNav} aria-label="Application">
-        {NAV_ITEMS.map(({ label, path }) => (
-          <button
-            key={label}
-            type="button"
-            className={styles.navBtn}
-            aria-current={path === currentPath ? 'page' : undefined}
-            disabled={path === null}
-            onClick={path ? () => navigate(path) : undefined}
-          >
-            {label}
-          </button>
-        ))}
-      </nav>
-    </header>
   )
 }
