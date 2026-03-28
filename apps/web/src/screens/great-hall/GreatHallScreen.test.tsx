@@ -182,11 +182,10 @@ describe('GreatHallScreen — navigation', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/great-hall')
   })
 
-  it('Iron Sheet nav button calls navigate("/iron-sheet")', async () => {
+  it('Iron Sheet nav button is disabled when no campaign is loaded', async () => {
     render(<GreatHallScreen />)
     await waitFor(() => screen.getByRole('button', { name: /iron sheet/i }))
-    fireEvent.click(screen.getByRole('button', { name: /iron sheet/i }))
-    expect(mockNavigate).toHaveBeenCalledWith('/iron-sheet')
+    expect((screen.getByRole('button', { name: /iron sheet/i }) as HTMLButtonElement).disabled).toBe(true)
   })
 
   it('Oracle nav button calls navigate("/oracle")', async () => {
@@ -196,17 +195,10 @@ describe('GreatHallScreen — navigation', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/oracle')
   })
 
-  it('Skald nav button calls navigate("/skald")', async () => {
+  it('Skald nav button is disabled when no campaign is loaded', async () => {
     render(<GreatHallScreen />)
     await waitFor(() => screen.getByRole('button', { name: /skald/i }))
-    const nav = screen.getByRole('navigation', { name: /application/i })
-    const skaldBtn = nav.querySelector('button[data-navkey="skald"]') as HTMLButtonElement | null
-    // Find by accessible name within nav
-    const btns = Array.from(nav.querySelectorAll('button')) as HTMLButtonElement[]
-    const skald = btns.find((b) => /skald/i.test(b.textContent ?? ''))
-    expect(skald).toBeTruthy()
-    fireEvent.click(skald!)
-    expect(mockNavigate).toHaveBeenCalledWith('/skald')
+    expect((screen.getByRole('button', { name: /skald/i }) as HTMLButtonElement).disabled).toBe(true)
   })
 
   it('World Forge nav button is disabled', async () => {

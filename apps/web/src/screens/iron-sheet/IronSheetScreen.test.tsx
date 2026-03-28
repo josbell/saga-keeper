@@ -194,11 +194,8 @@ describe('IronSheetScreen — accessibility', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/oracle')
   })
 
-  it('Skald nav button is enabled and navigates to /skald', () => {
+  it('Skald nav button is disabled when no campaign is loaded', () => {
     render(<IronSheetScreen />)
-    const skaldBtn = screen.getByRole('button', { name: /skald/i })
-    expect((skaldBtn as HTMLButtonElement).disabled).toBe(false)
-    fireEvent.click(skaldBtn)
-    expect(mockNavigate).toHaveBeenCalledWith('/skald')
+    expect(screen.getByRole('button', { name: /skald/i })).toHaveProperty('disabled', true)
   })
 })

@@ -40,7 +40,24 @@ describe('OracleScreen — layout', () => {
     expect(ironSheetBtn.getAttribute('aria-current')).toBeNull()
   })
 
-  it('clicking Iron Sheet nav calls navigate with /iron-sheet', () => {
+  it('Iron Sheet nav button is disabled when no campaign is loaded', () => {
+    render(<OracleScreen />)
+    expect(screen.getByRole('button', { name: /iron sheet/i })).toHaveProperty('disabled', true)
+  })
+
+  it('clicking Iron Sheet nav calls navigate with /iron-sheet when campaign is loaded', () => {
+    useGameStore.setState({
+      campaign: {
+        id: 'c1',
+        name: 'Test',
+        rulesetId: 'ironsworn-v1',
+        status: 'active' as const,
+        mode: 'solo' as const,
+        characterIds: [],
+        createdAt: '2026-01-01T00:00:00.000Z',
+        updatedAt: '2026-01-01T00:00:00.000Z',
+      },
+    })
     render(<OracleScreen />)
     fireEvent.click(screen.getByRole('button', { name: /iron sheet/i }))
     expect(mockNavigate).toHaveBeenCalledWith('/iron-sheet')
@@ -81,11 +98,8 @@ describe('OracleScreen — accessibility', () => {
     expect(mockNavigate).toHaveBeenCalledWith('/great-hall')
   })
 
-  it('Skald nav button is enabled and navigates to /skald', () => {
+  it('Skald nav button is disabled when no campaign is loaded', () => {
     render(<OracleScreen />)
-    const skaldBtn = screen.getByRole('button', { name: /skald/i })
-    expect((skaldBtn as HTMLButtonElement).disabled).toBe(false)
-    fireEvent.click(skaldBtn)
-    expect(mockNavigate).toHaveBeenCalledWith('/skald')
+    expect(screen.getByRole('button', { name: /skald/i })).toHaveProperty('disabled', true)
   })
 })
